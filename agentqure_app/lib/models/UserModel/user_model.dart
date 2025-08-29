@@ -79,6 +79,33 @@ class UserModel with ChangeNotifier {
 
   List<dynamic> get children => _children;
 
+  // UserModel() {
+  //   _dio.options.baseUrl =
+  //   'https://2sflw15kpf.execute-api.us-east-1.amazonaws.com/dev/app-user';
+  //   _dio.options.connectTimeout = const Duration(seconds: 30);
+  //   _dio.options.receiveTimeout = const Duration(seconds: 30);
+  //
+  //   _dio.interceptors.add(
+  //     InterceptorsWrapper(
+  //       onRequest: (options, handler) {
+  //         print('Sending request to ${options.uri}');
+  //         print('Request data: ${options.data}');
+  //         return handler.next(options);
+  //       },
+  //       onResponse: (response, handler) {
+  //         print('Received response: ${response.data}');
+  //         return handler.next(response);
+  //       },
+  //       onError: (DioException e, handler) {
+  //         print('Error occurred: ${e.message}');
+  //         print('Error response: ${e.response?.data}');
+  //         return handler.next(e);
+  //       },
+  //     ),
+  //   );
+  //
+  //   _initialize();
+  // }
   UserModel() {
     _dio.options.baseUrl =
     'https://2sflw15kpf.execute-api.us-east-1.amazonaws.com/dev/app-user';
@@ -103,17 +130,19 @@ class UserModel with ChangeNotifier {
         },
       ),
     );
-
-    _initialize();
   }
-
-  Future<void> _initialize() async {
+  // Future<void> _initialize() async {
+  //   await _loadNotifications();
+  //   await _loadWalletHistory();
+  //   await _loadNewNotificationCount();
+  //   await checkLoginStatus();
+  // }
+  Future<void> initialize() async {
     await _loadNotifications();
     await _loadWalletHistory();
     await _loadNewNotificationCount();
     await checkLoginStatus();
   }
-
   Future<void> _loadNotifications() async {
     final prefs = await SharedPreferences.getInstance();
     final String? notificationsJson = prefs.getString('notifications');

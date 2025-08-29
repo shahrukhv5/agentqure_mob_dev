@@ -209,6 +209,11 @@ class _BookingsScreenState extends State<BookingsScreen> {
     final processStatus =
         booking['processingStatus']?.toString().toLowerCase() ?? 'pending';
 
+    if (collectStatus == 'draft' &&
+        receiveStatus == 'draft' &&
+        processStatus == 'draft') {
+      return 'Initiated';
+    }
     if (collectStatus == 'cancelled' ||
         receiveStatus == 'cancelled' ||
         processStatus == 'cancelled') {
@@ -244,6 +249,8 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
   Color _getStatusColor(String status) {
     switch (status) {
+      case 'Initiated':
+        return const Color(0xFF9E9E9E);
       case 'In Collection':
         return const Color(0xFF0288D1);
       case 'In Processing':
@@ -259,6 +266,8 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
   Color _getStatusBgColor(String status) {
     switch (status) {
+      case 'Initiated':
+        return const Color(0xFF9E9E9E).withOpacity(0.15);
       case 'In Collection':
         return const Color(0xFF0288D1).withOpacity(0.15);
       case 'In Processing':
@@ -274,6 +283,8 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
   IconData _getStatusIcon(String status) {
     switch (status) {
+      case 'Initiated':
+        return Icons.edit_note;
       case 'In Collection':
         return Icons.move_to_inbox;
       case 'In Processing':
@@ -1851,6 +1862,7 @@ class StatusFilterBottomSheet extends StatelessWidget {
           SizedBox(height: 20.h),
           ...[
             'All Statuses',
+            'Initiated',
             'In Collection',
             'In Processing',
             'Completed',

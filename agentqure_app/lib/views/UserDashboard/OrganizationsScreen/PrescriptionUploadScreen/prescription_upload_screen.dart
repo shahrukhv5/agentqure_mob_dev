@@ -367,7 +367,7 @@ class _PrescriptionUploadScreenState extends State<PrescriptionUploadScreen> {
       ),
       body:
       _isLoadingOrganizations
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color:  Color(0xFF3661E2),))
           : _errorMessage != null
           ? Center(
         child: Column(

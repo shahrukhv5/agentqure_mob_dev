@@ -55,7 +55,6 @@ dependencies:
   font_awesome_flutter: ^10.10.0
   flutter_native_splash: ^2.4.6
   flutter_launcher_icons: ^0.14.4
-  uni_links3: ^0.5.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -75,7 +74,7 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/white_logo.png"
-  adaptive_icon_background: "#1770FF"
+  adaptive_icon_background: "#000000"
   adaptive_icon_foreground: "assets/white_logo.png"
 
 flutter:
@@ -99,17 +98,17 @@ flutter_native_splash:
   ios: true
   android_gravity: center
   ios_content_mode: scaleAspectFit
-  color: "#ffffff"
+  color: "#000000"
 
   image: assets/white_logo.png
   android_12:
     image: assets/white_logo.png
 
   # Splash screen background color.
-    color: "#ffffff"
+    color: "#000000"
 
   # App icon background color.
-    icon_background_color: "#1770FF"
+#    icon_background_color: "#1770FF"
 
 
   # For details regarding adding assets from package dependencies, see

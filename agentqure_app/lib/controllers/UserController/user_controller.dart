@@ -13,22 +13,22 @@ class UserController {
 
   UserController(this.userModel, this.context);
 
-  void initializeApp() {
-    userModel.checkLoginStatus().then((_) {
-      Future.delayed(Duration(seconds: 3), () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder:
-                (context) =>
-            userModel.isLoggedIn
-                ? HomeScreen()
-                : PermissionHandlerScreen(nextScreen: LoginScreen()),
-          ),
-        );
-      });
-    });
-  }
+  // void initializeApp() {
+  //   userModel.checkLoginStatus().then((_) {
+  //     Future.delayed(Duration(seconds: 3), () {
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder:
+  //               (context) =>
+  //           userModel.isLoggedIn
+  //               ? HomeScreen()
+  //               : PermissionHandlerScreen(nextScreen: LoginScreen()),
+  //         ),
+  //       );
+  //     });
+  //   });
+  // }
 
   Future<void> requestPermissions() async {
     Map<Permission, PermissionStatus> statuses =
