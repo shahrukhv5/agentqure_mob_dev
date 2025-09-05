@@ -1438,8 +1438,8 @@ class CartModel extends ChangeNotifier {
           services.map((service) {
             return {
               ...service,
-              'force_patient_id': service['user_id'],
-              'skip_patient_creation': true,
+              // 'force_patient_id': service['user_id'],
+              // 'skip_patient_creation': true,
             };
           }).toList(),
           'patient_linking': {
@@ -1459,7 +1459,8 @@ class CartModel extends ChangeNotifier {
       logger.d('Full request: ${jsonEncode(requestBody)}');
 
       final response = await _dio.post(
-        'https://77kxt00j0l.execute-api.us-east-1.amazonaws.com/dev/bookings/booking-requests/register-booking-requests',
+        // 'https://77kxt00j0l.execute-api.us-east-1.amazonaws.com/dev/bookings/booking-requests/register-booking-requests',
+        'https://2sflw15kpf.execute-api.us-east-1.amazonaws.com/dev/bookings/booking-requests/register-booking-requests',
         data: requestBody,
         cancelToken: _cancelToken,
         options: Options(
@@ -1584,7 +1585,7 @@ class CartModel extends ChangeNotifier {
     if (orgId == null) return;
     try {
       final verifyResponse = await _dio.get(
-        'https://77kxt00j0l.execute-api.us-east-1.amazonaws.com/dev/bookings/booking-requests/list-booking-requests',
+        'https://2sflw15kpf.execute-api.us-east-1.amazonaws.com/dev/bookings/booking-requests/list-booking-requests',
         queryParameters: {
           'org_id': orgId,
           'request_id': requestId,
@@ -1706,7 +1707,7 @@ class CartModel extends ChangeNotifier {
       }
 
       final response = await _dio.get(
-        'https://77kxt00j0l.execute-api.us-east-1.amazonaws.com/dev/bookings/booking-requests/list-booking-requests',
+        'https://2sflw15kpf.execute-api.us-east-1.amazonaws.com/dev/bookings/booking-requests/list-booking-requests',
         queryParameters: queryParameters,
       );
 
@@ -1726,7 +1727,7 @@ class CartModel extends ChangeNotifier {
   }) async {
     try {
       final response = await _dio.post(
-        'https://77kxt00j0l.execute-api.us-east-1.amazonaws.com/dev/bookings/booking-requests/booking-request-decisions',
+        'https://2sflw15kpf.execute-api.us-east-1.amazonaws.com/dev/bookings/booking-requests/booking-request-decisions',
         queryParameters: {
           'request_id': requestId,
           'request_status': requestStatus,

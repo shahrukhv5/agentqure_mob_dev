@@ -184,13 +184,78 @@ class _BookingsScreenState extends State<BookingsScreen> {
   //     );
   //   }
   // }
-  //
-  // bool _canCancelBooking(dynamic booking) {
-  //   final status = _formatBookingStatus(booking);
-  //   // Allow cancellation only for bookings that are not completed or already cancelled
-  //   return status != 'Completed' && status != 'Cancelled';
-  // }
+  Future<void> _cancelBooking(dynamic booking) async {
+    try {
+      final bookingId = booking['bookingId']?.toString();
+      if (bookingId == null || bookingId.isEmpty) {
+        _showSnackBar(
+          'Cannot cancel booking: Invalid booking ID',
+          Colors.red[600]!,
+        );
+        return;
+      }
 
+      final bool confirmCancel = await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text('Confirm Cancellation', style: GoogleFonts.poppins()),
+          content: Text(
+            'Are you sure you want to cancel this booking? This action cannot be undone.',
+            style: GoogleFonts.poppins(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text('No', style: GoogleFonts.poppins(color: Colors.black)),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(
+                'Yes, Cancel',
+                style: GoogleFonts.poppins(color: Colors.red),
+              ),
+            ),
+          ],
+        ),
+      );
+
+      if (confirmCancel != true) return;
+
+      _showSnackBar('Cancelling booking...', Colors.blue[600]!);
+
+      final dio = Dio();
+      final response = await dio.put(
+        'https://77kxt00j0l.execute-api.us-east-1.amazonaws.com/dev/bookings/booking-status',
+        data: {
+          'bookingId': bookingId,
+          'bookingStatus': 'Cancelled',
+          'notes': 'Cancelled by user',
+        },
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+
+      if (response.statusCode == 200) {
+        _showSnackBar('Booking cancelled successfully', Colors.green[600]!);
+
+        _loadOrders();
+      } else {
+        _showSnackBar('Failed to cancel booking', Colors.red[600]!);
+      }
+    } on DioException catch (e) {
+      print('Dio error cancelling booking: ${e.message}');
+      _showSnackBar(
+        'Error cancelling booking: ${e.message ?? 'Network error'}',
+        Colors.red[600]!,
+      );
+    } catch (e) {
+      print('Error cancelling booking: $e');
+      _showSnackBar(
+        'Error cancelling booking: ${e.toString()}',
+        Colors.red[600]!,
+      );
+    }
+  }
   void _onItemTapped(int index) {
     NavigationUtils.handleNavigation(
       context,
@@ -284,7 +349,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
   IconData _getStatusIcon(String status) {
     switch (status) {
       case 'Initiated':
-        return Icons.edit_note;
+        return Icons.access_time;
       case 'In Collection':
         return Icons.move_to_inbox;
       case 'In Processing':
@@ -648,6 +713,36 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   child: Row(
                     children: [
                       Expanded(
+                        // child: TextField(
+                        //   controller: _searchController,
+                        //   onChanged: (value) {
+                        //     setState(() {
+                        //       _searchQuery = value;
+                        //       _filterBookings();
+                        //     });
+                        //   },
+                        //   decoration: InputDecoration(
+                        //     hintText: 'Search by $_searchType...',
+                        //     hintStyle: GoogleFonts.poppins(
+                        //       color: Colors.grey[500],
+                        //       fontSize: 14.sp,
+                        //     ),
+                        //     prefixIcon: Icon(
+                        //       Icons.search_rounded,
+                        //       color: Colors.grey[500],
+                        //       size: 22.w,
+                        //     ),
+                        //     border: InputBorder.none,
+                        //     contentPadding: EdgeInsets.symmetric(
+                        //       horizontal: 16.w,
+                        //       vertical: 14.h,
+                        //     ),
+                        //   ),
+                        //   style: GoogleFonts.poppins(
+                        //     fontSize: 14.sp,
+                        //     color: Colors.grey[800],
+                        //   ),
+                        // ),
                         child: TextField(
                           controller: _searchController,
                           onChanged: (value) {
@@ -670,8 +765,10 @@ class _BookingsScreenState extends State<BookingsScreen> {
                             border: InputBorder.none,
                             contentPadding: EdgeInsets.symmetric(
                               horizontal: 16.w,
-                              vertical: 14.h,
+                              vertical: 20.h,
                             ),
+                            isDense: true,
+                            alignLabelWithHint: true,
                           ),
                           style: GoogleFonts.poppins(
                             fontSize: 14.sp,
@@ -1012,367 +1109,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   ).format(parsedDate)
                       : bookingDate;
 
-                  // return FadeInUp(
-                  //   duration: Duration(
-                  //     milliseconds: 300 + (index * 100),
-                  //   ),
-                  //   child: Container(
-                  //     decoration: BoxDecoration(
-                  //       borderRadius: BorderRadius.circular(16.r),
-                  //       color: Colors.white,
-                  //     ),
-                  //     child: Material(
-                  //       color: Colors.transparent,
-                  //       child: InkWell(
-                  //         borderRadius: BorderRadius.circular(16.r),
-                  //         onTap: () {
-                  //           // Add navigation to details screen
-                  //         },
-                  //         highlightColor: const Color(
-                  //           0xFF3661E2,
-                  //         ).withOpacity(0.05),
-                  //         splashColor: const Color(
-                  //           0xFF3661E2,
-                  //         ).withOpacity(0.1),
-                  //         child: Padding(
-                  //           padding: EdgeInsets.all(16.w),
-                  //           child: Column(
-                  //             crossAxisAlignment:
-                  //             CrossAxisAlignment.start,
-                  //             children: [
-                  //               Row(
-                  //                 mainAxisAlignment:
-                  //                 MainAxisAlignment.spaceBetween,
-                  //                 children: [
-                  //                   Flexible(
-                  //                     child: Text(
-                  //                       orgName,
-                  //                       style: GoogleFonts.poppins(
-                  //                         fontSize: 15.sp,
-                  //                         fontWeight: FontWeight.w600,
-                  //                         color: Colors.grey[700],
-                  //                       ),
-                  //                       maxLines: 1,
-                  //                       overflow: TextOverflow.ellipsis,
-                  //                     ),
-                  //                   ),
-                  //                   if (bookingStatus.isNotEmpty)
-                  //                     SizedBox(width: 8.w),
-                  //                   if (bookingStatus.isNotEmpty)
-                  //                     Container(
-                  //                       padding: EdgeInsets.symmetric(
-                  //                         horizontal: 12.w,
-                  //                         vertical: 6.h,
-                  //                       ),
-                  //                       decoration: BoxDecoration(
-                  //                         color: _getStatusBgColor(
-                  //                           bookingStatus,
-                  //                         ),
-                  //                         borderRadius:
-                  //                         BorderRadius.circular(
-                  //                           20.r,
-                  //                         ),
-                  //                       ),
-                  //                       child: Row(
-                  //                         mainAxisSize:
-                  //                         MainAxisSize.min,
-                  //                         children: [
-                  //                           Icon(
-                  //                             _getStatusIcon(
-                  //                               bookingStatus,
-                  //                             ),
-                  //                             size: 16.w,
-                  //                             color: _getStatusColor(
-                  //                               bookingStatus,
-                  //                             ),
-                  //                           ),
-                  //                           SizedBox(width: 6.w),
-                  //                           Text(
-                  //                             bookingStatus,
-                  //                             style:
-                  //                             GoogleFonts.poppins(
-                  //                               fontSize: 12.sp,
-                  //                               fontWeight:
-                  //                               FontWeight.w600,
-                  //                               color:
-                  //                               _getStatusColor(
-                  //                                 bookingStatus,
-                  //                               ),
-                  //                             ),
-                  //                           ),
-                  //                         ],
-                  //                       ),
-                  //                     ),
-                  //                 ],
-                  //               ),
-                  //               SizedBox(height: 12.h),
-                  //               Text(
-                  //                 testName,
-                  //                 style: GoogleFonts.poppins(
-                  //                   fontSize: 18.sp,
-                  //                   fontWeight: FontWeight.w700,
-                  //                   color: Colors.grey[900],
-                  //                   height: 1.3,
-                  //                 ),
-                  //               ),
-                  //               SizedBox(height: 16.h),
-                  //               Row(
-                  //                 mainAxisAlignment:
-                  //                 MainAxisAlignment.spaceBetween,
-                  //                 children: [
-                  //                   Row(
-                  //                     children: [
-                  //                       Icon(
-                  //                         Icons.person_outline,
-                  //                         size: 25.w,
-                  //                         color: Colors.black,
-                  //                       ),
-                  //                       SizedBox(width: 10.w),
-                  //                       Column(
-                  //                         crossAxisAlignment:
-                  //                         CrossAxisAlignment.start,
-                  //                         children: [
-                  //                           Text(
-                  //                             isChildBooking
-                  //                                 ? 'Patient'
-                  //                                 : 'Patient',
-                  //                             style:
-                  //                             GoogleFonts.poppins(
-                  //                               fontSize: 12.sp,
-                  //                               color:
-                  //                               Colors
-                  //                                   .grey[700],
-                  //                             ),
-                  //                           ),
-                  //                           Text(
-                  //                             userName.isNotEmpty
-                  //                                 ? userName
-                  //                                 : 'Unknown',
-                  //                             style:
-                  //                             GoogleFonts.poppins(
-                  //                               fontSize: 14.sp,
-                  //                               fontWeight:
-                  //                               FontWeight.w600,
-                  //                               color:
-                  //                               Colors
-                  //                                   .grey[800],
-                  //                             ),
-                  //                           ),
-                  //                         ],
-                  //                       ),
-                  //                     ],
-                  //                   ),
-                  //                   Row(
-                  //                     children: [
-                  //                       Icon(
-                  //                         Icons.calendar_today,
-                  //                         size: 20.w,
-                  //                         color: Colors.black,
-                  //                       ),
-                  //                       SizedBox(width: 10.w),
-                  //                       Column(
-                  //                         crossAxisAlignment:
-                  //                         CrossAxisAlignment.start,
-                  //                         children: [
-                  //                           Text(
-                  //                             'Date',
-                  //                             style:
-                  //                             GoogleFonts.poppins(
-                  //                               fontSize: 12.sp,
-                  //                               color:
-                  //                               Colors
-                  //                                   .grey[700],
-                  //                             ),
-                  //                           ),
-                  //                           Text(
-                  //                             formattedDate,
-                  //                             style:
-                  //                             GoogleFonts.poppins(
-                  //                               fontSize: 14.sp,
-                  //                               fontWeight:
-                  //                               FontWeight.w600,
-                  //                               color:
-                  //                               Colors
-                  //                                   .grey[800],
-                  //                             ),
-                  //                           ),
-                  //                         ],
-                  //                       ),
-                  //                     ],
-                  //                   ),
-                  //                 ],
-                  //               ),
-                  //               // if (_canCancelBooking(booking)) ...[
-                  //               //   SizedBox(height: 16.h),
-                  //               //   Divider(
-                  //               //     height: 1,
-                  //               //     thickness: 1,
-                  //               //     color: Colors.grey[300],
-                  //               //   ),
-                  //               //   SizedBox(height: 16.h),
-                  //               //   SizedBox(
-                  //               //     width: double.infinity,
-                  //               //     child: OutlinedButton(
-                  //               //       onPressed:
-                  //               //           () => _cancelBooking(booking),
-                  //               //       style: OutlinedButton.styleFrom(
-                  //               //         foregroundColor: Colors.red,
-                  //               //         side: BorderSide(
-                  //               //           color: Colors.red,
-                  //               //           width: 1.5,
-                  //               //         ),
-                  //               //         padding: EdgeInsets.symmetric(
-                  //               //           vertical: 12.h,
-                  //               //         ),
-                  //               //         shape: RoundedRectangleBorder(
-                  //               //           borderRadius:
-                  //               //               BorderRadius.circular(
-                  //               //                 12.r,
-                  //               //               ),
-                  //               //         ),
-                  //               //       ),
-                  //               //       child: Row(
-                  //               //         mainAxisAlignment:
-                  //               //             MainAxisAlignment.center,
-                  //               //         children: [
-                  //               //           Icon(
-                  //               //             Icons.cancel,
-                  //               //             size: 18.w,
-                  //               //           ),
-                  //               //           SizedBox(width: 8.w),
-                  //               //           Text(
-                  //               //             'Cancel Booking',
-                  //               //             style: GoogleFonts.poppins(
-                  //               //               fontSize: 14.sp,
-                  //               //               fontWeight:
-                  //               //                   FontWeight.w600,
-                  //               //             ),
-                  //               //           ),
-                  //               //         ],
-                  //               //       ),
-                  //               //     ),
-                  //               //   ),
-                  //               // ],
-                  //               if (bookingStatus == 'Completed' &&
-                  //                   booking['isReportSent'] ==
-                  //                       true) ...[
-                  //                 SizedBox(height: 16.h),
-                  //                 Divider(
-                  //                   height: 1,
-                  //                   thickness: 1,
-                  //                   color: Colors.grey[300],
-                  //                 ),
-                  //                 SizedBox(height: 16.h),
-                  //                 if (booking['reportUrl'] != null &&
-                  //                     booking['reportUrl'].isNotEmpty)
-                  //                   Row(
-                  //                     children: [
-                  //                       Expanded(
-                  //                         child: OutlinedButton.icon(
-                  //                           onPressed:
-                  //                               () => _viewReport(
-                  //                             booking,
-                  //                           ),
-                  //                           style: OutlinedButton.styleFrom(
-                  //                             foregroundColor:
-                  //                             const Color(
-                  //                               0xFF3661E2,
-                  //                             ),
-                  //                             side: BorderSide(
-                  //                               color: const Color(
-                  //                                 0xFF3661E2,
-                  //                               ),
-                  //                               width: 1.5,
-                  //                             ),
-                  //                             padding:
-                  //                             EdgeInsets.symmetric(
-                  //                               vertical: 12.h,
-                  //                             ),
-                  //                             shape: RoundedRectangleBorder(
-                  //                               borderRadius:
-                  //                               BorderRadius.circular(
-                  //                                 12.r,
-                  //                               ),
-                  //                             ),
-                  //                           ),
-                  //                           icon: Icon(
-                  //                             Icons.remove_red_eye,
-                  //                             size: 18.w,
-                  //                           ),
-                  //                           label: Text(
-                  //                             'View Report',
-                  //                             style:
-                  //                             GoogleFonts.poppins(
-                  //                               fontSize: 14.sp,
-                  //                               fontWeight:
-                  //                               FontWeight.w600,
-                  //                             ),
-                  //                           ),
-                  //                         ),
-                  //                       ),
-                  //                       SizedBox(width: 12.w),
-                  //                       Expanded(
-                  //                         child: ElevatedButton.icon(
-                  //                           onPressed:
-                  //                               () => _downloadReport(
-                  //                             booking,
-                  //                           ),
-                  //                           style: ElevatedButton.styleFrom(
-                  //                             backgroundColor:
-                  //                             const Color(
-                  //                               0xFF3661E2,
-                  //                             ),
-                  //                             foregroundColor:
-                  //                             Colors.white,
-                  //                             padding:
-                  //                             EdgeInsets.symmetric(
-                  //                               vertical: 12.h,
-                  //                             ),
-                  //                             shape: RoundedRectangleBorder(
-                  //                               borderRadius:
-                  //                               BorderRadius.circular(
-                  //                                 12.r,
-                  //                               ),
-                  //                             ),
-                  //                             elevation: 2,
-                  //                             shadowColor: const Color(
-                  //                               0xFF3661E2,
-                  //                             ).withOpacity(0.3),
-                  //                           ),
-                  //                           icon: Icon(
-                  //                             Icons.download,
-                  //                             size: 18.w,
-                  //                           ),
-                  //                           label: Text(
-                  //                             'Download',
-                  //                             style:
-                  //                             GoogleFonts.poppins(
-                  //                               fontSize: 14.sp,
-                  //                               fontWeight:
-                  //                               FontWeight.w600,
-                  //                             ),
-                  //                           ),
-                  //                         ),
-                  //                       ),
-                  //                     ],
-                  //                   ),
-                  //                 if (booking['reportUrl'] == null ||
-                  //                     booking['reportUrl'].isEmpty)
-                  //                   Text(
-                  //                     'Report not yet available',
-                  //                     style: GoogleFonts.poppins(
-                  //                       fontSize: 14.sp,
-                  //                       color: Colors.grey[600],
-                  //                     ),
-                  //                   ),
-                  //               ],
-                  //             ],
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ),
-                  //   ),
-                  // );
                   return FadeInUp(
                     duration: Duration(
                       milliseconds: 300 + (index * 100),
@@ -1591,7 +1327,51 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                     ],
                                   ),
                                 ],
-
+                                if (bookingStatus == 'Initiated') ...[
+                                  SizedBox(height: 16.h),
+                                  Divider(
+                                    height: 1,
+                                    thickness: 1,
+                                    color: Colors.grey[300],
+                                  ),
+                                  SizedBox(height: 16.h),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: OutlinedButton(
+                                      onPressed: () => _cancelBooking(booking),
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: Colors.red,
+                                        side: BorderSide(
+                                          color: Colors.red,
+                                          width: 1.5,
+                                        ),
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 12.h,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12.r),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.cancel,
+                                            size: 18.w,
+                                          ),
+                                          SizedBox(width: 8.w),
+                                          Text(
+                                            'Cancel Booking',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                                 // Rest of your existing code for cancel button and report buttons...
                                 // if (_canCancelBooking(booking)) ...[
                                 //   SizedBox(height: 16.h),
@@ -1920,3 +1700,365 @@ class StatusFilterBottomSheet extends StatelessWidget {
     );
   }
 }
+
+// return FadeInUp(
+//   duration: Duration(
+//     milliseconds: 300 + (index * 100),
+//   ),
+//   child: Container(
+//     decoration: BoxDecoration(
+//       borderRadius: BorderRadius.circular(16.r),
+//       color: Colors.white,
+//     ),
+//     child: Material(
+//       color: Colors.transparent,
+//       child: InkWell(
+//         borderRadius: BorderRadius.circular(16.r),
+//         onTap: () {
+//           // Add navigation to details screen
+//         },
+//         highlightColor: const Color(
+//           0xFF3661E2,
+//         ).withOpacity(0.05),
+//         splashColor: const Color(
+//           0xFF3661E2,
+//         ).withOpacity(0.1),
+//         child: Padding(
+//           padding: EdgeInsets.all(16.w),
+//           child: Column(
+//             crossAxisAlignment:
+//             CrossAxisAlignment.start,
+//             children: [
+//               Row(
+//                 mainAxisAlignment:
+//                 MainAxisAlignment.spaceBetween,
+//                 children: [
+//                   Flexible(
+//                     child: Text(
+//                       orgName,
+//                       style: GoogleFonts.poppins(
+//                         fontSize: 15.sp,
+//                         fontWeight: FontWeight.w600,
+//                         color: Colors.grey[700],
+//                       ),
+//                       maxLines: 1,
+//                       overflow: TextOverflow.ellipsis,
+//                     ),
+//                   ),
+//                   if (bookingStatus.isNotEmpty)
+//                     SizedBox(width: 8.w),
+//                   if (bookingStatus.isNotEmpty)
+//                     Container(
+//                       padding: EdgeInsets.symmetric(
+//                         horizontal: 12.w,
+//                         vertical: 6.h,
+//                       ),
+//                       decoration: BoxDecoration(
+//                         color: _getStatusBgColor(
+//                           bookingStatus,
+//                         ),
+//                         borderRadius:
+//                         BorderRadius.circular(
+//                           20.r,
+//                         ),
+//                       ),
+//                       child: Row(
+//                         mainAxisSize:
+//                         MainAxisSize.min,
+//                         children: [
+//                           Icon(
+//                             _getStatusIcon(
+//                               bookingStatus,
+//                             ),
+//                             size: 16.w,
+//                             color: _getStatusColor(
+//                               bookingStatus,
+//                             ),
+//                           ),
+//                           SizedBox(width: 6.w),
+//                           Text(
+//                             bookingStatus,
+//                             style:
+//                             GoogleFonts.poppins(
+//                               fontSize: 12.sp,
+//                               fontWeight:
+//                               FontWeight.w600,
+//                               color:
+//                               _getStatusColor(
+//                                 bookingStatus,
+//                               ),
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                 ],
+//               ),
+//               SizedBox(height: 12.h),
+//               Text(
+//                 testName,
+//                 style: GoogleFonts.poppins(
+//                   fontSize: 18.sp,
+//                   fontWeight: FontWeight.w700,
+//                   color: Colors.grey[900],
+//                   height: 1.3,
+//                 ),
+//               ),
+//               SizedBox(height: 16.h),
+//               Row(
+//                 mainAxisAlignment:
+//                 MainAxisAlignment.spaceBetween,
+//                 children: [
+//                   Row(
+//                     children: [
+//                       Icon(
+//                         Icons.person_outline,
+//                         size: 25.w,
+//                         color: Colors.black,
+//                       ),
+//                       SizedBox(width: 10.w),
+//                       Column(
+//                         crossAxisAlignment:
+//                         CrossAxisAlignment.start,
+//                         children: [
+//                           Text(
+//                             isChildBooking
+//                                 ? 'Patient'
+//                                 : 'Patient',
+//                             style:
+//                             GoogleFonts.poppins(
+//                               fontSize: 12.sp,
+//                               color:
+//                               Colors
+//                                   .grey[700],
+//                             ),
+//                           ),
+//                           Text(
+//                             userName.isNotEmpty
+//                                 ? userName
+//                                 : 'Unknown',
+//                             style:
+//                             GoogleFonts.poppins(
+//                               fontSize: 14.sp,
+//                               fontWeight:
+//                               FontWeight.w600,
+//                               color:
+//                               Colors
+//                                   .grey[800],
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ],
+//                   ),
+//                   Row(
+//                     children: [
+//                       Icon(
+//                         Icons.calendar_today,
+//                         size: 20.w,
+//                         color: Colors.black,
+//                       ),
+//                       SizedBox(width: 10.w),
+//                       Column(
+//                         crossAxisAlignment:
+//                         CrossAxisAlignment.start,
+//                         children: [
+//                           Text(
+//                             'Date',
+//                             style:
+//                             GoogleFonts.poppins(
+//                               fontSize: 12.sp,
+//                               color:
+//                               Colors
+//                                   .grey[700],
+//                             ),
+//                           ),
+//                           Text(
+//                             formattedDate,
+//                             style:
+//                             GoogleFonts.poppins(
+//                               fontSize: 14.sp,
+//                               fontWeight:
+//                               FontWeight.w600,
+//                               color:
+//                               Colors
+//                                   .grey[800],
+//                             ),
+//                           ),
+//                         ],
+//                       ),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//               // if (_canCancelBooking(booking)) ...[
+//               //   SizedBox(height: 16.h),
+//               //   Divider(
+//               //     height: 1,
+//               //     thickness: 1,
+//               //     color: Colors.grey[300],
+//               //   ),
+//               //   SizedBox(height: 16.h),
+//               //   SizedBox(
+//               //     width: double.infinity,
+//               //     child: OutlinedButton(
+//               //       onPressed:
+//               //           () => _cancelBooking(booking),
+//               //       style: OutlinedButton.styleFrom(
+//               //         foregroundColor: Colors.red,
+//               //         side: BorderSide(
+//               //           color: Colors.red,
+//               //           width: 1.5,
+//               //         ),
+//               //         padding: EdgeInsets.symmetric(
+//               //           vertical: 12.h,
+//               //         ),
+//               //         shape: RoundedRectangleBorder(
+//               //           borderRadius:
+//               //               BorderRadius.circular(
+//               //                 12.r,
+//               //               ),
+//               //         ),
+//               //       ),
+//               //       child: Row(
+//               //         mainAxisAlignment:
+//               //             MainAxisAlignment.center,
+//               //         children: [
+//               //           Icon(
+//               //             Icons.cancel,
+//               //             size: 18.w,
+//               //           ),
+//               //           SizedBox(width: 8.w),
+//               //           Text(
+//               //             'Cancel Booking',
+//               //             style: GoogleFonts.poppins(
+//               //               fontSize: 14.sp,
+//               //               fontWeight:
+//               //                   FontWeight.w600,
+//               //             ),
+//               //           ),
+//               //         ],
+//               //       ),
+//               //     ),
+//               //   ),
+//               // ],
+//               if (bookingStatus == 'Completed' &&
+//                   booking['isReportSent'] ==
+//                       true) ...[
+//                 SizedBox(height: 16.h),
+//                 Divider(
+//                   height: 1,
+//                   thickness: 1,
+//                   color: Colors.grey[300],
+//                 ),
+//                 SizedBox(height: 16.h),
+//                 if (booking['reportUrl'] != null &&
+//                     booking['reportUrl'].isNotEmpty)
+//                   Row(
+//                     children: [
+//                       Expanded(
+//                         child: OutlinedButton.icon(
+//                           onPressed:
+//                               () => _viewReport(
+//                             booking,
+//                           ),
+//                           style: OutlinedButton.styleFrom(
+//                             foregroundColor:
+//                             const Color(
+//                               0xFF3661E2,
+//                             ),
+//                             side: BorderSide(
+//                               color: const Color(
+//                                 0xFF3661E2,
+//                               ),
+//                               width: 1.5,
+//                             ),
+//                             padding:
+//                             EdgeInsets.symmetric(
+//                               vertical: 12.h,
+//                             ),
+//                             shape: RoundedRectangleBorder(
+//                               borderRadius:
+//                               BorderRadius.circular(
+//                                 12.r,
+//                               ),
+//                             ),
+//                           ),
+//                           icon: Icon(
+//                             Icons.remove_red_eye,
+//                             size: 18.w,
+//                           ),
+//                           label: Text(
+//                             'View Report',
+//                             style:
+//                             GoogleFonts.poppins(
+//                               fontSize: 14.sp,
+//                               fontWeight:
+//                               FontWeight.w600,
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                       SizedBox(width: 12.w),
+//                       Expanded(
+//                         child: ElevatedButton.icon(
+//                           onPressed:
+//                               () => _downloadReport(
+//                             booking,
+//                           ),
+//                           style: ElevatedButton.styleFrom(
+//                             backgroundColor:
+//                             const Color(
+//                               0xFF3661E2,
+//                             ),
+//                             foregroundColor:
+//                             Colors.white,
+//                             padding:
+//                             EdgeInsets.symmetric(
+//                               vertical: 12.h,
+//                             ),
+//                             shape: RoundedRectangleBorder(
+//                               borderRadius:
+//                               BorderRadius.circular(
+//                                 12.r,
+//                               ),
+//                             ),
+//                             elevation: 2,
+//                             shadowColor: const Color(
+//                               0xFF3661E2,
+//                             ).withOpacity(0.3),
+//                           ),
+//                           icon: Icon(
+//                             Icons.download,
+//                             size: 18.w,
+//                           ),
+//                           label: Text(
+//                             'Download',
+//                             style:
+//                             GoogleFonts.poppins(
+//                               fontSize: 14.sp,
+//                               fontWeight:
+//                               FontWeight.w600,
+//                             ),
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 if (booking['reportUrl'] == null ||
+//                     booking['reportUrl'].isEmpty)
+//                   Text(
+//                     'Report not yet available',
+//                     style: GoogleFonts.poppins(
+//                       fontSize: 14.sp,
+//                       color: Colors.grey[600],
+//                     ),
+//                   ),
+//               ],
+//             ],
+//           ),
+//         ),
+//       ),
+//     ),
+//   ),
+// );

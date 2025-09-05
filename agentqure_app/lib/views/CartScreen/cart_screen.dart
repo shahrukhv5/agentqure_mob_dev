@@ -6748,6 +6748,225 @@ class CartScreen extends StatelessWidget {
     );
   }
 
+  // void _showAddressSelectionBottomSheet(BuildContext context, CartModel cart) {
+  //   final primaryUser = userModel.currentUser;
+  //   final currentAddress = primaryUser?['address'] ?? '';
+  //   final selectedAddress = cart.selectedAddress ?? currentAddress;
+  //
+  //   final addressController = TextEditingController(text: selectedAddress);
+  //   final _formKey = GlobalKey<FormState>();
+  //
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     backgroundColor: Colors.transparent,
+  //     builder: (context) {
+  //       return Container(
+  //         decoration: BoxDecoration(
+  //           color: Colors.white,
+  //           borderRadius: BorderRadius.only(
+  //             topLeft: Radius.circular(24.r),
+  //             topRight: Radius.circular(24.r),
+  //           ),
+  //         ),
+  //         child: Padding(
+  //           padding: EdgeInsets.only(
+  //             bottom: MediaQuery.of(context).viewInsets.bottom,
+  //           ),
+  //           child: Column(
+  //             mainAxisSize: MainAxisSize.min,
+  //             crossAxisAlignment: CrossAxisAlignment.stretch,
+  //             children: [
+  //               // Header
+  //               Container(
+  //                 padding: EdgeInsets.all(20.w),
+  //                 decoration: BoxDecoration(
+  //                   color: Color(0xFF3661E2),
+  //                   borderRadius: BorderRadius.only(
+  //                     topLeft: Radius.circular(24.r),
+  //                     topRight: Radius.circular(24.r),
+  //                   ),
+  //                 ),
+  //                 child: Row(
+  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                   children: [
+  //                     Text(
+  //                       "Select Address",
+  //                       style: GoogleFonts.poppins(
+  //                         fontSize: 18.sp,
+  //                         fontWeight: FontWeight.w600,
+  //                         color: Colors.white,
+  //                       ),
+  //                     ),
+  //                     IconButton(
+  //                       icon: Icon(
+  //                         Icons.close,
+  //                         size: 24.w,
+  //                         color: Colors.white,
+  //                       ),
+  //                       onPressed: () => Navigator.pop(context),
+  //                       padding: EdgeInsets.zero,
+  //                       constraints: BoxConstraints(),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //
+  //               // Content
+  //               Padding(
+  //                 padding: EdgeInsets.all(20.w),
+  //                 child: Form(
+  //                   key: _formKey,
+  //                   child: Column(
+  //                     crossAxisAlignment: CrossAxisAlignment.start,
+  //                     children: [
+  //                       Text(
+  //                         "Delivery Address",
+  //                         style: GoogleFonts.poppins(
+  //                           fontSize: 16.sp,
+  //                           fontWeight: FontWeight.w600,
+  //                           color: Colors.black87,
+  //                         ),
+  //                       ),
+  //                       SizedBox(height: 12.h),
+  //                       Text(
+  //                         "Enter the address where you'd like your samples to be collected",
+  //                         style: GoogleFonts.poppins(
+  //                           fontSize: 12.sp,
+  //                           color: Colors.grey[600],
+  //                         ),
+  //                       ),
+  //                       SizedBox(height: 20.h),
+  //
+  //                       // Address Input Field
+  //                       Container(
+  //                         decoration: BoxDecoration(
+  //                           borderRadius: BorderRadius.circular(12.r),
+  //                           border: Border.all(
+  //                             color: Colors.grey[300]!,
+  //                             width: 1,
+  //                           ),
+  //                         ),
+  //                         child: TextFormField(
+  //                           controller: addressController,
+  //                           maxLines: 4,
+  //                           minLines: 3,
+  //                           decoration: InputDecoration(
+  //                             hintText: "Enter your complete address...",
+  //                             hintStyle: GoogleFonts.poppins(
+  //                               fontSize: 14.sp,
+  //                               color: Colors.grey[500],
+  //                             ),
+  //                             border: InputBorder.none,
+  //                             contentPadding: EdgeInsets.all(16.w),
+  //                             prefixIcon: Icon(
+  //                               Icons.location_on,
+  //                               color: Color(0xFF3661E2),
+  //                               size: 25.w,
+  //                             ),
+  //                           ),
+  //                           style: GoogleFonts.poppins(
+  //                             fontSize: 14.sp,
+  //                             color: Colors.black87,
+  //                           ),
+  //                           validator: (value) {
+  //                             if (value == null || value.trim().isEmpty) {
+  //                               return 'Please enter your address';
+  //                             }
+  //                             if (value.trim().length < 4) {
+  //                               return 'Please enter a complete address';
+  //                             }
+  //                             return null;
+  //                           },
+  //                         ),
+  //                       ),
+  //                       SizedBox(height: 24.h),
+  //
+  //                       // Action Buttons
+  //                       Row(
+  //                         children: [
+  //                           Expanded(
+  //                             child: OutlinedButton(
+  //                               onPressed: () => Navigator.pop(context),
+  //                               style: OutlinedButton.styleFrom(
+  //                                 padding: EdgeInsets.symmetric(vertical: 14.h),
+  //                                 side: BorderSide(
+  //                                   color: Colors.grey[400]!,
+  //                                   width: 1.5,
+  //                                 ),
+  //                                 shape: RoundedRectangleBorder(
+  //                                   borderRadius: BorderRadius.circular(12.r),
+  //                                 ),
+  //                                 backgroundColor: Colors.grey[50],
+  //                               ),
+  //                               child: Text(
+  //                                 "Cancel",
+  //                                 style: GoogleFonts.poppins(
+  //                                   fontSize: 14.sp,
+  //                                   fontWeight: FontWeight.w500,
+  //                                   color: Colors.grey[700],
+  //                                 ),
+  //                               ),
+  //                             ),
+  //                           ),
+  //                           SizedBox(width: 16.w),
+  //                           Expanded(
+  //                             child: ElevatedButton(
+  //                               onPressed: () {
+  //                                 if (_formKey.currentState?.validate() ??
+  //                                     false) {
+  //                                   cart.setSelectedAddress(
+  //                                     addressController.text.trim(),
+  //                                   );
+  //                                   Navigator.pop(context);
+  //                                   ScaffoldMessenger.of(context).showSnackBar(
+  //                                     SnackBar(
+  //                                       content: Text(
+  //                                         "Address saved successfully",
+  //                                         style: GoogleFonts.poppins(),
+  //                                       ),
+  //                                       backgroundColor: Color(0xFF3661E2),
+  //                                       behavior: SnackBarBehavior.floating,
+  //                                       shape: RoundedRectangleBorder(
+  //                                         borderRadius: BorderRadius.circular(
+  //                                           10.r,
+  //                                         ),
+  //                                       ),
+  //                                     ),
+  //                                   );
+  //                                 }
+  //                               },
+  //                               style: ElevatedButton.styleFrom(
+  //                                 backgroundColor: Color(0xFF3661E2),
+  //                                 padding: EdgeInsets.symmetric(vertical: 14.h),
+  //                                 shape: RoundedRectangleBorder(
+  //                                   borderRadius: BorderRadius.circular(12.r),
+  //                                 ),
+  //                                 elevation: 2,
+  //                               ),
+  //                               child: Text(
+  //                                 "Save Address",
+  //                                 style: GoogleFonts.poppins(
+  //                                   fontSize: 14.sp,
+  //                                   fontWeight: FontWeight.w600,
+  //                                   color: Colors.white,
+  //                                 ),
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ],
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
   void _showAddressSelectionBottomSheet(BuildContext context, CartModel cart) {
     final primaryUser = userModel.currentUser;
     final currentAddress = primaryUser?['address'] ?? '';
@@ -6755,6 +6974,301 @@ class CartScreen extends StatelessWidget {
 
     final addressController = TextEditingController(text: selectedAddress);
     final _formKey = GlobalKey<FormState>();
+    final String googleApiKey = 'AIzaSyC1GFWUpVW3J66nMDFhOHm09yRGFESAlVM';
+    final Dio _dio = Dio();
+
+    // Function to fetch autocomplete predictions using Dio
+    Future<List<Map<String, dynamic>>> _fetchPlacePredictions(String input, CancelToken cancelToken) async {
+      try {
+        final response = await _dio.get(
+          'https://maps.googleapis.com/maps/api/place/autocomplete/json',
+          queryParameters: {
+            'input': input,
+            'key': googleApiKey,
+            'components': 'country:in',
+            'language': 'en',
+          },
+          options: Options(
+            receiveTimeout: const Duration(seconds: 10),
+            sendTimeout: const Duration(seconds: 10),
+          ),
+          cancelToken: cancelToken,
+        );
+
+        if (response.statusCode == 200) {
+          final data = response.data;
+          if (data['status'] == 'OK') {
+            final predictions = data['predictions'] as List;
+            return predictions.map<Map<String, dynamic>>((prediction) {
+              return {
+                'description': prediction['description'],
+                'place_id': prediction['place_id'],
+              };
+            }).toList();
+          }
+        }
+        return [];
+      } on DioException catch (e) {
+        if (e.type != DioExceptionType.cancel) {
+          print('DioError fetching predictions: ${e.message}');
+        }
+        return [];
+      } catch (e) {
+        print('Error fetching predictions: $e');
+        return [];
+      }
+    }
+
+    // Function to get place details using Dio
+    Future<String> _getPlaceDetails(String placeId, CancelToken cancelToken) async {
+      try {
+        final response = await _dio.get(
+          'https://maps.googleapis.com/maps/api/place/details/json',
+          queryParameters: {
+            'place_id': placeId,
+            'key': googleApiKey,
+            'language': 'en',
+          },
+          options: Options(
+            receiveTimeout: const Duration(seconds: 10),
+            sendTimeout: const Duration(seconds: 10),
+          ),
+          cancelToken: cancelToken,
+        );
+
+        if (response.statusCode == 200) {
+          final data = response.data;
+          if (data['status'] == 'OK') {
+            return data['result']['formatted_address'] ?? '';
+          }
+        }
+        return '';
+      } on DioException catch (e) {
+        if (e.type != DioExceptionType.cancel) {
+          print('DioError fetching place details: ${e.message}');
+        }
+        return '';
+      } catch (e) {
+        print('Error fetching place details: $e');
+        return '';
+      }
+    }
+
+    // Function to show autocomplete dialog
+    Future<void> _showAutocompleteDialog(BuildContext context) async {
+      final searchController = TextEditingController();
+      List<Map<String, dynamic>> predictions = [];
+      bool isLoading = false;
+      bool isDialogOpen = true;
+      final CancelToken cancelToken = CancelToken();
+      bool isTokenCancelled = false; // Track if token is already cancelled
+
+      await showDialog(
+        context: context,
+        builder: (dialogContext) {
+          return StatefulBuilder(
+            builder: (stateContext, setState) {
+              // Helper function to safely close dialog
+              void safePopDialog() {
+                if (isDialogOpen && Navigator.of(stateContext).canPop()) {
+                  isDialogOpen = false;
+                  if (!isTokenCancelled) {
+                    isTokenCancelled = true;
+                    cancelToken.cancel('Dialog closed by user');
+                  }
+                  Navigator.of(stateContext).pop();
+                }
+              }
+
+              // Function to safely cancel token
+              void safeCancelToken([String reason = 'Dialog closed']) {
+                if (!isTokenCancelled) {
+                  isTokenCancelled = true;
+                  cancelToken.cancel(reason);
+                }
+              }
+
+              return Dialog(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                backgroundColor: Colors.grey[200],
+                child: Container(
+                  padding: EdgeInsets.all(16.w),
+                  width: MediaQuery.of(stateContext).size.width * 0.9,
+                  height: MediaQuery.of(stateContext).size.height * 0.7,
+                  child: Column(
+                    children: [
+                      // Search Header
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.arrow_back, size: 24.w, color: Color(0xFF3661E2)),
+                            onPressed: safePopDialog,
+                          ),
+                          SizedBox(width: 8.w),
+                          Expanded(
+                            child: Text(
+                              "Search Address",
+                              style: GoogleFonts.poppins(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF3661E2),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16.h),
+
+                      // Search Input
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: TextField(
+                          controller: searchController,
+                          decoration: InputDecoration(
+                            hintText: "Search for address...",
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.all(16.w),
+                            prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
+                            suffixIcon: searchController.text.isNotEmpty
+                                ? IconButton(
+                              icon: Icon(Icons.clear, size: 18.w),
+                              onPressed: () {
+                                searchController.clear();
+                                setState(() {
+                                  predictions.clear();
+                                  isLoading = false;
+                                });
+                              },
+                            )
+                                : null,
+                          ),
+                          onChanged: (value) async {
+                            if (value.length > 2) {
+                              setState(() => isLoading = true);
+                              final results = await _fetchPlacePredictions(value, cancelToken);
+                              // Only update state if dialog is still open
+                              if (isDialogOpen) {
+                                setState(() {
+                                  predictions = results;
+                                  isLoading = false;
+                                });
+                              }
+                            } else {
+                              setState(() {
+                                predictions.clear();
+                                isLoading = false;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+
+                      // Loading Indicator
+                      if (isLoading)
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.h),
+                          child: Column(
+                            children: [
+                              CircularProgressIndicator(
+                                color: Color(0xFF3661E2),
+                                strokeWidth: 2,
+                              ),
+                              SizedBox(height: 8.h),
+                              Text(
+                                "Searching...",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 12.sp,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                      // Predictions List
+                      Expanded(
+                        child: isLoading
+                            ? SizedBox()
+                            : predictions.isEmpty
+                            ? Center(
+                          child: Text(
+                            searchController.text.isEmpty
+                                ? "Start typing to search for addresses"
+                                : "No results found",
+                            style: GoogleFonts.poppins(
+                              fontSize: 14.sp,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        )
+                            : ListView.builder(
+                          itemCount: predictions.length,
+                          itemBuilder: (context, index) {
+                            final prediction = predictions[index];
+                            return ListTile(
+                              leading: Icon(
+                                Icons.location_on,
+                                color: Color(0xFF3661E2),
+                                size: 24.w,
+                              ),
+                              title: Text(
+                                prediction['description'],
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14.sp,
+                                  color: Colors.black87,
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              onTap: () async {
+                                setState(() => isLoading = true);
+                                final address = await _getPlaceDetails(prediction['place_id'], cancelToken);
+
+                                // Check if the dialog is still open before updating
+                                if (isDialogOpen && Navigator.of(stateContext).canPop()) {
+                                  setState(() => isLoading = false);
+
+                                  if (address.isNotEmpty) {
+                                    addressController.text = address;
+                                  } else {
+                                    addressController.text = prediction['description'];
+                                  }
+                                  safePopDialog();
+                                }
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+      ).then((_) {
+        // This runs when the dialog is closed (by any means)
+        isDialogOpen = false;
+        if (!isTokenCancelled) {
+          isTokenCancelled = true;
+          cancelToken.cancel('Dialog closed externally');
+        }
+      }).catchError((error) {
+        // Handle any errors that might occur during dialog closing
+        isDialogOpen = false;
+        if (!isTokenCancelled) {
+          isTokenCancelled = true;
+          cancelToken.cancel('Dialog closed with error: $error');
+        }
+      });
+    }
 
     showModalBottomSheet(
       context: context,
@@ -6838,7 +7352,75 @@ class CartScreen extends StatelessWidget {
                         ),
                         SizedBox(height: 20.h),
 
-                        // Address Input Field
+                        // Address Input Field with Google Places Search
+                        InkWell(
+                          onTap: () => _showAutocompleteDialog(context),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(
+                                color: Colors.grey[300]!,
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: addressController,
+                                    maxLines: 3,
+                                    minLines: 3,
+                                    enabled: false,
+                                    decoration: InputDecoration(
+                                      hintText: "Tap to search for address...",
+                                      hintStyle: GoogleFonts.poppins(
+                                        fontSize: 14.sp,
+                                        color: Colors.grey[500],
+                                      ),
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.all(16.w),
+                                      prefixIcon: Icon(
+                                        Icons.location_on,
+                                        color: Color(0xFF3661E2),
+                                        size: 25.w,
+                                      ),
+                                    ),
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14.sp,
+                                      color: Colors.black87,
+                                    ),
+                                    validator: (value) {
+                                      if (value == null || value.trim().isEmpty) {
+                                        return 'Please select an address';
+                                      }
+                                      if (value.trim().length < 4) {
+                                        return 'Please select a complete address';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(right: 12.w),
+                                  child: Icon(
+                                    Icons.search,
+                                    color: Color(0xFF3661E2),
+                                    size: 24.w,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12.h),
+                        Text(
+                          "Or enter manually:",
+                          style: GoogleFonts.poppins(
+                            fontSize: 12.sp,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                        SizedBox(height: 12.h),
                         Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(12.r),
@@ -6848,36 +7430,24 @@ class CartScreen extends StatelessWidget {
                             ),
                           ),
                           child: TextFormField(
-                            controller: addressController,
                             maxLines: 4,
                             minLines: 3,
                             decoration: InputDecoration(
-                              hintText: "Enter your complete address...",
+                              hintText: "Enter address manually...",
                               hintStyle: GoogleFonts.poppins(
                                 fontSize: 14.sp,
                                 color: Colors.grey[500],
                               ),
                               border: InputBorder.none,
                               contentPadding: EdgeInsets.all(16.w),
-                              prefixIcon: Icon(
-                                Icons.location_on,
-                                color: Color(0xFF3661E2),
-                                size: 25.w,
-                              ),
                             ),
+                            onChanged: (value) {
+                              addressController.text = value;
+                            },
                             style: GoogleFonts.poppins(
                               fontSize: 14.sp,
                               color: Colors.black87,
                             ),
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Please enter your address';
-                              }
-                              if (value.trim().length < 4) {
-                                return 'Please enter a complete address';
-                              }
-                              return null;
-                            },
                           ),
                         ),
                         SizedBox(height: 24.h),
@@ -6913,8 +7483,7 @@ class CartScreen extends StatelessWidget {
                             Expanded(
                               child: ElevatedButton(
                                 onPressed: () {
-                                  if (_formKey.currentState?.validate() ??
-                                      false) {
+                                  if (_formKey.currentState?.validate() ?? false) {
                                     cart.setSelectedAddress(
                                       addressController.text.trim(),
                                     );
@@ -6994,561 +7563,565 @@ class CartScreen extends StatelessWidget {
                   topRight: Radius.circular(24.r),
                 ),
               ),
-              child: Padding(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).viewInsets.bottom,
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Header
-                    Container(
-                      padding: EdgeInsets.all(20.w),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF3661E2),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(24.r),
-                          topRight: Radius.circular(24.r),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Select Time Slot",
-                            style: GoogleFonts.poppins(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.close,
-                              size: 24.w,
-                              color: Colors.white,
-                            ),
-                            onPressed: () => Navigator.pop(context),
-                            padding: EdgeInsets.zero,
-                            constraints: BoxConstraints(),
-                          ),
-                        ],
-                      ),
+              child: Consumer<CartModel>(  // Add this Consumer here
+                builder: (context, cart, child) {
+                  return Padding(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
                     ),
-
-                    // Content
-                    Padding(
-                      padding: EdgeInsets.all(20.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Date Picker Section
-                          Container(
-                            padding: EdgeInsets.all(16.w),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(16.r),
-                              border: Border.all(
-                                color: Colors.grey[200]!,
-                                width: 1.5,
-                              ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Header
+                        Container(
+                          padding: EdgeInsets.all(20.w),
+                          decoration: BoxDecoration(
+                            color: Color(0xFF3661E2),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(24.r),
+                              topRight: Radius.circular(24.r),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.calendar_today,
-                                      size: 18.w,
-                                      color: Color(0xFF3661E2),
-                                    ),
-                                    SizedBox(width: 8.w),
-                                    Text(
-                                      "Select Date",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                  ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Select Time Slot",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
                                 ),
-                                SizedBox(height: 12.h),
-                                InkWell(
-                                  onTap: () async {
-                                    final selectedDate = await showDatePicker(
-                                      context: context,
-                                      initialDate: DateTime.now(),
-                                      firstDate: DateTime.now(),
-                                      lastDate: DateTime.now().add(Duration(days: 30)),
-                                      builder: (context, child) {
-                                        return Theme(
-                                          data: Theme.of(context).copyWith(
-                                            colorScheme: ColorScheme.light(
-                                              primary: Color(0xFF3661E2),
-                                              onPrimary: Colors.white,
-                                              surface: Colors.white,
-                                              onSurface: Colors.black,
-                                            ),
-                                            dialogBackgroundColor: Colors.white,
-                                          ),
-                                          child: child!,
-                                        );
-                                      },
-                                    );
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.close,
+                                  size: 24.w,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () => Navigator.pop(context),
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
+                              ),
+                            ],
+                          ),
+                        ),
 
-                                    if (selectedDate != null) {
-                                      final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
-                                      cart.setSelectedBookingDate(formattedDate);
-
-                                      // Refresh time slots with new date
-                                      cart.fetchTimeSlots();
-                                      setState(() {});
-                                    }
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(16.w),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border: Border.all(
-                                        color: Color(
-                                          0xFF3661E2,
-                                        ).withOpacity(0.3),
-                                        width: 1.5,
-                                      ),
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withOpacity(0.1),
-                                          blurRadius: 6,
-                                          offset: Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "Selected Date",
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 12.sp,
-                                                  color: Colors.grey[600],
-                                                ),
-                                              ),
-                                              SizedBox(height: 4.h),
-                                              Text(
-                                                _formatDisplayDate(
-                                                  cart.selectedBookingDate,
-                                                ),
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 16.sp,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: Color(0xFF3661E2),
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.all(8.w),
-                                          decoration: BoxDecoration(
-                                            color: Color(
-                                              0xFF3661E2,
-                                            ).withOpacity(0.1),
-                                            shape: BoxShape.circle,
-                                          ),
-                                          child: Icon(
-                                            Icons.edit,
-                                            size: 18.w,
-                                            color: Color(0xFF3661E2),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                        // Content
+                        Padding(
+                          padding: EdgeInsets.all(20.w),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Date Picker Section
+                              Container(
+                                padding: EdgeInsets.all(16.w),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[50],
+                                  borderRadius: BorderRadius.circular(16.r),
+                                  border: Border.all(
+                                    color: Colors.grey[200]!,
+                                    width: 1.5,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 20.h),
-
-                          // Time Slots Section
-                          Container(
-                            padding: EdgeInsets.all(16.w),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[50],
-                              borderRadius: BorderRadius.circular(16.r),
-                              border: Border.all(
-                                color: Colors.grey[200]!,
-                                width: 1.5,
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Icon(
-                                      Icons.access_time,
-                                      size: 18.w,
-                                      color: Color(0xFF3661E2),
-                                    ),
-                                    SizedBox(width: 8.w),
-                                    Text(
-                                      "Available Time Slots",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                    SizedBox(width: 8.w),
-                                    if (cart.isLoadingTimeSlots)
-                                      SizedBox(
-                                        width: 16.w,
-                                        height: 16.w,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Color(0xFF3661E2),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                                SizedBox(height: 12.h),
-
-                                if (cart.isLoadingTimeSlots)
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 40.h,
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        CircularProgressIndicator(
-                                          color: Color(0xFF3661E2),
-                                          strokeWidth: 3,
-                                        ),
-                                        SizedBox(height: 16.h),
-                                        Text(
-                                          "Loading available slots...",
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 14.sp,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                else if (cart.timeSlots.isEmpty)
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 40.h,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      border: Border.all(
-                                        color: Colors.grey[200]!,
-                                      ),
-                                    ),
-                                    child: Column(
+                                    Row(
                                       children: [
                                         Icon(
-                                          Icons.schedule,
-                                          size: 48.w,
-                                          color: Colors.grey[400],
+                                          Icons.calendar_today,
+                                          size: 18.w,
+                                          color: Color(0xFF3661E2),
                                         ),
-                                        SizedBox(height: 12.h),
+                                        SizedBox(width: 8.w),
                                         Text(
-                                          "No time slots available",
+                                          "Select Date",
                                           style: GoogleFonts.poppins(
                                             fontSize: 16.sp,
-                                            fontWeight: FontWeight.w500,
-                                            color: Colors.grey[600],
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black87,
                                           ),
-                                        ),
-                                        SizedBox(height: 8.h),
-                                        Text(
-                                          "Please try another date",
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 14.sp,
-                                            color: Colors.grey[500],
-                                          ),
-                                          textAlign: TextAlign.center,
                                         ),
                                       ],
                                     ),
-                                  )
-                                else
-                                  Container(
-                                    constraints: BoxConstraints(maxHeight: 200.h),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(12.r),
-                                      border: Border.all(
-                                        color: Colors.grey[200]!,
-                                        width: 1.5,
-                                      ),
-                                    ),
-                                    child: ListView.builder(
-                                      shrinkWrap: true,
-                                      physics: BouncingScrollPhysics(),
-                                      itemCount: cart.timeSlots.length,
-                                      itemBuilder: (context, index) {
-                                        final slot = cart.timeSlots[index];
-                                        final isSelected = cart.selectedTimeSlot == slot['slotName'];
-                                        final isAvailable = slot['available'] != false;
+                                    SizedBox(height: 12.h),
+                                    InkWell(
+                                      onTap: () async {
+                                        final selectedDate = await showDatePicker(
+                                          context: context,
+                                          initialDate: DateTime.now(),
+                                          firstDate: DateTime.now(),
+                                          lastDate: DateTime.now().add(Duration(days: 30)),
+                                          builder: (context, child) {
+                                            return Theme(
+                                              data: Theme.of(context).copyWith(
+                                                colorScheme: ColorScheme.light(
+                                                  primary: Color(0xFF3661E2),
+                                                  onPrimary: Colors.white,
+                                                  surface: Colors.white,
+                                                  onSurface: Colors.black,
+                                                ),
+                                                dialogBackgroundColor: Colors.white,
+                                              ),
+                                              child: child!,
+                                            );
+                                          },
+                                        );
 
-                                        return InkWell(
-                                          onTap: isAvailable ? () {
-                                            cart.setSelectedTimeSlot(slot['slotName']!);
-                                            setState(() {});
-                                          } : null,
-                                          child: Container(
-                                            padding: EdgeInsets.all(16.w),
-                                            decoration: BoxDecoration(
-                                              color: isSelected
-                                                  ? Color(0xFF3661E2).withOpacity(0.1)
-                                                  : Colors.white,
-                                              border: Border(
-                                                bottom: index < cart.timeSlots.length - 1
-                                                    ? BorderSide(color: Colors.grey[100]!, width: 1)
-                                                    : BorderSide.none,
+                                        if (selectedDate != null) {
+                                          final formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
+                                          cart.setSelectedBookingDate(formattedDate);
+
+                                          // Refresh time slots with new date
+                                          cart.fetchTimeSlots();
+                                          setState(() {});
+                                        }
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(16.w),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          border: Border.all(
+                                            color: Color(
+                                              0xFF3661E2,
+                                            ).withOpacity(0.3),
+                                            width: 1.5,
+                                          ),
+                                          borderRadius: BorderRadius.circular(12.r),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withOpacity(0.1),
+                                              blurRadius: 6,
+                                              offset: Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "Selected Date",
+                                                    style: GoogleFonts.poppins(
+                                                      fontSize: 12.sp,
+                                                      color: Colors.grey[600],
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 4.h),
+                                                  Text(
+                                                    _formatDisplayDate(
+                                                      cart.selectedBookingDate,
+                                                    ),
+                                                    style: GoogleFonts.poppins(
+                                                      fontSize: 16.sp,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: Color(0xFF3661E2),
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ],
                                               ),
                                             ),
-                                            child: Row(
-                                              children: [
-                                                // Selection Indicator
-                                                Container(
-                                                  width: 22.w,
-                                                  height: 22.w,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    border: Border.all(
-                                                      color: isSelected
-                                                          ? Color(0xFF3661E2)
-                                                          : isAvailable
-                                                          ? Colors.grey[400]!
-                                                          : Colors.grey[300]!,
-                                                      width: 2,
-                                                    ),
-                                                    color: isSelected ? Color(0xFF3661E2) : Colors.transparent,
-                                                  ),
-                                                  child: isSelected
-                                                      ? Icon(Icons.check, size: 14.w, color: Colors.white)
-                                                      : null,
-                                                ),
-                                                SizedBox(width: 16.w),
+                                            Container(
+                                              padding: EdgeInsets.all(8.w),
+                                              decoration: BoxDecoration(
+                                                color: Color(
+                                                  0xFF3661E2,
+                                                ).withOpacity(0.1),
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.edit,
+                                                size: 18.w,
+                                                color: Color(0xFF3661E2),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 20.h),
 
-                                                // Slot Info
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                                    children: [
-                                                      Text(
-                                                        slot['slotName'] ?? 'Unknown Slot',
-                                                        style: GoogleFonts.poppins(
-                                                          fontSize: 15.sp,
-                                                          fontWeight: FontWeight.w500,
+                              // Time Slots Section
+                              Container(
+                                padding: EdgeInsets.all(16.w),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[50],
+                                  borderRadius: BorderRadius.circular(16.r),
+                                  border: Border.all(
+                                    color: Colors.grey[200]!,
+                                    width: 1.5,
+                                  ),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.access_time,
+                                          size: 18.w,
+                                          color: Color(0xFF3661E2),
+                                        ),
+                                        SizedBox(width: 8.w),
+                                        Text(
+                                          "Available Time Slots",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        SizedBox(width: 8.w),
+                                        if (cart.isLoadingTimeSlots)
+                                          SizedBox(
+                                            width: 16.w,
+                                            height: 16.w,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Color(0xFF3661E2),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    SizedBox(height: 12.h),
+
+                                    if (cart.isLoadingTimeSlots)
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 40.h,
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            CircularProgressIndicator(
+                                              color: Color(0xFF3661E2),
+                                              strokeWidth: 3,
+                                            ),
+                                            SizedBox(height: 16.h),
+                                            Text(
+                                              "Loading available slots...",
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 14.sp,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    else if (cart.timeSlots.isEmpty)
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 40.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(12.r),
+                                          border: Border.all(
+                                            color: Colors.grey[200]!,
+                                          ),
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Icon(
+                                              Icons.schedule,
+                                              size: 48.w,
+                                              color: Colors.grey[400],
+                                            ),
+                                            SizedBox(height: 12.h),
+                                            Text(
+                                              "No time slots available",
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 16.sp,
+                                                fontWeight: FontWeight.w500,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
+                                            SizedBox(height: 8.h),
+                                            Text(
+                                              "Please try another date",
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 14.sp,
+                                                color: Colors.grey[500],
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
+                                        ),
+                                      )
+                                    else
+                                      Container(
+                                        constraints: BoxConstraints(maxHeight: 200.h),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(12.r),
+                                          border: Border.all(
+                                            color: Colors.grey[200]!,
+                                            width: 1.5,
+                                          ),
+                                        ),
+                                        child: ListView.builder(
+                                          shrinkWrap: true,
+                                          physics: BouncingScrollPhysics(),
+                                          itemCount: cart.timeSlots.length,
+                                          itemBuilder: (context, index) {
+                                            final slot = cart.timeSlots[index];
+                                            final isSelected = cart.selectedTimeSlot == slot['slotName'];
+                                            final isAvailable = slot['available'] != false;
+
+                                            return InkWell(
+                                              onTap: isAvailable ? () {
+                                                cart.setSelectedTimeSlot(slot['slotName']!);
+                                                setState(() {});
+                                              } : null,
+                                              child: Container(
+                                                padding: EdgeInsets.all(16.w),
+                                                decoration: BoxDecoration(
+                                                  color: isSelected
+                                                      ? Color(0xFF3661E2).withOpacity(0.1)
+                                                      : Colors.white,
+                                                  border: Border(
+                                                    bottom: index < cart.timeSlots.length - 1
+                                                        ? BorderSide(color: Colors.grey[100]!, width: 1)
+                                                        : BorderSide.none,
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    // Selection Indicator
+                                                    Container(
+                                                      width: 22.w,
+                                                      height: 22.w,
+                                                      decoration: BoxDecoration(
+                                                        shape: BoxShape.circle,
+                                                        border: Border.all(
                                                           color: isSelected
                                                               ? Color(0xFF3661E2)
                                                               : isAvailable
-                                                              ? Colors.black87
-                                                              : Colors.grey[400]!,
+                                                              ? Colors.grey[400]!
+                                                              : Colors.grey[300]!,
+                                                          width: 2,
                                                         ),
+                                                        color: isSelected ? Color(0xFF3661E2) : Colors.transparent,
                                                       ),
-                                                      if (slot['timing'] != null)
-                                                        Text(
-                                                          slot['timing'],
-                                                          style: GoogleFonts.poppins(
-                                                            fontSize: 12.sp,
-                                                            color: isAvailable
-                                                                ? Colors.grey[600]
-                                                                : Colors.grey[400],
+                                                      child: isSelected
+                                                          ? Icon(Icons.check, size: 14.w, color: Colors.white)
+                                                          : null,
+                                                    ),
+                                                    SizedBox(width: 16.w),
+
+                                                    // Slot Info
+                                                    Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(
+                                                            slot['slotName'] ?? 'Unknown Slot',
+                                                            style: GoogleFonts.poppins(
+                                                              fontSize: 15.sp,
+                                                              fontWeight: FontWeight.w500,
+                                                              color: isSelected
+                                                                  ? Color(0xFF3661E2)
+                                                                  : isAvailable
+                                                                  ? Colors.black87
+                                                                  : Colors.grey[400]!,
+                                                            ),
+                                                          ),
+                                                          if (slot['timing'] != null)
+                                                            Text(
+                                                              slot['timing'],
+                                                              style: GoogleFonts.poppins(
+                                                                fontSize: 12.sp,
+                                                                color: isAvailable
+                                                                    ? Colors.grey[600]
+                                                                    : Colors.grey[400],
+                                                              ),
+                                                            ),
+                                                        ],
+                                                      ),
+                                                    ),
+
+                                                    // Availability Status
+                                                    if (!isAvailable)
+                                                      Container(
+                                                        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+                                                        decoration: BoxDecoration(
+                                                          color: Colors.red.withOpacity(0.1),
+                                                          borderRadius: BorderRadius.circular(6.r),
+                                                          border: Border.all(
+                                                            color: Colors.red.withOpacity(0.3),
+                                                            width: 1,
                                                           ),
                                                         ),
-                                                    ],
-                                                  ),
+                                                        child: Text(
+                                                          "Passed",
+                                                          style: GoogleFonts.poppins(
+                                                            fontSize: 11.sp,
+                                                            color: Colors.red,
+                                                            fontWeight: FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                  ],
                                                 ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: 20.h),
 
-                                                // Availability Status
-                                                if (!isAvailable)
-                                                  Container(
-                                                    padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.red.withOpacity(0.1),
-                                                      borderRadius: BorderRadius.circular(6.r),
-                                                      border: Border.all(
-                                                        color: Colors.red.withOpacity(0.3),
-                                                        width: 1,
-                                                      ),
-                                                    ),
-                                                    child: Text(
-                                                      "Passed",
-                                                      style: GoogleFonts.poppins(
-                                                        fontSize: 11.sp,
-                                                        color: Colors.red,
-                                                        fontWeight: FontWeight.w500,
-                                                      ),
-                                                    ),
-                                                  ),
-                                              ],
+                              // Selected Info Banner
+                              if (cart.selectedTimeSlot != null &&
+                                  cart.selectedBookingDate != null)
+                                Container(
+                                  padding: EdgeInsets.all(16.w),
+                                  decoration: BoxDecoration(
+                                    color: Color(0xFF3661E2).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12.r),
+                                    border: Border.all(
+                                      color: Color(0xFF3661E2).withOpacity(0.2),
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.check_circle,
+                                        size: 20.w,
+                                        color: Color(0xFF3661E2),
+                                      ),
+                                      SizedBox(width: 12.w),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              "Selected Time Slot",
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 12.sp,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
+                                            SizedBox(height: 4.h),
+                                            Text(
+                                              "${_formatDisplayDate(cart.selectedBookingDate)} • ${cart.selectedTimeSlot}",
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 14.sp,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xFF3661E2),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              SizedBox(height: 24.h),
+
+                              // Action Buttons
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: OutlinedButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      style: OutlinedButton.styleFrom(
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 16.h,
+                                        ),
+                                        side: BorderSide(
+                                          color: Colors.grey[400]!,
+                                          width: 1.5,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12.r),
+                                        ),
+                                        backgroundColor: Colors.grey[50],
+                                      ),
+                                      child: Text(
+                                        "Cancel",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.grey[700],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 16.w),
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed:
+                                      cart.selectedTimeSlot != null &&
+                                          cart.selectedBookingDate != null
+                                          ? () {
+                                        Navigator.pop(context);
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              "Time slot selected successfully",
+                                              style: GoogleFonts.poppins(),
+                                            ),
+                                            behavior:
+                                            SnackBarBehavior.floating,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                              BorderRadius.circular(
+                                                10.r,
+                                              ),
+                                            ),
+                                            backgroundColor: Color(
+                                              0xFF3661E2,
                                             ),
                                           ),
                                         );
-                                      },
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 20.h),
-
-                          // Selected Info Banner
-                          if (cart.selectedTimeSlot != null &&
-                              cart.selectedBookingDate != null)
-                            Container(
-                              padding: EdgeInsets.all(16.w),
-                              decoration: BoxDecoration(
-                                color: Color(0xFF3661E2).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(12.r),
-                                border: Border.all(
-                                  color: Color(0xFF3661E2).withOpacity(0.2),
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.check_circle,
-                                    size: 20.w,
-                                    color: Color(0xFF3661E2),
-                                  ),
-                                  SizedBox(width: 12.w),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Selected Time Slot",
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 12.sp,
-                                            color: Colors.grey[600],
-                                          ),
+                                      }
+                                          : null,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Color(0xFF3661E2),
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 16.h,
                                         ),
-                                        SizedBox(height: 4.h),
-                                        Text(
-                                          "${_formatDisplayDate(cart.selectedBookingDate)} • ${cart.selectedTimeSlot}",
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w600,
-                                            color: Color(0xFF3661E2),
-                                          ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12.r),
                                         ),
-                                      ],
+                                        elevation: 2,
+                                      ),
+                                      child: Text(
+                                        "Confirm Slot",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          SizedBox(height: 24.h),
-
-                          // Action Buttons
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 16.h,
-                                    ),
-                                    side: BorderSide(
-                                      color: Colors.grey[400]!,
-                                      width: 1.5,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                    ),
-                                    backgroundColor: Colors.grey[50],
-                                  ),
-                                  child: Text(
-                                    "Cancel",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.grey[700],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 16.w),
-                              Expanded(
-                                child: ElevatedButton(
-                                  onPressed:
-                                  cart.selectedTimeSlot != null &&
-                                      cart.selectedBookingDate != null
-                                      ? () {
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(
-                                      context,
-                                    ).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          "Time slot selected successfully",
-                                          style: GoogleFonts.poppins(),
-                                        ),
-                                        behavior:
-                                        SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                          BorderRadius.circular(
-                                            10.r,
-                                          ),
-                                        ),
-                                        backgroundColor: Color(
-                                          0xFF3661E2,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                      : null,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFF3661E2),
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 16.h,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                    ),
-                                    elevation: 2,
-                                  ),
-                                  child: Text(
-                                    "Confirm Slot",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
                             ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  );
+                },
               ),
             );
           },
@@ -7556,7 +8129,6 @@ class CartScreen extends StatelessWidget {
       },
     );
   }
-
   String _formatDisplayDate(String? dateString) {
     if (dateString == null) return "Select a date";
 
@@ -7581,6 +8153,1071 @@ class CartScreen extends StatelessWidget {
     }
   }
 
+  // @override
+  // Widget build(BuildContext context) {
+  //   final ScrollController _scrollController = ScrollController();
+  //   final GlobalKey _walletSummaryKey = GlobalKey();
+  //   final GlobalKey _orderSummaryKey = GlobalKey();
+  //
+  //   return Scaffold(
+  //     key: _scaffoldKey,
+  //     backgroundColor: Colors.grey[200],
+  //     appBar: AppBar(
+  //       elevation: 0,
+  //       backgroundColor: Colors.grey[200],
+  //       title: Consumer<CartModel>(
+  //         builder: (context, cart, child) => Text(
+  //           "Cart (${cart.selectedItemCount}/${cart.itemCount})",
+  //           style: GoogleFonts.poppins(
+  //             fontSize: 20.sp,
+  //             fontWeight: FontWeight.bold,
+  //             color: Color(0xFF3661E2),
+  //           ),
+  //         ),
+  //       ),
+  //       iconTheme: const IconThemeData(color: Color(0xFF3661E2)),
+  //     ),
+  //     body: Consumer<CartModel>(
+  //       builder: (context, cart, child) {
+  //         if (cart.items.isEmpty) {
+  //           return Center(
+  //             child: Column(
+  //               mainAxisAlignment: MainAxisAlignment.center,
+  //               children: [
+  //                 Icon(
+  //                   Icons.shopping_cart_outlined,
+  //                   size: 80.w,
+  //                   color: Colors.grey[400],
+  //                 ),
+  //                 SizedBox(height: 16.h),
+  //                 Text(
+  //                   "Your Cart is Empty",
+  //                   style: GoogleFonts.poppins(
+  //                     fontSize: 18.sp,
+  //                     fontWeight: FontWeight.w600,
+  //                     color: Colors.grey[600],
+  //                   ),
+  //                 ),
+  //                 SizedBox(height: 8.h),
+  //                 Text(
+  //                   "Add some tests to get started",
+  //                   style: GoogleFonts.poppins(
+  //                     fontSize: 14.sp,
+  //                     color: Colors.grey[500],
+  //                   ),
+  //                 ),
+  //                 SizedBox(height: 24.h),
+  //                 ElevatedButton(
+  //                   onPressed: () => Navigator.pop(context),
+  //                   style: ElevatedButton.styleFrom(
+  //                     backgroundColor: Color(0xFF3661E2),
+  //                     padding: EdgeInsets.symmetric(
+  //                       horizontal: 24.w,
+  //                       vertical: 12.h,
+  //                     ),
+  //                     shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.circular(12.r),
+  //                     ),
+  //                   ),
+  //                   child: Text(
+  //                     "Browse Tests",
+  //                     style: GoogleFonts.poppins(
+  //                       fontSize: 14.sp,
+  //                       fontWeight: FontWeight.w600,
+  //                       color: Colors.white,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ],
+  //             ),
+  //           );
+  //         }
+  //
+  //         final isWalletEnabled =
+  //             cart.items.isNotEmpty &&
+  //                 cart.items.first['isWalletEnabled'] == true;
+  //         final walletAmount = isWalletEnabled ? cart.walletAmount : 0.0;
+  //
+  //         final walletDiscount = isWalletEnabled && walletAmount > 0
+  //             ? cart.selectedSubtotal * (cart.walletDiscountPercentage / 100)
+  //             : 0.0;
+  //
+  //         final payableAmount = (cart.selectedSubtotal - walletDiscount) +
+  //             (cart.requiresHomeCollection ? cart.homeCollectionCharge : 0);
+  //         final walletAmountAfterDeduction =
+  //         isWalletEnabled ? walletAmount - walletDiscount : 0.0;
+  //         final hasSufficientBalance =
+  //             !isWalletEnabled || walletAmountAfterDeduction >= 0;
+  //
+  //         return Column(
+  //             children: [
+  //             Expanded(
+  //               child: ListView(
+  //                 controller: _scrollController,
+  //                 padding: EdgeInsets.symmetric(
+  //                   horizontal: 16.w,
+  //                   vertical: 16.h,
+  //                 ),
+  //                 children: [
+  //                   ...List.generate(cart.items.length, (index) {
+  //                     final item = cart.items[index];
+  //                     final itemId = item['itemId'];
+  //                     final isSelected = cart.isItemSelected(itemId);
+  //                     final quantity = item['quantity'] as int;
+  //                     final discountPrice = item["discountPrice"] as double;
+  //                     final originalPrice = item["originalPrice"] as double;
+  //                     final discountPercentage = ((originalPrice - discountPrice) / originalPrice * 100).round();
+  //                     final totalItemPrice = discountPrice * quantity;
+  //                     final selectedPatientCount = (item['selectedPatientIds'] as List?)?.length ?? 0;
+  //
+  //                     return GestureDetector(
+  //                       onTap: () {
+  //                         Navigator.push(
+  //                           context,
+  //                           CustomPageRoute(
+  //                             child: TestListDetails(
+  //                               test: item,
+  //                               provider: item["provider"],
+  //                               service: item["service"],
+  //                               userModel: userModel,
+  //                             ),
+  //                             direction: AxisDirection.right,
+  //                           ),
+  //                         );
+  //                       },
+  //                       child: Card(
+  //                         elevation: isSelected ? 4 : 2,
+  //                         margin: EdgeInsets.only(bottom: 12.h),
+  //                         shape: RoundedRectangleBorder(
+  //                           borderRadius: BorderRadius.circular(16.r),
+  //                           side: BorderSide(
+  //                             color: isSelected ? Color(0xFF3661E2) : Colors.grey[200]!,
+  //                             width: isSelected ? 2 : 1,
+  //                           ),
+  //                         ),
+  //                         child: Container(
+  //                           padding: EdgeInsets.all(16.w),
+  //                           decoration: BoxDecoration(
+  //                               borderRadius: BorderRadius.circular(16.r),
+  //                               color: Colors.white
+  //                           ),
+  //                           child: Column(
+  //                             crossAxisAlignment: CrossAxisAlignment.start,
+  //                             children: [
+  //                             // Header row with test icon and select patients button
+  //                             Row(
+  //                             crossAxisAlignment: CrossAxisAlignment.center,
+  //                             children: [
+  //                               // Test icon
+  //                               Container(
+  //                                 padding: EdgeInsets.all(8.w),
+  //                                 decoration: BoxDecoration(
+  //                                   color: Colors.grey.shade300,
+  //                                   shape: BoxShape.circle,
+  //                                 ),
+  //                                 child: Icon(
+  //                                   Icons.science,
+  //                                   color: Color(0xFF3661E2),
+  //                                   size: 25.w,
+  //                                 ),
+  //                               ),
+  //                               SizedBox(width: 12.w),
+  //
+  //                               // Test name and provider
+  //                               Expanded(
+  //                                 child: Column(
+  //                                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                                   children: [
+  //                                     Text(
+  //                                       item["name"],
+  //                                       style: GoogleFonts.poppins(
+  //                                         fontSize: 18.sp,
+  //                                         fontWeight: FontWeight.bold,
+  //                                         color: Color(0xFF3661E2),
+  //                                       ),
+  //                                       maxLines: 2,
+  //                                       overflow: TextOverflow.ellipsis,
+  //                                     ),
+  //                                     SizedBox(height: 4.h),
+  //                                     Text(
+  //                                       "Provider: ${item['provider']}",
+  //                                       style: GoogleFonts.poppins(
+  //                                         fontSize: 14.sp,
+  //                                         color: Colors.black,
+  //                                       ),
+  //                                       maxLines: 1,
+  //                                       overflow: TextOverflow.ellipsis,
+  //                                     ),
+  //                                   ],
+  //                                 ),
+  //                               ),
+  //
+  //                               // Select Patients button
+  //                               ElevatedButton(
+  //                                 onPressed: () => _showPatientSelectionDialog(
+  //                                   context,
+  //                                   item,
+  //                                   cart,
+  //                                 ),
+  //                                 style: ElevatedButton.styleFrom(
+  //                                   backgroundColor: selectedPatientCount > 0
+  //                                       ? Colors.white
+  //                                       : Color(0xFF3661E2),
+  //                                   padding: EdgeInsets.symmetric(
+  //                                     horizontal: 16.w,
+  //                                     vertical: 10.h,
+  //                                   ),
+  //                                   shape: RoundedRectangleBorder(
+  //                                     borderRadius: BorderRadius.circular(8.r),
+  //                                     side: selectedPatientCount > 0
+  //                                         ? BorderSide(
+  //                                       color: Color(0xFF3661E2),
+  //                                       width: 1,
+  //                                     )
+  //                                         : BorderSide.none,
+  //                                   ),
+  //                                   elevation: 0,
+  //                                 ),
+  //                                 child: Text(
+  //                                   selectedPatientCount > 0
+  //                                       ? "$selectedPatientCount"
+  //                                       : "Select",
+  //                                   style: GoogleFonts.poppins(
+  //                                     fontSize: 14.sp,
+  //                                     fontWeight: FontWeight.w600,
+  //                                     color: selectedPatientCount > 0
+  //                                         ? Color(0xFF3661E2)
+  //                                         : Colors.white,
+  //                                   ),
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //
+  //                           SizedBox(height: 12.h),
+  //
+  //                           // Price information
+  //                           Row(
+  //                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                             crossAxisAlignment: CrossAxisAlignment.end,
+  //                             children: [
+  //                               Expanded(
+  //                                 child: Column(
+  //                                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                                   children: [
+  //                                     Row(
+  //                                       children: [
+  //                                         Text(
+  //                                           "Price per patient: ",
+  //                                           style: GoogleFonts.poppins(
+  //                                             fontSize: 14.sp,
+  //                                             color: Colors.grey[700],
+  //                                           ),
+  //                                         ),
+  //                                         Text(
+  //                                           "₹${discountPrice.toStringAsFixed(0)}",
+  //                                           style: GoogleFonts.poppins(
+  //                                             fontSize: 14.sp,
+  //                                             fontWeight: FontWeight.w600,
+  //                                             color: Colors.black87,
+  //                                           ),
+  //                                         ),
+  //                                       ],
+  //                                     ),
+  //                                     SizedBox(height: 4.h),
+  //                                     Row(
+  //                                       children: [
+  //                                         Text(
+  //                                           "₹${originalPrice.toStringAsFixed(0)}",
+  //                                           style: GoogleFonts.poppins(
+  //                                             fontSize: 12.sp,
+  //                                             color: Colors.grey,
+  //                                             decoration: TextDecoration.lineThrough,
+  //                                           ),
+  //                                         ),
+  //                                         SizedBox(width: 8.w),
+  //                                         Container(
+  //                                           padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+  //                                           decoration: BoxDecoration(
+  //                                             color: Color(0xFF3661E2).withOpacity(0.1),
+  //                                             borderRadius: BorderRadius.circular(4.r),
+  //                                           ),
+  //                                           child: Text(
+  //                                             "${discountPercentage.toStringAsFixed(0)}% OFF",
+  //                                             style: GoogleFonts.poppins(
+  //                                               fontSize: 12.sp,
+  //                                               color: Color(0xFF3661E2),
+  //                                               fontWeight: FontWeight.w600,
+  //                                             ),
+  //                                           ),
+  //                                         ),
+  //                                       ],
+  //                                     ),
+  //                                   ],
+  //                                 ),
+  //                               ),
+  //
+  //                               Column(
+  //                                 crossAxisAlignment: CrossAxisAlignment.end,
+  //                                 children: [
+  //                                   Text(
+  //                                     "Total for $selectedPatientCount patient${selectedPatientCount == 1 ? '' : 's'}",
+  //                                     style: GoogleFonts.poppins(
+  //                                       fontSize: 12.sp,
+  //                                       color: Colors.grey[600],
+  //                                     ),
+  //                                   ),
+  //                                   SizedBox(height: 4.h),
+  //                                   Text(
+  //                                     "₹${totalItemPrice.toStringAsFixed(0)}",
+  //                                     style: GoogleFonts.poppins(
+  //                                       fontSize: 16.sp,
+  //                                       fontWeight: FontWeight.bold,
+  //                                       color: Color(0xFF3661E2),
+  //                                     ),
+  //                                   ),
+  //                                 ],
+  //                               ),
+  //                             ],
+  //                           ),
+  //
+  //                           SizedBox(height: 4.h),
+  //                           Container(
+  //                             padding: EdgeInsets.only(top: 2.h),
+  //                             decoration: BoxDecoration(
+  //                               border: Border(
+  //                                 top: BorderSide(
+  //                                   color: Colors.grey[200]!,
+  //                                   width: 1,
+  //                                 ),
+  //                               ),
+  //                             ),
+  //                           child: Row(
+  //                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                             children: [
+  //                               // Checkbox for selection
+  //                               Row(
+  //                                 children: [
+  //                                   SizedBox(
+  //                                     width: 24.w,
+  //                                     height: 24.w,
+  //                                     child: Checkbox(
+  //                                       value: isSelected,
+  //                                       onChanged: (value) {
+  //                                         cart.toggleItemSelection(itemId, value ?? false);
+  //                                       },
+  //                                       activeColor: Color(0xFF3661E2),
+  //                                       shape: RoundedRectangleBorder(
+  //                                         borderRadius: BorderRadius.circular(6.r),
+  //                                       ),
+  //                                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+  //                                     ),
+  //                                   ),
+  //                                   SizedBox(width: 8.w),
+  //                                   Text(
+  //                                     "Select this item",
+  //                                     style: GoogleFonts.poppins(
+  //                                       fontSize: 14.sp,
+  //                                       color: Colors.grey[700],
+  //                                     ),
+  //                                   ),
+  //                                 ],
+  //                               ),
+  //
+  //                               // Remove button
+  //                               TextButton(
+  //                                 onPressed: () {
+  //                                   cart.removeFromCart(itemId);
+  //                                   ScaffoldMessenger.of(context).showSnackBar(
+  //                                     SnackBar(
+  //                                       content: Text(
+  //                                         "${item['name']} removed from cart",
+  //                                       ),
+  //                                       behavior: SnackBarBehavior.floating,
+  //                                       shape: RoundedRectangleBorder(
+  //                                         borderRadius: BorderRadius.circular(10.r),
+  //                                       ),
+  //                                     ),
+  //                                   );
+  //                                 },
+  //                                 style: TextButton.styleFrom(
+  //                                   foregroundColor: Colors.red,
+  //                                   padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
+  //                                 ),
+  //                                 child: Row(
+  //                                   children: [
+  //                                     Icon(Icons.delete_outline, size: 18.w),
+  //                                     SizedBox(width: 4.w),
+  //                                     Text(
+  //                                       "Remove",
+  //                                       style: GoogleFonts.poppins(
+  //                                         fontSize: 14.sp,
+  //                                         fontWeight: FontWeight.w500,
+  //                                       ),
+  //                                     ),
+  //                                   ],
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                         ],
+  //                       ),
+  //                     ),
+  //                     ),
+  //                     );
+  //                   }),
+  //                   if (cart.items.isNotEmpty) ...[
+  //                     Container(
+  //                       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+  //                       decoration: BoxDecoration(
+  //                         color: Colors.white,
+  //                         borderRadius: BorderRadius.circular(12.r),
+  //                         boxShadow: [
+  //                           BoxShadow(
+  //                             color: Colors.black.withOpacity(0.05),
+  //                             blurRadius: 8.r,
+  //                             offset: Offset(0, 2.h),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                       child: Row(
+  //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                         children: [
+  //                           // Selection controls with improved visual feedback
+  //                           Row(
+  //                             children: [
+  //                               Text(
+  //                                 "Select: ",
+  //                                 style: GoogleFonts.poppins(
+  //                                   fontSize: 14.sp,
+  //                                   color: Colors.grey[700],
+  //                                   fontWeight: FontWeight.w500,
+  //                                 ),
+  //                               ),
+  //                               SizedBox(width: 4.w),
+  //                               // All button with selection state indicator
+  //                               _buildSelectionButton(
+  //                                 text: "All",
+  //                                 onPressed: () => cart.selectAllItems(),
+  //                                 isActive: cart.selectedItemCount == cart.itemCount,
+  //                               ),
+  //                               SizedBox(width: 8.w),
+  //                               // None button with selection state indicator
+  //                               _buildSelectionButton(
+  //                                 text: "None",
+  //                                 onPressed: () => cart.deselectAllItems(),
+  //                                 isActive: cart.selectedItemCount == 0,
+  //                               ),
+  //                             ],
+  //                           ),
+  //
+  //                           // Selection counter with progress indicator
+  //                           Row(
+  //                             children: [
+  //                               AnimatedSwitcher(
+  //                                 duration: Duration(milliseconds: 300),
+  //                                 child: Text(
+  //                                   "${cart.selectedItemCount} of ${cart.itemCount} selected",
+  //                                   key: ValueKey(cart.selectedItemCount),
+  //                                   style: GoogleFonts.poppins(
+  //                                     fontSize: 13.sp,
+  //                                     color: Colors.grey[700],
+  //                                     fontWeight: FontWeight.w500,
+  //                                   ),
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ),
+  //                     SizedBox(height: 16.h),
+  //                   ],
+  //                   SizedBox(height: 16.h),
+  //         if (cart.selectedItemCount > 0) ...[
+  //                   Card(
+  //                     key: _walletSummaryKey,
+  //                     elevation: 2,
+  //                     shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.circular(12.r),
+  //                     ),
+  //                     child: Container(
+  //                       padding: EdgeInsets.all(12.w),
+  //                       decoration: BoxDecoration(
+  //                         borderRadius: BorderRadius.circular(12.r),
+  //                         gradient: LinearGradient(
+  //                           colors: [Colors.grey[50]!, Colors.white],
+  //                           begin: Alignment.topLeft,
+  //                           end: Alignment.bottomRight,
+  //                         ),
+  //                       ),
+  //                       child: Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         children: [
+  //                           Text(
+  //                             "Wallet Summary",
+  //                             style: GoogleFonts.poppins(
+  //                               fontSize: 16.sp,
+  //                               fontWeight: FontWeight.bold,
+  //                               color: Color(0xFF3661E2),
+  //                             ),
+  //                           ),
+  //                           SizedBox(height: 8.h),
+  //                           _buildAmountRow(
+  //                             "Wallet Balance",
+  //                             "₹${walletAmount.toStringAsFixed(0)}",
+  //                             Colors.black87,
+  //                           ),
+  //
+  //                           // Only show these if wallet has balance
+  //                           if (walletAmount > 0) ...[
+  //                             SizedBox(height: 8.h),
+  //
+  //                             // Wallet Points Utilised WITH TOOLTIP
+  //                             Row(
+  //                               mainAxisAlignment:
+  //                               MainAxisAlignment.spaceBetween,
+  //                               children: [
+  //                                 Row(
+  //                                   children: [
+  //                                     Text(
+  //                                       "Wallet Points Utilised",
+  //                                       style: GoogleFonts.poppins(
+  //                                         fontSize: 14.sp,
+  //                                         color: Colors.grey[700],
+  //                                       ),
+  //                                     ),
+  //                                     SizedBox(width: 4.w),
+  //                                     _buildInfoTooltip(
+  //                                       "Amount of wallet points being used from your ${_getOrganizationName(cart)} balance for this order",
+  //                                     ),
+  //                                   ],
+  //                                 ),
+  //                                 Text(
+  //                                   "₹${walletDiscount.toStringAsFixed(0)}",
+  //                                   style: GoogleFonts.poppins(
+  //                                     fontSize: 14.sp,
+  //                                     color: Color(0xFF3661E2),
+  //                                   ),
+  //                                 ),
+  //                               ],
+  //                             ),
+  //
+  //                             SizedBox(height: 8.h),
+  //                             _buildAmountRow(
+  //                               "Remaining Wallet Balance",
+  //                               "₹${walletAmountAfterDeduction.toStringAsFixed(0)}",
+  //                               hasSufficientBalance
+  //                                   ? Colors.black87
+  //                                   : Colors.red,
+  //                               isBold: true,
+  //                             ),
+  //                             if (!hasSufficientBalance)
+  //                               Padding(
+  //                                 padding: EdgeInsets.only(top: 8.h),
+  //                                 child: Text(
+  //                                   "Please add funds to your wallet to proceed.",
+  //                                   style: GoogleFonts.poppins(
+  //                                     fontSize: 12.sp,
+  //                                     color: Colors.red,
+  //                                   ),
+  //                                 ),
+  //                               ),
+  //                           ] else if (isWalletEnabled &&
+  //                               walletAmount == 0) ...[
+  //                             SizedBox(height: 8.h),
+  //                             Text(
+  //                               "No wallet balance available",
+  //                               style: GoogleFonts.poppins(
+  //                                 fontSize: 12.sp,
+  //                                 color: Colors.grey[600],
+  //                               ),
+  //                             ),
+  //                           ],
+  //                         ],
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   SizedBox(height: 16.h),
+  //                   Card(
+  //                     elevation: 2,
+  //                     shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.circular(12.r),
+  //                     ),
+  //                     child: Container(
+  //                       padding: EdgeInsets.all(12.w),
+  //                       decoration: BoxDecoration(
+  //                         borderRadius: BorderRadius.circular(12.r),
+  //                         gradient: LinearGradient(
+  //                           colors: [Colors.grey[50]!, Colors.white],
+  //                           begin: Alignment.topLeft,
+  //                           end: Alignment.bottomRight,
+  //                         ),
+  //                       ),
+  //                       child: Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         children: [
+  //                           Text(
+  //                             "Price Details",
+  //                             style: GoogleFonts.poppins(
+  //                               fontSize: 16.sp,
+  //                               fontWeight: FontWeight.bold,
+  //                               color: Color(0xFF3661E2),
+  //                             ),
+  //                           ),
+  //                           SizedBox(height: 8.h),
+  //
+  //                           // Calculate total original price and total discount
+  //                           _buildPriceDetailRow(
+  //                             "Total Original Price",
+  //                             "₹${_calculateTotalOriginalPrice(cart).toStringAsFixed(0)}",
+  //                           ),
+  //                           SizedBox(height: 4.h),
+  //                           _buildPriceDetailRow(
+  //                             "Total Discount",
+  //                             "-₹${_calculateTotalDiscount(cart).toStringAsFixed(0)}",
+  //                             valueColor: Colors.green,
+  //                           ),
+  //                           SizedBox(height: 4.h),
+  //                           if (cart.requiresHomeCollection)
+  //                             _buildPriceDetailRow(
+  //                               "Home Collection Charge",
+  //                               "₹${cart.homeCollectionCharge.toStringAsFixed(0)}",
+  //                             ),
+  //                           Divider(height: 16.h, thickness: 1),
+  //                           _buildPriceDetailRow(
+  //                             "Subtotal",
+  //                             "₹${cart.selectedTotalPrice .toStringAsFixed(0)}",
+  //                             isBold: true,
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ),
+  //                   ),
+  //                   SizedBox(height: 16.h),
+  //                   Card(
+  //                     key: _orderSummaryKey,
+  //                     elevation: 2,
+  //                     shape: RoundedRectangleBorder(
+  //                       borderRadius: BorderRadius.circular(12.r),
+  //                     ),
+  //                     child: Container(
+  //                       padding: EdgeInsets.all(12.w),
+  //                       decoration: BoxDecoration(
+  //                         borderRadius: BorderRadius.circular(12.r),
+  //                         gradient: LinearGradient(
+  //                           colors: [Colors.grey[50]!, Colors.white],
+  //                           begin: Alignment.topLeft,
+  //                           end: Alignment.bottomRight,
+  //                         ),
+  //                       ),
+  //                       child: Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         children: [
+  //                           Text(
+  //                             "Order Summary",
+  //                             style: GoogleFonts.poppins(
+  //                               fontSize: 16.sp,
+  //                               fontWeight: FontWeight.bold,
+  //                               color: Color(0xFF3661E2),
+  //                             ),
+  //                           ),
+  //                           SizedBox(height: 8.h),
+  //                           _buildAmountRow(
+  //                             "Subtotal",
+  //                             "₹${cart.selectedTotalPrice.toStringAsFixed(0)}",
+  //                             Colors.black87,
+  //                           ),
+  //                           // Only show wallet discount if there's wallet balance
+  //                           if (walletAmount > 0) ...[
+  //                             SizedBox(height: 8.h),
+  //                             // Wallet Points Discount WITH TOOLTIP
+  //                             Row(
+  //                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                               children: [
+  //                                 Row(
+  //                                   children: [
+  //                                     Text(
+  //                                       "Wallet Points Discount (${cart.walletDiscountPercentage.toStringAsFixed(0)}%)",
+  //                                       style: GoogleFonts.poppins(
+  //                                         fontSize: 14.sp,
+  //                                         color: Colors.grey[700],
+  //                                       ),
+  //                                     ),
+  //                                     SizedBox(width: 4.w),
+  //                                     _buildInfoTooltip(
+  //                                       "Discount applied from your ${_getOrganizationName(cart)} wallet balance",
+  //                                     ),
+  //                                   ],
+  //                                 ),
+  //                                 Text(
+  //                                   "-₹${walletDiscount.toStringAsFixed(0)}",
+  //                                   style: GoogleFonts.poppins(
+  //                                     fontSize: 14.sp,
+  //                                     color: Color(0xFF3661E2),
+  //                                   ),
+  //                                 ),
+  //                               ],
+  //                             ),
+  //                           ],
+  //                           // Only show home collection charge if it's enabled
+  //                           if (cart.requiresHomeCollection) ...[
+  //                             SizedBox(height: 8.h),
+  //                             _buildAmountRow(
+  //                               "Home Collection Charge",
+  //                               "₹${cart.homeCollectionCharge.toStringAsFixed(0)}",
+  //                               Colors.black87,
+  //                             ),
+  //                           ],
+  //                           Divider(height: 16.h, thickness: 1),
+  //                           _buildAmountRow(
+  //                             "Amount to Pay",
+  //                             "₹${payableAmount.toStringAsFixed(0)}",
+  //                             Color(0xFF3661E2),
+  //                             isBold: true,
+  //                           ),
+  //
+  //                           // Add savings information
+  //                           SizedBox(height: 8.h),
+  //                           Container(
+  //                             padding: EdgeInsets.all(8.w),
+  //                             decoration: BoxDecoration(
+  //                               color: Colors.green.withOpacity(0.1),
+  //                               borderRadius: BorderRadius.circular(8.r),
+  //                             ),
+  //                             child: Row(
+  //                               mainAxisAlignment: MainAxisAlignment.center,
+  //                               children: [
+  //                                 Icon(
+  //                                   Icons.discount,
+  //                                   size: 16.w,
+  //                                   color: Colors.green,
+  //                                 ),
+  //                                 SizedBox(width: 4.w),
+  //                                 Text(
+  //                                   "You saved ₹${_calculateTotalDiscount(cart).toStringAsFixed(0)}",
+  //                                   style: GoogleFonts.poppins(
+  //                                     fontSize: 12.sp,
+  //                                     color: Colors.green,
+  //                                     fontWeight: FontWeight.w600,
+  //                                   ),
+  //                                 ),
+  //                               ],
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ),
+  //                   ),
+  //                 ],
+  //         ],
+  //               ),
+  //             ),
+  //             SafeArea(
+  //               child: cart.selectedItemCount > 0 ? Container(
+  //                 padding: EdgeInsets.all(16.w),
+  //                 decoration: BoxDecoration(
+  //                   color: Colors.white,
+  //                   borderRadius: BorderRadius.only(
+  //                     topLeft: Radius.circular(16.r),
+  //                     topRight: Radius.circular(16.r),
+  //                   ),
+  //                   boxShadow: [
+  //                     BoxShadow(
+  //                       color: Colors.grey.withOpacity(0.2),
+  //                       blurRadius: 8,
+  //                       spreadRadius: 1,
+  //                       offset: const Offset(0, -2),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 child: Column(
+  //                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                   children: [
+  //                     // Home Sample Collection with proper padding
+  //                     Container(
+  //                       padding: EdgeInsets.symmetric(vertical: 8.h),
+  //                       child: Row(
+  //                         children: [
+  //                           // Checkbox
+  //                           SizedBox(
+  //                             width: 24.w,
+  //                             height: 24.w,
+  //                             child: Checkbox(
+  //                               value: cart.requiresHomeCollection,
+  //                               onChanged: (bool? value) {
+  //                                 final newValue = value ?? false;
+  //                                 cart.setRequiresHomeCollection(newValue);
+  //                                 if (!newValue) {
+  //                                   cart.clearHomeCollectionDetails();
+  //                                 }
+  //                               },
+  //                               activeColor: Color(0xFF3661E2),
+  //                               shape: RoundedRectangleBorder(
+  //                                 borderRadius: BorderRadius.circular(4.r),
+  //                               ),
+  //                             ),
+  //                           ),
+  //                           SizedBox(width: 12.w),
+  //                           // Text with proper alignment
+  //                           Expanded(
+  //                             child: RichText(
+  //                               text: TextSpan(
+  //                                 text: "Home Sample Collection",
+  //                                 style: GoogleFonts.poppins(
+  //                                   fontSize: 16.sp,
+  //                                   fontWeight: FontWeight.w600,
+  //                                   color: Color(0xFF3661E2),
+  //                                 ),
+  //                                 children: [
+  //                                   TextSpan(
+  //                                     text:
+  //                                     " (+₹${cart.homeCollectionCharge.toStringAsFixed(0)})",
+  //                                     style: GoogleFonts.poppins(
+  //                                       fontSize: 14.sp,
+  //                                       color: Colors.grey[600],
+  //                                       fontWeight: FontWeight.normal,
+  //                                     ),
+  //                                   ),
+  //                                 ],
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ),
+  //
+  //                     // Show address and time slot selection only if home collection is required
+  //                     if (cart.requiresHomeCollection) ...[
+  //                       SizedBox(height: 16.h),
+  //                       // Address Selection
+  //                       Container(
+  //                         decoration: BoxDecoration(
+  //                           color: Colors.grey[50],
+  //                           borderRadius: BorderRadius.circular(12.r),
+  //                         ),
+  //                         child: ListTile(
+  //                           contentPadding: EdgeInsets.symmetric(
+  //                             horizontal: 16.w,
+  //                             vertical: 8.h,
+  //                           ),
+  //                           leading: Icon(
+  //                             Icons.location_on,
+  //                             color: Color(0xFF3661E2),
+  //                             size: 24.w,
+  //                           ),
+  //                           title: Text(
+  //                             "Delivery Address",
+  //                             style: GoogleFonts.poppins(
+  //                               fontSize: 14.sp,
+  //                               fontWeight: FontWeight.w600,
+  //                               color: Colors.black87,
+  //                             ),
+  //                           ),
+  //                           subtitle: Text(
+  //                             cart.selectedAddress ?? "Tap to select address",
+  //                             style: GoogleFonts.poppins(
+  //                               fontSize: 13.sp,
+  //                               color:
+  //                               cart.selectedAddress != null
+  //                                   ? Colors.grey[700]
+  //                                   : Colors.grey[500],
+  //                             ),
+  //                             maxLines: 1,
+  //                             overflow: TextOverflow.ellipsis,
+  //                           ),
+  //                           trailing: Icon(
+  //                             Icons.arrow_forward_ios,
+  //                             size: 18.w,
+  //                             color: Colors.grey[600],
+  //                           ),
+  //                           onTap:
+  //                               () => _showAddressSelectionBottomSheet(
+  //                             context,
+  //                             cart,
+  //                           ),
+  //                           shape: RoundedRectangleBorder(
+  //                             borderRadius: BorderRadius.circular(12.r),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                       SizedBox(height: 12.h),
+  //                       // Time Slot Selection
+  //                       Container(
+  //                         decoration: BoxDecoration(
+  //                           color: Colors.grey[50],
+  //                           borderRadius: BorderRadius.circular(12.r),
+  //                         ),
+  //                         child: ListTile(
+  //                           contentPadding: EdgeInsets.symmetric(
+  //                             horizontal: 16.w,
+  //                             vertical: 8.h,
+  //                           ),
+  //                           leading: Icon(
+  //                             Icons.access_time,
+  //                             color: Color(0xFF3661E2),
+  //                             size: 24.w,
+  //                           ),
+  //                           title: Text(
+  //                             "Time Slot",
+  //                             style: GoogleFonts.poppins(
+  //                               fontSize: 14.sp,
+  //                               fontWeight: FontWeight.w600,
+  //                               color: Colors.black87,
+  //                             ),
+  //                           ),
+  //                           subtitle: Text(
+  //                             cart.selectedTimeSlot != null &&
+  //                                 cart.selectedBookingDate != null
+  //                                 ? "${_formatDisplayDate(cart.selectedBookingDate)} • ${cart.selectedTimeSlot}"
+  //                                 : "Tap to select time slot",
+  //                             style: GoogleFonts.poppins(
+  //                               fontSize: 13.sp,
+  //                               color:
+  //                               cart.selectedTimeSlot != null
+  //                                   ? Colors.grey[700]
+  //                                   : Colors.grey[500],
+  //                             ),
+  //                             maxLines: 1,
+  //                             overflow: TextOverflow.ellipsis,
+  //                           ),
+  //                           trailing: Icon(
+  //                             Icons.arrow_forward_ios,
+  //                             size: 18.w,
+  //                             color: Colors.grey[600],
+  //                           ),
+  //                           onTap:
+  //                               () => _showTimeSlotSelectionBottomSheet(
+  //                             context,
+  //                             cart,
+  //                           ),
+  //                           shape: RoundedRectangleBorder(
+  //                             borderRadius: BorderRadius.circular(12.r),
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ],
+  //                     SizedBox(height: 16.h),
+  //                     Container(
+  //                       padding: EdgeInsets.symmetric(
+  //                         vertical: 12.h,
+  //                         horizontal: 4.w,
+  //                       ),
+  //                       decoration: BoxDecoration(
+  //                         border: Border(
+  //                           top: BorderSide(color: Colors.grey[200]!, width: 1),
+  //                         ),
+  //                       ),
+  //                       child: Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.start,
+  //                         children: [
+  //                           // Only show home collection charge if it's enabled
+  //                           if (cart.requiresHomeCollection) ...[
+  //                             _buildAmountRow(
+  //                               "Home Collection Charge",
+  //                               "₹${cart.homeCollectionCharge.toStringAsFixed(0)}",
+  //                               Colors.black87,
+  //                             ),
+  //                             SizedBox(height: 8.h),
+  //                           ],
+  //                           Row(
+  //                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                             crossAxisAlignment: CrossAxisAlignment.center,
+  //                             children: [
+  //                               // Total Amount Section
+  //                               Expanded(
+  //                                 child: Column(
+  //                                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                                   mainAxisSize: MainAxisSize.min,
+  //                                   children: [
+  //                                     Text(
+  //                                       "Total Amount",
+  //                                       style: GoogleFonts.poppins(
+  //                                         fontSize: 14.sp,
+  //                                         fontWeight: FontWeight.w500,
+  //                                         color: Colors.grey[700],
+  //                                       ),
+  //                                     ),
+  //                                     SizedBox(height: 4.h),
+  //                                     Text(
+  //                                       "₹${payableAmount.toStringAsFixed(0)}",
+  //                                       style: GoogleFonts.poppins(
+  //                                         fontSize: 20.sp,
+  //                                         fontWeight: FontWeight.bold,
+  //                                         color: Color(0xFF3661E2),
+  //                                       ),
+  //                                     ),
+  //                                     SizedBox(height: 4.h),
+  //                                     Text(
+  //                                       "Saved ₹${_calculateTotalDiscount(cart).toStringAsFixed(0)}",
+  //                                       style: GoogleFonts.poppins(
+  //                                         fontSize: 12.sp,
+  //                                         color: Colors.green,
+  //                                       ),
+  //                                     ),
+  //                                   ],
+  //                                 ),
+  //                               ),
+  //                               SizedBox(width: 12.w),
+  //                               // Checkout Button
+  //                               ElevatedButton(
+  //                                 onPressed: cart.selectedItemCount > 0 &&
+  //                                     hasSufficientBalance &&
+  //                                     (!cart.requiresHomeCollection ||
+  //                                         (cart.selectedAddress != null &&
+  //                                             cart.selectedTimeSlot != null &&
+  //                                             cart.selectedBookingDate != null))
+  //                                     ? () {
+  //                                   _showPaymentOptionsDialog(
+  //                                     context,
+  //                                     cart,
+  //                                     payableAmount,
+  //                                   );
+  //                                 }
+  //                                     : null,
+  //                                 style: ElevatedButton.styleFrom(
+  //                                   backgroundColor: cart.selectedItemCount > 0 && hasSufficientBalance
+  //                                       ? Color(0xFF3661E2)
+  //                                       : Colors.grey[400],
+  //                                   padding: EdgeInsets.symmetric(
+  //                                     horizontal: 20.w,
+  //                                     vertical: 14.h,
+  //                                   ),
+  //                                   shape: RoundedRectangleBorder(
+  //                                     borderRadius: BorderRadius.circular(12.r),
+  //                                   ),
+  //                                   elevation: cart.selectedItemCount > 0 && hasSufficientBalance ? 2 : 0,
+  //                                   minimumSize: Size(0, 50.h),
+  //                                 ),
+  //                                 child: Text(
+  //                                   cart.selectedItemCount > 0
+  //                                       ? (hasSufficientBalance
+  //                                       ? "Proceed to Checkout"
+  //                                       : "Insufficient Balance")
+  //                                       : "Select Items",
+  //                                   style: GoogleFonts.poppins(
+  //                                     fontSize: 14.sp,
+  //                                     fontWeight: FontWeight.w600,
+  //                                     color: Colors.white,
+  //                                   ),
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ): SizedBox.shrink(),
+  //             ),
+  //           ],
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
   @override
   Widget build(BuildContext context) {
     final ScrollController _scrollController = ScrollController();
@@ -7678,7 +9315,7 @@ class CartScreen extends StatelessWidget {
               !isWalletEnabled || walletAmountAfterDeduction >= 0;
 
           return Column(
-              children: [
+            children: [
               Expanded(
                 child: ListView(
                   controller: _scrollController,
@@ -7719,8 +9356,8 @@ class CartScreen extends StatelessWidget {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16.r),
                             side: BorderSide(
-                              color: isSelected ? Color(0xFF3661E2) : Colors.grey[200]!,
-                              width: isSelected ? 2 : 1,
+                                color: isSelected ? Color(0xFF3661E2).withOpacity(0.3) : Colors.grey[200]!,
+                                width: isSelected ? 1.5 : 1,
                             ),
                           ),
                           child: Container(
@@ -7732,255 +9369,275 @@ class CartScreen extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                              // Header row with test icon and select patients button
-                              Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                // Test icon
-                                Container(
-                                  padding: EdgeInsets.all(8.w),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade300,
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.science,
-                                    color: Color(0xFF3661E2),
-                                    size: 25.w,
-                                  ),
-                                ),
-                                SizedBox(width: 12.w),
-
-                                // Test name and provider
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item["name"],
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 18.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Color(0xFF3661E2),
-                                        ),
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
+                                // Header row with test icon and select patients button
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    // Test icon
+                                    Container(
+                                      padding: EdgeInsets.all(8.w),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade300,
+                                        shape: BoxShape.circle,
                                       ),
-                                      SizedBox(height: 4.h),
-                                      Text(
-                                        "Provider: ${item['provider']}",
+                                      child: Icon(
+                                        Icons.science,
+                                        color: Color(0xFF3661E2),
+                                        size: 25.w,
+                                      ),
+                                    ),
+                                    SizedBox(width: 12.w),
+
+                                    // Test name and provider
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            item["name"],
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 18.sp,
+                                              fontWeight: FontWeight.bold,
+                                              color: Color(0xFF3661E2),
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          SizedBox(height: 4.h),
+                                          Text(
+                                            "Provider: ${item['provider']}",
+                                            style: GoogleFonts.poppins(
+                                              fontSize: 14.sp,
+                                              color: Colors.black,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+
+                                    // Select Patients button
+                                    ElevatedButton(
+                                      onPressed: () => _showPatientSelectionDialog(
+                                        context,
+                                        item,
+                                        cart,
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: selectedPatientCount > 0
+                                            ? Colors.white
+                                            : Color(0xFF3661E2),
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 16.w,
+                                          vertical: 10.h,
+                                        ),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.r),
+                                          side: selectedPatientCount > 0
+                                              ? BorderSide(
+                                            color: Color(0xFF3661E2),
+                                            width: 1,
+                                          )
+                                              : BorderSide.none,
+                                        ),
+                                        elevation: 0,
+                                      ),
+                                      child: Text(
+                                        selectedPatientCount > 0
+                                            ? "$selectedPatientCount"
+                                            : "Select",
                                         style: GoogleFonts.poppins(
                                           fontSize: 14.sp,
-                                          color: Colors.black,
+                                          fontWeight: FontWeight.w600,
+                                          color: selectedPatientCount > 0
+                                              ? Color(0xFF3661E2)
+                                              : Colors.white,
                                         ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
 
-                                // Select Patients button
-                                ElevatedButton(
-                                  onPressed: () => _showPatientSelectionDialog(
-                                    context,
-                                    item,
-                                    cart,
-                                  ),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: selectedPatientCount > 0
-                                        ? Colors.white
-                                        : Color(0xFF3661E2),
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 16.w,
-                                      vertical: 10.h,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.r),
-                                      side: selectedPatientCount > 0
-                                          ? BorderSide(
-                                        color: Color(0xFF3661E2),
-                                        width: 1,
-                                      )
-                                          : BorderSide.none,
-                                    ),
-                                    elevation: 0,
-                                  ),
-                                  child: Text(
-                                    selectedPatientCount > 0
-                                        ? "$selectedPatientCount"
-                                        : "Select",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14.sp,
-                                      fontWeight: FontWeight.w600,
-                                      color: selectedPatientCount > 0
-                                          ? Color(0xFF3661E2)
-                                          : Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                                SizedBox(height: 12.h),
 
-                            SizedBox(height: 12.h),
-
-                            // Price information
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            "Price per patient: ",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 14.sp,
-                                              color: Colors.grey[700],
-                                            ),
-                                          ),
-                                          Text(
-                                            "₹${discountPrice.toStringAsFixed(0)}",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 14.sp,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.black87,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 4.h),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            "₹${originalPrice.toStringAsFixed(0)}",
-                                            style: GoogleFonts.poppins(
-                                              fontSize: 12.sp,
-                                              color: Colors.grey,
-                                              decoration: TextDecoration.lineThrough,
-                                            ),
-                                          ),
-                                          SizedBox(width: 8.w),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-                                            decoration: BoxDecoration(
-                                              color: Color(0xFF3661E2).withOpacity(0.1),
-                                              borderRadius: BorderRadius.circular(4.r),
-                                            ),
-                                            child: Text(
-                                              "${discountPercentage.toStringAsFixed(0)}% OFF",
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 12.sp,
-                                                color: Color(0xFF3661E2),
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                Column(
+                                // Price information
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
-                                    Text(
-                                      "Total for $selectedPatientCount patient${selectedPatientCount == 1 ? '' : 's'}",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 12.sp,
-                                        color: Colors.grey[600],
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "Price per patient: ",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 14.sp,
+                                                  color: Colors.grey[700],
+                                                ),
+                                              ),
+                                              Text(
+                                                "₹${discountPrice.toStringAsFixed(0)}",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 14.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: Colors.black87,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          SizedBox(height: 4.h),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "₹${originalPrice.toStringAsFixed(0)}",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 12.sp,
+                                                  color: Colors.grey,
+                                                  decoration: TextDecoration.lineThrough,
+                                                ),
+                                              ),
+                                              SizedBox(width: 8.w),
+                                              Container(
+                                                padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                                                decoration: BoxDecoration(
+                                                  color: Color(0xFF3661E2).withOpacity(0.1),
+                                                  borderRadius: BorderRadius.circular(4.r),
+                                                ),
+                                                child: Text(
+                                                  "${discountPercentage.toStringAsFixed(0)}% OFF",
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 12.sp,
+                                                    color: Color(0xFF3661E2),
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                    SizedBox(height: 4.h),
-                                    Text(
-                                      "₹${totalItemPrice.toStringAsFixed(0)}",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 16.sp,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF3661E2),
-                                      ),
+
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: [
+                                        Text(
+                                          "Total for $selectedPatientCount patient${selectedPatientCount == 1 ? '' : 's'}",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 12.sp,
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                        SizedBox(height: 4.h),
+                                        Text(
+                                          "₹${totalItemPrice.toStringAsFixed(0)}",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16.sp,
+                                            fontWeight: FontWeight.bold,
+                                            // color: Color(0xFF3661E2),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                              ],
-                            ),
 
-                            SizedBox(height: 4.h),
-                            Container(
-                              padding: EdgeInsets.only(top: 2.h),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  top: BorderSide(
-                                    color: Colors.grey[200]!,
-                                    width: 1,
-                                  ),
-                                ),
-                              ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                // Checkbox for selection
-                                Row(
-                                  children: [
-                                    SizedBox(
-                                      width: 24.w,
-                                      height: 24.w,
-                                      child: Checkbox(
-                                        value: isSelected,
-                                        onChanged: (value) {
-                                          cart.toggleItemSelection(itemId, value ?? false);
-                                        },
-                                        activeColor: Color(0xFF3661E2),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(6.r),
-                                        ),
-                                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                SizedBox(height: 4.h),
+                                Container(
+                                  padding: EdgeInsets.only(top: 2.h),
+                                  decoration: BoxDecoration(
+                                    border: Border(
+                                      top: BorderSide(
+                                        color: Colors.grey[200]!,
+                                        width: 1,
                                       ),
                                     ),
-                                    SizedBox(width: 8.w),
-                                    Text(
-                                      "Select this item",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 14.sp,
-                                        color: Colors.grey[700],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                // Remove button
-                                TextButton(
-                                  onPressed: () {
-                                    cart.removeFromCart(itemId);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          "${item['name']} removed from cart",
-                                        ),
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10.r),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: Colors.red,
-                                    padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
                                   ),
                                   child: Row(
                                     children: [
-                                      Icon(Icons.delete_outline, size: 18.w),
-                                      SizedBox(width: 4.w),
-                                      Text(
-                                        "Remove",
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w500,
+                                      Expanded(
+                                        child: InkWell(
+                                          onTap: () {
+                                            cart.toggleItemSelection(itemId, !isSelected);
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(vertical: 8.h),
+                                            child: Row(
+                                              children: [
+                                                SizedBox(
+                                                  width: 24.w,
+                                                  height: 24.w,
+                                                  child: Checkbox(
+                                                    value: isSelected,
+                                                    onChanged: (value) {
+                                                      cart.toggleItemSelection(itemId, value ?? false);
+                                                    },
+                                                    activeColor: Color(0xFF3661E2),
+                                                    shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(6.r),
+                                                    ),
+                                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 8.w),
+                                                Text(
+                                                  "Select this item",
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 14.sp,
+                                                    color: Colors.grey[700],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+
+                                      Container(
+                                        width: 1.w,
+                                        height: 24.h,
+                                        color: Colors.grey[300],
+                                        margin: EdgeInsets.symmetric(horizontal: 8.w),
+                                      ),
+
+                                      Expanded(
+                                        child: InkWell(
+                                          onTap: () {
+                                            cart.removeFromCart(itemId);
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              SnackBar(
+                                                content: Text(
+                                                  "${item['name']} removed from cart",
+                                                ),
+                                                behavior: SnackBarBehavior.floating,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(10.r),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            padding: EdgeInsets.symmetric(vertical: 8.h),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.delete_outline, size: 18.w, color: Colors.red),
+                                                SizedBox(width: 4.w),
+                                                Text(
+                                                  "Remove",
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 14.sp,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.red,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ],
@@ -7989,10 +9646,7 @@ class CartScreen extends StatelessWidget {
                               ],
                             ),
                           ),
-                          ],
                         ),
-                      ),
-                      ),
                       );
                     }),
                     if (cart.items.isNotEmpty) ...[
@@ -8012,7 +9666,6 @@ class CartScreen extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            // Selection controls with improved visual feedback
                             Row(
                               children: [
                                 Text(
@@ -8024,14 +9677,12 @@ class CartScreen extends StatelessWidget {
                                   ),
                                 ),
                                 SizedBox(width: 4.w),
-                                // All button with selection state indicator
                                 _buildSelectionButton(
                                   text: "All",
                                   onPressed: () => cart.selectAllItems(),
                                   isActive: cart.selectedItemCount == cart.itemCount,
                                 ),
                                 SizedBox(width: 8.w),
-                                // None button with selection state indicator
                                 _buildSelectionButton(
                                   text: "None",
                                   onPressed: () => cart.deselectAllItems(),
@@ -8040,7 +9691,6 @@ class CartScreen extends StatelessWidget {
                               ],
                             ),
 
-                            // Selection counter with progress indicator
                             Row(
                               children: [
                                 AnimatedSwitcher(
@@ -8063,283 +9713,283 @@ class CartScreen extends StatelessWidget {
                       SizedBox(height: 16.h),
                     ],
                     SizedBox(height: 16.h),
-          if (cart.selectedItemCount > 0) ...[
-                    Card(
-                      key: _walletSummaryKey,
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.all(12.w),
-                        decoration: BoxDecoration(
+                    if (cart.selectedItemCount > 0) ...[
+                      Card(
+                        key: _walletSummaryKey,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.r),
-                          gradient: LinearGradient(
-                            colors: [Colors.grey[50]!, Colors.white],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
                         ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Wallet Summary",
-                              style: GoogleFonts.poppins(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF3661E2),
-                              ),
+                        child: Container(
+                          padding: EdgeInsets.all(12.w),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12.r),
+                            gradient: LinearGradient(
+                              colors: [Colors.grey[50]!, Colors.white],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
                             ),
-                            SizedBox(height: 8.h),
-                            _buildAmountRow(
-                              "Wallet Balance",
-                              "₹${walletAmount.toStringAsFixed(0)}",
-                              Colors.black87,
-                            ),
-
-                            // Only show these if wallet has balance
-                            if (walletAmount > 0) ...[
-                              SizedBox(height: 8.h),
-
-                              // Wallet Points Utilised WITH TOOLTIP
-                              Row(
-                                mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "Wallet Points Utilised",
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 14.sp,
-                                          color: Colors.grey[700],
-                                        ),
-                                      ),
-                                      SizedBox(width: 4.w),
-                                      _buildInfoTooltip(
-                                        "Amount of wallet points being used from your ${_getOrganizationName(cart)} balance for this order",
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    "₹${walletDiscount.toStringAsFixed(0)}",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14.sp,
-                                      color: Color(0xFF3661E2),
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              SizedBox(height: 8.h),
-                              _buildAmountRow(
-                                "Remaining Wallet Balance",
-                                "₹${walletAmountAfterDeduction.toStringAsFixed(0)}",
-                                hasSufficientBalance
-                                    ? Colors.black87
-                                    : Colors.red,
-                                isBold: true,
-                              ),
-                              if (!hasSufficientBalance)
-                                Padding(
-                                  padding: EdgeInsets.only(top: 8.h),
-                                  child: Text(
-                                    "Please add funds to your wallet to proceed.",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 12.sp,
-                                      color: Colors.red,
-                                    ),
-                                  ),
-                                ),
-                            ] else if (isWalletEnabled &&
-                                walletAmount == 0) ...[
-                              SizedBox(height: 8.h),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Text(
-                                "No wallet balance available",
+                                "Wallet Summary",
                                 style: GoogleFonts.poppins(
-                                  fontSize: 12.sp,
-                                  color: Colors.grey[600],
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF3661E2),
                                 ),
                               ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    Card(
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.all(12.w),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.r),
-                          gradient: LinearGradient(
-                            colors: [Colors.grey[50]!, Colors.white],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Price Details",
-                              style: GoogleFonts.poppins(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF3661E2),
-                              ),
-                            ),
-                            SizedBox(height: 8.h),
-
-                            // Calculate total original price and total discount
-                            _buildPriceDetailRow(
-                              "Total Original Price",
-                              "₹${_calculateTotalOriginalPrice(cart).toStringAsFixed(0)}",
-                            ),
-                            SizedBox(height: 4.h),
-                            _buildPriceDetailRow(
-                              "Total Discount",
-                              "-₹${_calculateTotalDiscount(cart).toStringAsFixed(0)}",
-                              valueColor: Colors.green,
-                            ),
-                            SizedBox(height: 4.h),
-                            if (cart.requiresHomeCollection)
-                              _buildPriceDetailRow(
-                                "Home Collection Charge",
-                                "₹${cart.homeCollectionCharge.toStringAsFixed(0)}",
-                              ),
-                            Divider(height: 16.h, thickness: 1),
-                            _buildPriceDetailRow(
-                              "Subtotal",
-                              "₹${cart.selectedTotalPrice .toStringAsFixed(0)}",
-                              isBold: true,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 16.h),
-                    Card(
-                      key: _orderSummaryKey,
-                      elevation: 2,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.all(12.w),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12.r),
-                          gradient: LinearGradient(
-                            colors: [Colors.grey[50]!, Colors.white],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Order Summary",
-                              style: GoogleFonts.poppins(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                                color: Color(0xFF3661E2),
-                              ),
-                            ),
-                            SizedBox(height: 8.h),
-                            _buildAmountRow(
-                              "Subtotal",
-                              "₹${cart.selectedTotalPrice.toStringAsFixed(0)}",
-                              Colors.black87,
-                            ),
-                            // Only show wallet discount if there's wallet balance
-                            if (walletAmount > 0) ...[
-                              SizedBox(height: 8.h),
-                              // Wallet Points Discount WITH TOOLTIP
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Text(
-                                        "Wallet Points Discount (${cart.walletDiscountPercentage.toStringAsFixed(0)}%)",
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 14.sp,
-                                          color: Colors.grey[700],
-                                        ),
-                                      ),
-                                      SizedBox(width: 4.w),
-                                      _buildInfoTooltip(
-                                        "Discount applied from your ${_getOrganizationName(cart)} wallet balance",
-                                      ),
-                                    ],
-                                  ),
-                                  Text(
-                                    "-₹${walletDiscount.toStringAsFixed(0)}",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14.sp,
-                                      color: Color(0xFF3661E2),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                            // Only show home collection charge if it's enabled
-                            if (cart.requiresHomeCollection) ...[
                               SizedBox(height: 8.h),
                               _buildAmountRow(
-                                "Home Collection Charge",
-                                "₹${cart.homeCollectionCharge.toStringAsFixed(0)}",
+                                "Wallet Balance",
+                                "₹${walletAmount.toStringAsFixed(0)}",
                                 Colors.black87,
                               ),
-                            ],
-                            Divider(height: 16.h, thickness: 1),
-                            _buildAmountRow(
-                              "Amount to Pay",
-                              "₹${payableAmount.toStringAsFixed(0)}",
-                              Color(0xFF3661E2),
-                              isBold: true,
-                            ),
 
-                            // Add savings information
-                            SizedBox(height: 8.h),
-                            Container(
-                              padding: EdgeInsets.all(8.w),
-                              decoration: BoxDecoration(
-                                color: Colors.green.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.discount,
-                                    size: 16.w,
-                                    color: Colors.green,
-                                  ),
-                                  SizedBox(width: 4.w),
-                                  Text(
-                                    "You saved ₹${_calculateTotalDiscount(cart).toStringAsFixed(0)}",
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 12.sp,
-                                      color: Colors.green,
-                                      fontWeight: FontWeight.w600,
+                              // Only show these if wallet has balance
+                              if (walletAmount > 0) ...[
+                                SizedBox(height: 8.h),
+
+                                // Wallet Points Utilised WITH TOOLTIP
+                                Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "Wallet Points Utilised",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 14.sp,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                        SizedBox(width: 4.w),
+                                        _buildInfoTooltip(
+                                          "Amount of wallet points being used from your ${_getOrganizationName(cart)} balance for this order",
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      "₹${walletDiscount.toStringAsFixed(0)}",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14.sp,
+                                        color: Color(0xFF3661E2),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                SizedBox(height: 8.h),
+                                _buildAmountRow(
+                                  "Remaining Wallet Balance",
+                                  "₹${walletAmountAfterDeduction.toStringAsFixed(0)}",
+                                  hasSufficientBalance
+                                      ? Colors.black87
+                                      : Colors.red,
+                                  isBold: true,
+                                ),
+                                if (!hasSufficientBalance)
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 8.h),
+                                    child: Text(
+                                      "Please add funds to your wallet to proceed.",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 12.sp,
+                                        color: Colors.red,
+                                      ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ],
+                              ] else if (isWalletEnabled &&
+                                  walletAmount == 0) ...[
+                                SizedBox(height: 8.h),
+                                Text(
+                                  "No wallet balance available",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12.sp,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
                         ),
                       ),
-                    ),
+                      SizedBox(height: 16.h),
+                      Card(
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.all(12.w),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12.r),
+                            gradient: LinearGradient(
+                              colors: [Colors.grey[50]!, Colors.white],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Price Details",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF3661E2),
+                                ),
+                              ),
+                              SizedBox(height: 8.h),
+
+                              // Calculate total original price and total discount
+                              _buildPriceDetailRow(
+                                "Total Original Price",
+                                "₹${_calculateTotalOriginalPrice(cart).toStringAsFixed(0)}",
+                              ),
+                              SizedBox(height: 4.h),
+                              _buildPriceDetailRow(
+                                "Total Discount",
+                                "-₹${_calculateTotalDiscount(cart).toStringAsFixed(0)}",
+                                valueColor: Colors.green,
+                              ),
+                              SizedBox(height: 4.h),
+                              if (cart.requiresHomeCollection)
+                                _buildPriceDetailRow(
+                                  "Home Collection Charge",
+                                  "₹${cart.homeCollectionCharge.toStringAsFixed(0)}",
+                                ),
+                              Divider(height: 16.h, thickness: 1),
+                              _buildPriceDetailRow(
+                                "Subtotal",
+                                "₹${cart.selectedTotalPrice .toStringAsFixed(0)}",
+                                isBold: true,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16.h),
+                      Card(
+                        key: _orderSummaryKey,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.all(12.w),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12.r),
+                            gradient: LinearGradient(
+                              colors: [Colors.grey[50]!, Colors.white],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Order Summary",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFF3661E2),
+                                ),
+                              ),
+                              SizedBox(height: 8.h),
+                              _buildAmountRow(
+                                "Subtotal",
+                                "₹${cart.selectedTotalPrice.toStringAsFixed(0)}",
+                                Colors.black87,
+                              ),
+                              // Only show wallet discount if there's wallet balance
+                              if (walletAmount > 0) ...[
+                                SizedBox(height: 8.h),
+                                // Wallet Points Discount WITH TOOLTIP
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "Wallet Points Discount (${cart.walletDiscountPercentage.toStringAsFixed(0)}%)",
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 14.sp,
+                                            color: Colors.grey[700],
+                                          ),
+                                        ),
+                                        SizedBox(width: 4.w),
+                                        _buildInfoTooltip(
+                                          "Discount applied from your ${_getOrganizationName(cart)} wallet balance",
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      "-₹${walletDiscount.toStringAsFixed(0)}",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 14.sp,
+                                        color: Color(0xFF3661E2),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                              // Only show home collection charge if it's enabled
+                              if (cart.requiresHomeCollection) ...[
+                                SizedBox(height: 8.h),
+                                _buildAmountRow(
+                                  "Home Collection Charge",
+                                  "₹${cart.homeCollectionCharge.toStringAsFixed(0)}",
+                                  Colors.black87,
+                                ),
+                              ],
+                              Divider(height: 16.h, thickness: 1),
+                              _buildAmountRow(
+                                "Amount to Pay",
+                                "₹${payableAmount.toStringAsFixed(0)}",
+                                Color(0xFF3661E2),
+                                isBold: true,
+                              ),
+
+                              // Add savings information
+                              SizedBox(height: 8.h),
+                              Container(
+                                padding: EdgeInsets.all(8.w),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.discount,
+                                      size: 16.w,
+                                      color: Colors.green,
+                                    ),
+                                    SizedBox(width: 4.w),
+                                    Text(
+                                      "You saved ₹${_calculateTotalDiscount(cart).toStringAsFixed(0)}",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 12.sp,
+                                        color: Colors.green,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
-          ],
                 ),
               ),
               SafeArea(
@@ -8363,56 +10013,65 @@ class CartScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Home Sample Collection with proper padding
-                      Container(
-                        padding: EdgeInsets.symmetric(vertical: 8.h),
-                        child: Row(
-                          children: [
-                            // Checkbox
-                            SizedBox(
-                              width: 24.w,
-                              height: 24.w,
-                              child: Checkbox(
-                                value: cart.requiresHomeCollection,
-                                onChanged: (bool? value) {
-                                  final newValue = value ?? false;
-                                  cart.setRequiresHomeCollection(newValue);
-                                  if (!newValue) {
-                                    cart.clearHomeCollectionDetails();
-                                  }
-                                },
-                                activeColor: Color(0xFF3661E2),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(4.r),
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 12.w),
-                            // Text with proper alignment
-                            Expanded(
-                              child: RichText(
-                                text: TextSpan(
-                                  text: "Home Sample Collection",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 16.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: Color(0xFF3661E2),
+                      // Make the entire Home Sample Collection section clickable
+                      InkWell(
+                        onTap: () {
+                          final newValue = !cart.requiresHomeCollection;
+                          cart.setRequiresHomeCollection(newValue);
+                          if (!newValue) {
+                            cart.clearHomeCollectionDetails();
+                          }
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 8.h),
+                          child: Row(
+                            children: [
+                              // Checkbox
+                              SizedBox(
+                                width: 24.w,
+                                height: 24.w,
+                                child: Checkbox(
+                                  value: cart.requiresHomeCollection,
+                                  onChanged: (bool? value) {
+                                    final newValue = value ?? false;
+                                    cart.setRequiresHomeCollection(newValue);
+                                    if (!newValue) {
+                                      cart.clearHomeCollectionDetails();
+                                    }
+                                  },
+                                  activeColor: Color(0xFF3661E2),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(4.r),
                                   ),
-                                  children: [
-                                    TextSpan(
-                                      text:
-                                      " (+₹${cart.homeCollectionCharge.toStringAsFixed(0)})",
-                                      style: GoogleFonts.poppins(
-                                        fontSize: 14.sp,
-                                        color: Colors.grey[600],
-                                        fontWeight: FontWeight.normal,
-                                      ),
-                                    ),
-                                  ],
                                 ),
                               ),
-                            ),
-                          ],
+                              SizedBox(width: 12.w),
+                              // Text with proper alignment
+                              Expanded(
+                                child: RichText(
+                                  text: TextSpan(
+                                    text: "Home Sample Collection",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF3661E2),
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                        text:
+                                        " (+₹${cart.homeCollectionCharge.toStringAsFixed(0)})",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 14.sp,
+                                          color: Colors.grey[600],
+                                          fontWeight: FontWeight.normal,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
 

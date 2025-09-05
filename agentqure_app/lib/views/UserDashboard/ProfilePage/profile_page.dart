@@ -824,7 +824,7 @@ class _ProfileScreenState extends State<ProfileScreen>
           borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: Color(0xFF3661E2), width: 2),
         ),
-        contentPadding: EdgeInsets.symmetric(vertical: 16.h),
+        // contentPadding: EdgeInsets.symmetric(vertical: 16.h),
         errorStyle: GoogleFonts.poppins(fontSize: 12.sp, color: Colors.red),
       ),
       style: GoogleFonts.poppins(fontSize: 16.sp, fontWeight: FontWeight.w600),

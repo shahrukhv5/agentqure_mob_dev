@@ -360,17 +360,17 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             if (cartModel.itemCount > 0)
                               Positioned(
-                                right: -2.w,
-                                top: -1.h,
+                                right: 6.w,
+                                top: 8.h,
                                 child: Container(
-                                  padding: EdgeInsets.all(4.w),
+                                  // padding: EdgeInsets.all(4.w),
                                   decoration: BoxDecoration(
                                     color: Colors.red,
                                     shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 1.5.w,
-                                    ),
+                                    // border: Border.all(
+                                    //   color: Colors.white,
+                                    //   width: 1.5.w,
+                                    // ),
                                   ),
                                   constraints: BoxConstraints(
                                     minWidth: 18.w,

@@ -498,8 +498,8 @@ class _TestListDetailsState extends State<TestListDetails> {
                     ),
                     if (cart.itemCount > 0)
                       Positioned(
-                        right: 2.w,
-                        top: 4.h,
+                        right: 6.w,
+                        top: 8.h,
                         child: Container(
                           width: 18.w,
                           height: 18.h,
@@ -507,10 +507,10 @@ class _TestListDetailsState extends State<TestListDetails> {
                           decoration: BoxDecoration(
                             color: Colors.redAccent,
                             shape: BoxShape.circle,
-                            border: Border.all(
-                              color: Colors.white,
-                              width: 1.5.w,
-                            ),
+                            // border: Border.all(
+                            //   color: Colors.white,
+                            //   width: 1.5.w,
+                            // ),
                           ),
                           child: Text(
                             cart.itemCount.toString(),

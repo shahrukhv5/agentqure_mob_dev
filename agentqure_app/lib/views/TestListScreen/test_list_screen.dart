@@ -748,11 +748,9 @@ class _TestListScreenState extends State<TestListScreen> {
       }
     });
   }
-
   @override
   Widget build(BuildContext context) {
-    final filteredTests =
-    _searchQuery.isEmpty
+    final filteredTests = _searchQuery.isEmpty
         ? _tests
         : _tests.where((test) {
       final query = _searchQuery.toLowerCase();
@@ -798,12 +796,10 @@ class _TestListScreenState extends State<TestListScreen> {
                   tooltip: 'View Cart',
                 ),
                 Positioned(
-                  right: 2.w,
-                  top: 4.h,
+                  right: 6.w,
+                  top: 8.h,
                   child: Consumer<CartModel>(
-                    builder:
-                        (context, cart, child) =>
-                    cart.itemCount > 0
+                    builder: (context, cart, child) => cart.itemCount > 0
                         ? Container(
                       width: 18.w,
                       height: 18.h,
@@ -811,10 +807,10 @@ class _TestListScreenState extends State<TestListScreen> {
                       decoration: BoxDecoration(
                         color: Colors.redAccent,
                         shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 1.5.w,
-                        ),
+                        // border: Border.all(
+                        //   color: Colors.white,
+                        //   width: 1.5.w,
+                        // ),
                       ),
                       child: Text(
                         cart.itemCount.toString(),
@@ -833,487 +829,489 @@ class _TestListScreenState extends State<TestListScreen> {
           ),
         ],
       ),
-      body: Stack(
+      body: Column(
         children: [
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 12.h,
+          // Fixed Search Bar Only
+          Container(
+            color: Colors.grey[200],
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 12.h,
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12.r),
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: Offset(0, 2),
                   ),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.r),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: TextField(
-                      controller: _searchController,
-                      decoration: InputDecoration(
-                        hintText: "Search tests...",
-                        prefixIcon: Icon(
-                          Icons.search,
-                          color: Colors.grey.shade500,
-                          size: 20.w,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                          borderSide: BorderSide.none,
-                        ),
-                        filled: true,
-                        fillColor: Colors.white,
-                        contentPadding: EdgeInsets.symmetric(vertical: 12.h),
-                      ),
-                      style: GoogleFonts.poppins(fontSize: 14.sp),
-                    ),
+                ],
+              ),
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: "Search tests...",
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Colors.grey.shade500,
+                    size: 20.w,
                   ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.r),
+                    borderSide: BorderSide.none,
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: EdgeInsets.symmetric(vertical: 12.h),
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 8.h,
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.location_on,
-                        color: Colors.grey[600],
-                        size: 20.w,
-                      ),
-                      SizedBox(width: 8.w),
-                      Expanded(
-                        child: Text(
-                          widget.currentAddress,
-                          style: GoogleFonts.poppins(
-                            color: Colors.grey[600],
-                            fontSize: 14.sp,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (_isLoadingTests)
-                  Padding(
-                    padding: EdgeInsets.all(16.w),
-                    child: Shimmer.fromColors(
-                      baseColor: Colors.grey[300]!,
-                      highlightColor: Colors.grey[100]!,
-                      child: ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: 6,
-                        itemBuilder:
-                            (context, index) => _buildShimmerTestCard(),
-                      ),
-                    ),
-                  )
-                else if (_errorMessage != null)
-                  Padding(
-                    padding: EdgeInsets.all(16.w),
-                    child: Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            _errorMessage!,
-                            style: GoogleFonts.poppins(
-                              fontSize: 16.sp,
-                              color: Colors.redAccent,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 12.h),
-                          ElevatedButton(
-                            onPressed: _fetchTests,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF3661E2),
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 20.w,
-                                vertical: 10.h,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.r),
-                              ),
-                            ),
-                            child: Text(
-                              "Retry",
-                              style: GoogleFonts.poppins(
-                                fontSize: 14.sp,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                else
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16.w,
-                      vertical: 8.h,
-                    ),
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: filteredTests.length,
-                      itemBuilder: (context, index) {
-                        final test = filteredTests[index];
-                        final testName = test["name"] ?? "Unknown Test";
-                        final isSelected = _selectedTests[testName] ?? false;
-                        final originalPrice = test["originalPrice"] ?? 0.0;
-                        final discountPrice = test["discountPrice"] ?? 0.0;
-                        final description = test['description'];
-                        final discount = test["discount"] ?? 0;
-                        final reportTime = test["reportTime"] ?? "24 hours";
-                        final itemId =
-                            '${widget.service["provider"]}_$testName';
-                        final cartItem = _cartModel.items.firstWhere(
-                              (item) => item['itemId'] == itemId,
-                          orElse: () => {},
-                        );
-                        final selectedPatientCount =
-                        isSelected && cartItem['selectedPatientIds'] != null
-                            ? (cartItem['selectedPatientIds'] as List)
-                            .length
-                            : 0;
+                style: GoogleFonts.poppins(fontSize: 14.sp),
+              ),
+            ),
+          ),
 
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              CustomPageRoute(
-                                child: TestListDetails(
-                                  test: {
-                                    ...test, // Include all test data
-                                    "provider": widget.service["provider"],
-                                    "service": widget.service["service"],
-                                    "pointBalance":
-                                    widget.service["pointBalance"] ?? 0,
-                                    "walletAmtPercentage":
-                                    widget.service["walletAmtPercentage"]
-                                        ?.toDouble() ??
-                                        0.0,
-                                    'isWalletEnabled':
-                                    widget.service['isWalletEnabled'] ??
-                                        false,
-                                  },
-                                  provider: widget.service["provider"],
-                                  service: widget.service["service"],
-                                  userModel: widget.userModel,
-                                ),
-                                direction: AxisDirection.left,
-                              ),
-                            );
-                          },
-                          child: Container(
-                            margin: EdgeInsets.only(bottom: 16.h),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12.r),
+          // Scrollable Content Area (including location section)
+          Expanded(
+            child: Stack(
+              children: [
+                SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      // Location Section (now scrolls with content)
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.w,
+                          vertical: 8.h,
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.location_on,
+                              color: Colors.grey[600],
+                              size: 20.w,
                             ),
+                            SizedBox(width: 8.w),
+                            Expanded(
+                              child: Text(
+                                widget.currentAddress,
+                                style: GoogleFonts.poppins(
+                                  color: Colors.grey[600],
+                                  fontSize: 14.sp,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      if (_isLoadingTests)
+                        Padding(
+                          padding: EdgeInsets.all(16.w),
+                          child: Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: 6,
+                              itemBuilder: (context, index) =>
+                                  _buildShimmerTestCard(),
+                            ),
+                          ),
+                        )
+                      else if (_errorMessage != null)
+                        Padding(
+                          padding: EdgeInsets.all(16.w),
+                          child: Center(
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Padding(
-                                  padding: EdgeInsets.all(16.w),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        testName,
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 18.sp,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                      if (description != null)
-                                        Text(
-                                          description,
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 14,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                    ],
+                                Text(
+                                  _errorMessage!,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16.sp,
+                                    color: Colors.redAccent,
                                   ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                Divider(height: 1.h, color: Colors.grey[300]),
-                                Padding(
-                                  padding: EdgeInsets.all(16.w),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                        children: [
-                                          GestureDetector(
-                                            onTap:
-                                                () => _showTestParameters(
-                                              context,
-                                              test,
-                                            ),
-                                            child: Text(
-                                              "Includes ${test['testCount']} test${test['testCount'] == 1 ? '' : 's'}",
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 14.sp,
-                                                color: Color(0xFF3661E2),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 8.h),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "₹${discountPrice.toStringAsFixed(0)}",
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 18.sp,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black87,
-                                                ),
-                                              ),
-                                              SizedBox(width: 8.w),
-                                              Text(
-                                                "₹${originalPrice.toStringAsFixed(0)}",
-                                                style: GoogleFonts.poppins(
-                                                  fontSize: 14.sp,
-                                                  color: Colors.grey,
-                                                  decoration:
-                                                  TextDecoration
-                                                      .lineThrough,
-                                                ),
-                                              ),
-                                              SizedBox(width: 8.w),
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: 6.w,
-                                                  vertical: 2.h,
-                                                ),
-                                                decoration: BoxDecoration(
-                                                  color: Color(
-                                                    0xFF3661E2,
-                                                  ).withOpacity(0.1),
-                                                  borderRadius:
-                                                  BorderRadius.circular(
-                                                    4.r,
-                                                  ),
-                                                ),
-                                                child: Text(
-                                                  "${discount.toStringAsFixed(0)}% OFF",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: 12.sp,
-                                                    color: Color(0xFF3661E2),
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      ElevatedButton(
-                                        onPressed:
-                                            () => _showPatientSelectionDialog(
-                                          context,
-                                          test,
-                                        ),
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor:
-                                          selectedPatientCount > 0
-                                              ? Colors.white
-                                              : Color(0xFF3661E2),
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 24.w,
-                                            vertical: 12.h,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              8.r,
-                                            ),
-                                            side:
-                                            selectedPatientCount > 0
-                                                ? BorderSide(
-                                              color: Color(0xFF3661E2),
-                                              width: 1,
-                                            )
-                                                : BorderSide.none,
-                                          ),
-                                          elevation: 0,
-                                        ),
-                                        child: Text(
-                                          selectedPatientCount > 0
-                                              ? "$selectedPatientCount Patient${selectedPatientCount == 1 ? '' : 's'}"
-                                              : "Book Now",
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.w600,
-                                            color:
-                                            selectedPatientCount > 0
-                                                ? Color(0xFF3661E2)
-                                                : Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.all(16.w),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[50],
-                                    borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(12.r),
-                                      bottomRight: Radius.circular(12.r),
+                                SizedBox(height: 12.h),
+                                ElevatedButton(
+                                  onPressed: _fetchTests,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Color(0xFF3661E2),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 20.w,
+                                      vertical: 10.h,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.r),
                                     ),
                                   ),
-                                  child: Row(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        test["requiresFasting"]
-                                            ? Icons.fastfood
-                                            : Icons.no_food,
-                                        size: 16.w,
-                                        color: Colors.grey[600],
-                                      ),
-                                      SizedBox(width: 4.w),
-                                      Text(
-                                        test["requiresFasting"]
-                                            ? "Fasting required"
-                                            : "Fasting not required",
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 12.sp,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                      SizedBox(width: 16.w),
-                                      Icon(
-                                        Icons.access_time,
-                                        size: 16.w,
-                                        color: Colors.grey[600],
-                                      ),
-                                      SizedBox(width: 4.w),
-                                      Text(
-                                        "Reports in ${test["reportTime"]}",
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 12.sp,
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                    ],
+                                  child: Text(
+                                    "Retry",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                        );
-                      },
-                    ),
-                  ),
-                SizedBox(height: 100.h),
-              ],
-            ),
-          ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Consumer<CartModel>(
-              builder: (context, cart, child) {
-                if (cart.itemCount == 0) return const SizedBox.shrink();
-                return Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 20.w,
-                    vertical: 12.h,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(12.r),
-                      topRight: Radius.circular(12.r),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, -2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "${cart.itemCount} item${cart.itemCount == 1 ? '' : 's'} added",
-                            style: GoogleFonts.poppins(
-                              fontSize: 14.sp,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          Text(
-                            "₹${cart.totalPrice.toStringAsFixed(2)}",
-                            // "₹${cart.selectedTotalPrice.toStringAsFixed(2)}",
-                            style: GoogleFonts.poppins(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFF3661E2),
-                            ),
-                          ),
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            CustomPageRoute(
-                              child: CartScreen(userModel: widget.userModel),
-                              direction: AxisDirection.left,
-                            ),
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF3661E2),
+                        )
+                      else
+                        Padding(
                           padding: EdgeInsets.symmetric(
-                            horizontal: 24.w,
-                            vertical: 12.h,
+                            horizontal: 16.w,
+                            vertical: 8.h,
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10.r),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: filteredTests.length,
+                            itemBuilder: (context, index) {
+                              final test = filteredTests[index];
+                              final testName = test["name"] ?? "Unknown Test";
+                              final isSelected = _selectedTests[testName] ?? false;
+                              final originalPrice = test["originalPrice"] ?? 0.0;
+                              final discountPrice = test["discountPrice"] ?? 0.0;
+                              final description = test['description'];
+                              final discount = test["discount"] ?? 0;
+                              final reportTime = test["reportTime"] ?? "24 hours";
+                              final itemId =
+                                  '${widget.service["provider"]}_$testName';
+                              final cartItem = _cartModel.items.firstWhere(
+                                    (item) => item['itemId'] == itemId,
+                                orElse: () => {},
+                              );
+                              final selectedPatientCount =
+                              isSelected && cartItem['selectedPatientIds'] != null
+                                  ? (cartItem['selectedPatientIds'] as List).length
+                                  : 0;
+
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    CustomPageRoute(
+                                      child: TestListDetails(
+                                        test: {
+                                          ...test, // Include all test data
+                                          "provider": widget.service["provider"],
+                                          "service": widget.service["service"],
+                                          "pointBalance":
+                                          widget.service["pointBalance"] ?? 0,
+                                          "walletAmtPercentage":
+                                          widget.service["walletAmtPercentage"]
+                                              ?.toDouble() ??
+                                              0.0,
+                                          'isWalletEnabled':
+                                          widget.service['isWalletEnabled'] ??
+                                              false,
+                                        },
+                                        provider: widget.service["provider"],
+                                        service: widget.service["service"],
+                                        userModel: widget.userModel,
+                                      ),
+                                      direction: AxisDirection.left,
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(bottom: 16.h),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(12.r),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.all(16.w),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              testName,
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 18.sp,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.black87,
+                                              ),
+                                            ),
+                                            if (description != null)
+                                              Text(
+                                                description,
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 14,
+                                                  color: Colors.grey[600],
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                      ),
+                                      Divider(height: 1.h, color: Colors.grey[300]),
+                                      Padding(
+                                        padding: EdgeInsets.all(16.w),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () => _showTestParameters(
+                                                    context,
+                                                    test,
+                                                  ),
+                                                  child: Text(
+                                                    "Includes ${test['testCount']} test${test['testCount'] == 1 ? '' : 's'}",
+                                                    style: GoogleFonts.poppins(
+                                                      fontSize: 14.sp,
+                                                      color: Color(0xFF3661E2),
+                                                    ),
+                                                  ),
+                                                ),
+                                                SizedBox(height: 8.h),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "₹${discountPrice.toStringAsFixed(0)}",
+                                                      style: GoogleFonts.poppins(
+                                                        fontSize: 18.sp,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.black87,
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 8.w),
+                                                    Text(
+                                                      "₹${originalPrice.toStringAsFixed(0)}",
+                                                      style: GoogleFonts.poppins(
+                                                        fontSize: 14.sp,
+                                                        color: Colors.grey,
+                                                        decoration:
+                                                        TextDecoration.lineThrough,
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 8.w),
+                                                    Container(
+                                                      padding: EdgeInsets.symmetric(
+                                                        horizontal: 6.w,
+                                                        vertical: 2.h,
+                                                      ),
+                                                      decoration: BoxDecoration(
+                                                        color: Color(0xFF3661E2)
+                                                            .withOpacity(0.1),
+                                                        borderRadius:
+                                                        BorderRadius.circular(4.r),
+                                                      ),
+                                                      child: Text(
+                                                        "${discount.toStringAsFixed(0)}% OFF",
+                                                        style: GoogleFonts.poppins(
+                                                          fontSize: 12.sp,
+                                                          color: Color(0xFF3661E2),
+                                                          fontWeight: FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () =>
+                                                  _showPatientSelectionDialog(
+                                                    context,
+                                                    test,
+                                                  ),
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: selectedPatientCount > 0
+                                                    ? Colors.white
+                                                    : Color(0xFF3661E2),
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 24.w,
+                                                  vertical: 12.h,
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(
+                                                    8.r,
+                                                  ),
+                                                  side: selectedPatientCount > 0
+                                                      ? BorderSide(
+                                                    color: Color(0xFF3661E2),
+                                                    width: 1,
+                                                  )
+                                                      : BorderSide.none,
+                                                ),
+                                                elevation: 0,
+                                              ),
+                                              child: Text(
+                                                selectedPatientCount > 0
+                                                    ? "$selectedPatientCount Patient${selectedPatientCount == 1 ? '' : 's'}"
+                                                    : "Book Now",
+                                                style: GoogleFonts.poppins(
+                                                  fontSize: 14.sp,
+                                                  fontWeight: FontWeight.w600,
+                                                  color: selectedPatientCount > 0
+                                                      ? Color(0xFF3661E2)
+                                                      : Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      Container(
+                                        padding: EdgeInsets.all(16.w),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[50],
+                                          borderRadius: BorderRadius.only(
+                                            bottomLeft: Radius.circular(12.r),
+                                            bottomRight: Radius.circular(12.r),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                          children: [
+                                            Icon(
+                                              test["requiresFasting"]
+                                                  ? Icons.fastfood
+                                                  : Icons.no_food,
+                                              size: 16.w,
+                                              color: Colors.grey[600],
+                                            ),
+                                            SizedBox(width: 4.w),
+                                            Text(
+                                              test["requiresFasting"]
+                                                  ? "Fasting required"
+                                                  : "Fasting not required",
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 12.sp,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
+                                            SizedBox(width: 16.w),
+                                            Icon(
+                                              Icons.access_time,
+                                              size: 16.w,
+                                              color: Colors.grey[600],
+                                            ),
+                                            SizedBox(width: 4.w),
+                                            Text(
+                                              "Reports in ${test["reportTime"]}",
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 12.sp,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
                           ),
-                          elevation: 2,
                         ),
-                        child: Text(
-                          "Go to Cart",
-                          style: GoogleFonts.poppins(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
+                      SizedBox(height: 100.h),
                     ],
                   ),
-                );
-              },
+                ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Consumer<CartModel>(
+                    builder: (context, cart, child) {
+                      if (cart.itemCount == 0) return const SizedBox.shrink();
+                      return Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 20.w,
+                          vertical: 12.h,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(12.r),
+                            topRight: Radius.circular(12.r),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, -2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${cart.itemCount} item${cart.itemCount == 1 ? '' : 's'} added",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black87,
+                                  ),
+                                ),
+                                Text(
+                                  "₹${cart.totalPrice.toStringAsFixed(2)}",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF3661E2),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  CustomPageRoute(
+                                    child: CartScreen(userModel: widget.userModel),
+                                    direction: AxisDirection.left,
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF3661E2),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 24.w,
+                                  vertical: 12.h,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.r),
+                                ),
+                                elevation: 2,
+                              ),
+                              child: Text(
+                                "Go to Cart",
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -1325,6 +1323,1161 @@ class _TestListScreenState extends State<TestListScreen> {
       ),
     );
   }
+  // @override
+  // Widget build(BuildContext context) {
+  //   final filteredTests = _searchQuery.isEmpty
+  //       ? _tests
+  //       : _tests.where((test) {
+  //     final query = _searchQuery.toLowerCase();
+  //     return test["name"].toLowerCase().contains(query) ||
+  //         test["description"].toLowerCase().contains(query);
+  //   }).toList();
+  //
+  //   return Scaffold(
+  //     backgroundColor: Colors.grey[200],
+  //     appBar: AppBar(
+  //       backgroundColor: Colors.grey[200],
+  //       elevation: 0,
+  //       title: Text(
+  //         "${widget.service["provider"]}",
+  //         style: GoogleFonts.poppins(
+  //           fontSize: 20.sp,
+  //           fontWeight: FontWeight.w600,
+  //           color: const Color(0xFF3661E2),
+  //         ),
+  //       ),
+  //       iconTheme: const IconThemeData(color: Color(0xFF3661E2)),
+  //       actions: [
+  //         Padding(
+  //           padding: EdgeInsets.only(right: 16.w),
+  //           child: Stack(
+  //             clipBehavior: Clip.none,
+  //             children: [
+  //               IconButton(
+  //                 icon: Icon(
+  //                   Icons.shopping_cart,
+  //                   size: 28.w,
+  //                   color: const Color(0xFF3661E2),
+  //                 ),
+  //                 onPressed: () {
+  //                   Navigator.push(
+  //                     context,
+  //                     CustomPageRoute(
+  //                       child: CartScreen(userModel: widget.userModel),
+  //                       direction: AxisDirection.left,
+  //                     ),
+  //                   );
+  //                 },
+  //                 tooltip: 'View Cart',
+  //               ),
+  //               Positioned(
+  //                 right: 2.w,
+  //                 top: 4.h,
+  //                 child: Consumer<CartModel>(
+  //                   builder: (context, cart, child) => cart.itemCount > 0
+  //                       ? Container(
+  //                     width: 18.w,
+  //                     height: 18.h,
+  //                     alignment: Alignment.center,
+  //                     decoration: BoxDecoration(
+  //                       color: Colors.redAccent,
+  //                       shape: BoxShape.circle,
+  //                       border: Border.all(
+  //                         color: Colors.white,
+  //                         width: 1.5.w,
+  //                       ),
+  //                     ),
+  //                     child: Text(
+  //                       cart.itemCount.toString(),
+  //                       style: GoogleFonts.poppins(
+  //                         fontSize: 10.sp,
+  //                         color: Colors.white,
+  //                         fontWeight: FontWeight.w600,
+  //                       ),
+  //                     ),
+  //                   )
+  //                       : const SizedBox.shrink(),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //     body: Column(
+  //       children: [
+  //         // Fixed Search Bar and Address Section
+  //         Container(
+  //           color: Colors.grey[200],
+  //           child: Column(
+  //             children: [
+  //               Padding(
+  //                 padding: EdgeInsets.symmetric(
+  //                   horizontal: 16.w,
+  //                   vertical: 12.h,
+  //                 ),
+  //                 child: Container(
+  //                   decoration: BoxDecoration(
+  //                     borderRadius: BorderRadius.circular(12.r),
+  //                     color: Colors.white,
+  //                     boxShadow: [
+  //                       BoxShadow(
+  //                         color: Colors.black.withOpacity(0.05),
+  //                         blurRadius: 8,
+  //                         offset: Offset(0, 2),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   child: TextField(
+  //                     controller: _searchController,
+  //                     decoration: InputDecoration(
+  //                       hintText: "Search tests...",
+  //                       prefixIcon: Icon(
+  //                         Icons.search,
+  //                         color: Colors.grey.shade500,
+  //                         size: 20.w,
+  //                       ),
+  //                       border: OutlineInputBorder(
+  //                         borderRadius: BorderRadius.circular(12.r),
+  //                         borderSide: BorderSide.none,
+  //                       ),
+  //                       filled: true,
+  //                       fillColor: Colors.white,
+  //                       contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+  //                     ),
+  //                     style: GoogleFonts.poppins(fontSize: 14.sp),
+  //                   ),
+  //                 ),
+  //               ),
+  //               Padding(
+  //                 padding: EdgeInsets.symmetric(
+  //                   horizontal: 16.w,
+  //                   vertical: 8.h,
+  //                 ),
+  //                 child: Row(
+  //                   children: [
+  //                     Icon(
+  //                       Icons.location_on,
+  //                       color: Colors.grey[600],
+  //                       size: 20.w,
+  //                     ),
+  //                     SizedBox(width: 8.w),
+  //                     Expanded(
+  //                       child: Text(
+  //                         widget.currentAddress,
+  //                         style: GoogleFonts.poppins(
+  //                           color: Colors.grey[600],
+  //                           fontSize: 14.sp,
+  //                         ),
+  //                         overflow: TextOverflow.ellipsis,
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //
+  //         // Scrollable Content Area
+  //         Expanded(
+  //           child: Stack(
+  //             children: [
+  //               SingleChildScrollView(
+  //                 child: Column(
+  //                   children: [
+  //                     if (_isLoadingTests)
+  //                       Padding(
+  //                         padding: EdgeInsets.all(16.w),
+  //                         child: Shimmer.fromColors(
+  //                           baseColor: Colors.grey[300]!,
+  //                           highlightColor: Colors.grey[100]!,
+  //                           child: ListView.builder(
+  //                             shrinkWrap: true,
+  //                             physics: const NeverScrollableScrollPhysics(),
+  //                             itemCount: 6,
+  //                             itemBuilder: (context, index) =>
+  //                                 _buildShimmerTestCard(),
+  //                           ),
+  //                         ),
+  //                       )
+  //                     else if (_errorMessage != null)
+  //                       Padding(
+  //                         padding: EdgeInsets.all(16.w),
+  //                         child: Center(
+  //                           child: Column(
+  //                             mainAxisSize: MainAxisSize.min,
+  //                             children: [
+  //                               Text(
+  //                                 _errorMessage!,
+  //                                 style: GoogleFonts.poppins(
+  //                                   fontSize: 16.sp,
+  //                                   color: Colors.redAccent,
+  //                                 ),
+  //                                 textAlign: TextAlign.center,
+  //                               ),
+  //                               SizedBox(height: 12.h),
+  //                               ElevatedButton(
+  //                                 onPressed: _fetchTests,
+  //                                 style: ElevatedButton.styleFrom(
+  //                                   backgroundColor: Color(0xFF3661E2),
+  //                                   padding: EdgeInsets.symmetric(
+  //                                     horizontal: 20.w,
+  //                                     vertical: 10.h,
+  //                                   ),
+  //                                   shape: RoundedRectangleBorder(
+  //                                     borderRadius: BorderRadius.circular(8.r),
+  //                                   ),
+  //                                 ),
+  //                                 child: Text(
+  //                                   "Retry",
+  //                                   style: GoogleFonts.poppins(
+  //                                     fontSize: 14.sp,
+  //                                     fontWeight: FontWeight.w600,
+  //                                     color: Colors.white,
+  //                                   ),
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                       )
+  //                     else
+  //                       Padding(
+  //                         padding: EdgeInsets.symmetric(
+  //                           horizontal: 16.w,
+  //                           vertical: 8.h,
+  //                         ),
+  //                         child: ListView.builder(
+  //                           shrinkWrap: true,
+  //                           physics: const NeverScrollableScrollPhysics(),
+  //                           itemCount: filteredTests.length,
+  //                           itemBuilder: (context, index) {
+  //                             final test = filteredTests[index];
+  //                             final testName = test["name"] ?? "Unknown Test";
+  //                             final isSelected = _selectedTests[testName] ?? false;
+  //                             final originalPrice = test["originalPrice"] ?? 0.0;
+  //                             final discountPrice = test["discountPrice"] ?? 0.0;
+  //                             final description = test['description'];
+  //                             final discount = test["discount"] ?? 0;
+  //                             final reportTime = test["reportTime"] ?? "24 hours";
+  //                             final itemId =
+  //                                 '${widget.service["provider"]}_$testName';
+  //                             final cartItem = _cartModel.items.firstWhere(
+  //                                   (item) => item['itemId'] == itemId,
+  //                               orElse: () => {},
+  //                             );
+  //                             final selectedPatientCount =
+  //                             isSelected && cartItem['selectedPatientIds'] != null
+  //                                 ? (cartItem['selectedPatientIds'] as List).length
+  //                                 : 0;
+  //
+  //                             return GestureDetector(
+  //                               onTap: () {
+  //                                 Navigator.push(
+  //                                   context,
+  //                                   CustomPageRoute(
+  //                                     child: TestListDetails(
+  //                                       test: {
+  //                                         ...test, // Include all test data
+  //                                         "provider": widget.service["provider"],
+  //                                         "service": widget.service["service"],
+  //                                         "pointBalance":
+  //                                         widget.service["pointBalance"] ?? 0,
+  //                                         "walletAmtPercentage":
+  //                                         widget.service["walletAmtPercentage"]
+  //                                             ?.toDouble() ??
+  //                                             0.0,
+  //                                         'isWalletEnabled':
+  //                                         widget.service['isWalletEnabled'] ??
+  //                                             false,
+  //                                       },
+  //                                       provider: widget.service["provider"],
+  //                                       service: widget.service["service"],
+  //                                       userModel: widget.userModel,
+  //                                     ),
+  //                                     direction: AxisDirection.left,
+  //                                   ),
+  //                                 );
+  //                               },
+  //                               child: Container(
+  //                                 margin: EdgeInsets.only(bottom: 16.h),
+  //                                 decoration: BoxDecoration(
+  //                                   color: Colors.white,
+  //                                   borderRadius: BorderRadius.circular(12.r),
+  //                                 ),
+  //                                 child: Column(
+  //                                   crossAxisAlignment: CrossAxisAlignment.start,
+  //                                   children: [
+  //                                     Padding(
+  //                                       padding: EdgeInsets.all(16.w),
+  //                                       child: Column(
+  //                                         crossAxisAlignment:
+  //                                         CrossAxisAlignment.start,
+  //                                         children: [
+  //                                           Text(
+  //                                             testName,
+  //                                             style: GoogleFonts.poppins(
+  //                                               fontSize: 18.sp,
+  //                                               fontWeight: FontWeight.bold,
+  //                                               color: Colors.black87,
+  //                                             ),
+  //                                           ),
+  //                                           if (description != null)
+  //                                             Text(
+  //                                               description,
+  //                                               style: GoogleFonts.poppins(
+  //                                                 fontSize: 14,
+  //                                                 color: Colors.grey[600],
+  //                                               ),
+  //                                             ),
+  //                                         ],
+  //                                       ),
+  //                                     ),
+  //                                     Divider(height: 1.h, color: Colors.grey[300]),
+  //                                     Padding(
+  //                                       padding: EdgeInsets.all(16.w),
+  //                                       child: Row(
+  //                                         mainAxisAlignment:
+  //                                         MainAxisAlignment.spaceBetween,
+  //                                         children: [
+  //                                           Column(
+  //                                             crossAxisAlignment:
+  //                                             CrossAxisAlignment.start,
+  //                                             children: [
+  //                                               GestureDetector(
+  //                                                 onTap: () => _showTestParameters(
+  //                                                   context,
+  //                                                   test,
+  //                                                 ),
+  //                                                 child: Text(
+  //                                                   "Includes ${test['testCount']} test${test['testCount'] == 1 ? '' : 's'}",
+  //                                                   style: GoogleFonts.poppins(
+  //                                                     fontSize: 14.sp,
+  //                                                     color: Color(0xFF3661E2),
+  //                                                   ),
+  //                                                 ),
+  //                                               ),
+  //                                               SizedBox(height: 8.h),
+  //                                               Row(
+  //                                                 children: [
+  //                                                   Text(
+  //                                                     "₹${discountPrice.toStringAsFixed(0)}",
+  //                                                     style: GoogleFonts.poppins(
+  //                                                       fontSize: 18.sp,
+  //                                                       fontWeight: FontWeight.bold,
+  //                                                       color: Colors.black87,
+  //                                                     ),
+  //                                                   ),
+  //                                                   SizedBox(width: 8.w),
+  //                                                   Text(
+  //                                                     "₹${originalPrice.toStringAsFixed(0)}",
+  //                                                     style: GoogleFonts.poppins(
+  //                                                       fontSize: 14.sp,
+  //                                                       color: Colors.grey,
+  //                                                       decoration:
+  //                                                       TextDecoration.lineThrough,
+  //                                                     ),
+  //                                                   ),
+  //                                                   SizedBox(width: 8.w),
+  //                                                   Container(
+  //                                                     padding: EdgeInsets.symmetric(
+  //                                                       horizontal: 6.w,
+  //                                                       vertical: 2.h,
+  //                                                     ),
+  //                                                     decoration: BoxDecoration(
+  //                                                       color: Color(0xFF3661E2)
+  //                                                           .withOpacity(0.1),
+  //                                                       borderRadius:
+  //                                                       BorderRadius.circular(4.r),
+  //                                                     ),
+  //                                                     child: Text(
+  //                                                       "${discount.toStringAsFixed(0)}% OFF",
+  //                                                       style: GoogleFonts.poppins(
+  //                                                         fontSize: 12.sp,
+  //                                                         color: Color(0xFF3661E2),
+  //                                                         fontWeight: FontWeight.w600,
+  //                                                       ),
+  //                                                     ),
+  //                                                   ),
+  //                                                 ],
+  //                                               ),
+  //                                             ],
+  //                                           ),
+  //                                           ElevatedButton(
+  //                                             onPressed: () =>
+  //                                                 _showPatientSelectionDialog(
+  //                                                   context,
+  //                                                   test,
+  //                                                 ),
+  //                                             style: ElevatedButton.styleFrom(
+  //                                               backgroundColor: selectedPatientCount > 0
+  //                                                   ? Colors.white
+  //                                                   : Color(0xFF3661E2),
+  //                                               padding: EdgeInsets.symmetric(
+  //                                                 horizontal: 24.w,
+  //                                                 vertical: 12.h,
+  //                                               ),
+  //                                               shape: RoundedRectangleBorder(
+  //                                                 borderRadius: BorderRadius.circular(
+  //                                                   8.r,
+  //                                                 ),
+  //                                                 side: selectedPatientCount > 0
+  //                                                     ? BorderSide(
+  //                                                   color: Color(0xFF3661E2),
+  //                                                   width: 1,
+  //                                                 )
+  //                                                     : BorderSide.none,
+  //                                               ),
+  //                                               elevation: 0,
+  //                                             ),
+  //                                             child: Text(
+  //                                               selectedPatientCount > 0
+  //                                                   ? "$selectedPatientCount Patient${selectedPatientCount == 1 ? '' : 's'}"
+  //                                                   : "Book Now",
+  //                                               style: GoogleFonts.poppins(
+  //                                                 fontSize: 14.sp,
+  //                                                 fontWeight: FontWeight.w600,
+  //                                                 color: selectedPatientCount > 0
+  //                                                     ? Color(0xFF3661E2)
+  //                                                     : Colors.white,
+  //                                               ),
+  //                                             ),
+  //                                           ),
+  //                                         ],
+  //                                       ),
+  //                                     ),
+  //                                     Container(
+  //                                       padding: EdgeInsets.all(16.w),
+  //                                       decoration: BoxDecoration(
+  //                                         color: Colors.grey[50],
+  //                                         borderRadius: BorderRadius.only(
+  //                                           bottomLeft: Radius.circular(12.r),
+  //                                           bottomRight: Radius.circular(12.r),
+  //                                         ),
+  //                                       ),
+  //                                       child: Row(
+  //                                         crossAxisAlignment:
+  //                                         CrossAxisAlignment.center,
+  //                                         children: [
+  //                                           Icon(
+  //                                             test["requiresFasting"]
+  //                                                 ? Icons.fastfood
+  //                                                 : Icons.no_food,
+  //                                             size: 16.w,
+  //                                             color: Colors.grey[600],
+  //                                           ),
+  //                                           SizedBox(width: 4.w),
+  //                                           Text(
+  //                                             test["requiresFasting"]
+  //                                                 ? "Fasting required"
+  //                                                 : "Fasting not required",
+  //                                             style: GoogleFonts.poppins(
+  //                                               fontSize: 12.sp,
+  //                                               color: Colors.grey[600],
+  //                                             ),
+  //                                           ),
+  //                                           SizedBox(width: 16.w),
+  //                                           Icon(
+  //                                             Icons.access_time,
+  //                                             size: 16.w,
+  //                                             color: Colors.grey[600],
+  //                                           ),
+  //                                           SizedBox(width: 4.w),
+  //                                           Text(
+  //                                             "Reports in ${test["reportTime"]}",
+  //                                             style: GoogleFonts.poppins(
+  //                                               fontSize: 12.sp,
+  //                                               color: Colors.grey[600],
+  //                                             ),
+  //                                           ),
+  //                                         ],
+  //                                       ),
+  //                                     ),
+  //                                   ],
+  //                                 ),
+  //                               ),
+  //                             );
+  //                           },
+  //                         ),
+  //                       ),
+  //                     SizedBox(height: 100.h),
+  //                   ],
+  //                 ),
+  //               ),
+  //               Align(
+  //                 alignment: Alignment.bottomCenter,
+  //                 child: Consumer<CartModel>(
+  //                   builder: (context, cart, child) {
+  //                     if (cart.itemCount == 0) return const SizedBox.shrink();
+  //                     return Container(
+  //                       padding: EdgeInsets.symmetric(
+  //                         horizontal: 20.w,
+  //                         vertical: 12.h,
+  //                       ),
+  //                       decoration: BoxDecoration(
+  //                         color: Colors.white,
+  //                         borderRadius: BorderRadius.only(
+  //                           topLeft: Radius.circular(12.r),
+  //                           topRight: Radius.circular(12.r),
+  //                         ),
+  //                         boxShadow: [
+  //                           BoxShadow(
+  //                             color: Colors.black.withOpacity(0.1),
+  //                             blurRadius: 8,
+  //                             offset: const Offset(0, -2),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                       child: Row(
+  //                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                         children: [
+  //                           Column(
+  //                             mainAxisSize: MainAxisSize.min,
+  //                             crossAxisAlignment: CrossAxisAlignment.start,
+  //                             children: [
+  //                               Text(
+  //                                 "${cart.itemCount} item${cart.itemCount == 1 ? '' : 's'} added",
+  //                                 style: GoogleFonts.poppins(
+  //                                   fontSize: 14.sp,
+  //                                   fontWeight: FontWeight.w500,
+  //                                   color: Colors.black87,
+  //                                 ),
+  //                               ),
+  //                               Text(
+  //                                 "₹${cart.totalPrice.toStringAsFixed(2)}",
+  //                                 style: GoogleFonts.poppins(
+  //                                   fontSize: 16.sp,
+  //                                   fontWeight: FontWeight.w700,
+  //                                   color: Color(0xFF3661E2),
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                           ElevatedButton(
+  //                             onPressed: () {
+  //                               Navigator.push(
+  //                                 context,
+  //                                 CustomPageRoute(
+  //                                   child: CartScreen(userModel: widget.userModel),
+  //                                   direction: AxisDirection.left,
+  //                                 ),
+  //                               );
+  //                             },
+  //                             style: ElevatedButton.styleFrom(
+  //                               backgroundColor: Color(0xFF3661E2),
+  //                               padding: EdgeInsets.symmetric(
+  //                                 horizontal: 24.w,
+  //                                 vertical: 12.h,
+  //                               ),
+  //                               shape: RoundedRectangleBorder(
+  //                                 borderRadius: BorderRadius.circular(10.r),
+  //                               ),
+  //                               elevation: 2,
+  //                             ),
+  //                             child: Text(
+  //                               "Go to Cart",
+  //                               style: GoogleFonts.poppins(
+  //                                 fontSize: 14.sp,
+  //                                 fontWeight: FontWeight.w600,
+  //                                 color: Colors.white,
+  //                               ),
+  //                             ),
+  //                           ),
+  //                         ],
+  //                       ),
+  //                     );
+  //                   },
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //     bottomNavigationBar: CustomBottomNavigationBar(
+  //       currentIndex: _selectedIndex,
+  //       onTap: _onItemTapped,
+  //       userModel: widget.userModel,
+  //     ),
+  //   );
+  // }
+  // @override
+  // Widget build(BuildContext context) {
+  //   final filteredTests =
+  //   _searchQuery.isEmpty
+  //       ? _tests
+  //       : _tests.where((test) {
+  //     final query = _searchQuery.toLowerCase();
+  //     return test["name"].toLowerCase().contains(query) ||
+  //         test["description"].toLowerCase().contains(query);
+  //   }).toList();
+  //
+  //   return Scaffold(
+  //     backgroundColor: Colors.grey[200],
+  //     appBar: AppBar(
+  //       backgroundColor: Colors.grey[200],
+  //       elevation: 0,
+  //       title: Text(
+  //         "${widget.service["provider"]}",
+  //         style: GoogleFonts.poppins(
+  //           fontSize: 20.sp,
+  //           fontWeight: FontWeight.w600,
+  //           color: const Color(0xFF3661E2),
+  //         ),
+  //       ),
+  //       iconTheme: const IconThemeData(color: Color(0xFF3661E2)),
+  //       actions: [
+  //         Padding(
+  //           padding: EdgeInsets.only(right: 16.w),
+  //           child: Stack(
+  //             clipBehavior: Clip.none,
+  //             children: [
+  //               IconButton(
+  //                 icon: Icon(
+  //                   Icons.shopping_cart,
+  //                   size: 28.w,
+  //                   color: const Color(0xFF3661E2),
+  //                 ),
+  //                 onPressed: () {
+  //                   Navigator.push(
+  //                     context,
+  //                     CustomPageRoute(
+  //                       child: CartScreen(userModel: widget.userModel),
+  //                       direction: AxisDirection.left,
+  //                     ),
+  //                   );
+  //                 },
+  //                 tooltip: 'View Cart',
+  //               ),
+  //               Positioned(
+  //                 right: 2.w,
+  //                 top: 4.h,
+  //                 child: Consumer<CartModel>(
+  //                   builder:
+  //                       (context, cart, child) =>
+  //                   cart.itemCount > 0
+  //                       ? Container(
+  //                     width: 18.w,
+  //                     height: 18.h,
+  //                     alignment: Alignment.center,
+  //                     decoration: BoxDecoration(
+  //                       color: Colors.redAccent,
+  //                       shape: BoxShape.circle,
+  //                       border: Border.all(
+  //                         color: Colors.white,
+  //                         width: 1.5.w,
+  //                       ),
+  //                     ),
+  //                     child: Text(
+  //                       cart.itemCount.toString(),
+  //                       style: GoogleFonts.poppins(
+  //                         fontSize: 10.sp,
+  //                         color: Colors.white,
+  //                         fontWeight: FontWeight.w600,
+  //                       ),
+  //                     ),
+  //                   )
+  //                       : const SizedBox.shrink(),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //     body: Stack(
+  //       children: [
+  //         SingleChildScrollView(
+  //           child: Column(
+  //             children: [
+  //               Padding(
+  //                 padding: EdgeInsets.symmetric(
+  //                   horizontal: 16.w,
+  //                   vertical: 12.h,
+  //                 ),
+  //                 child: Container(
+  //                   decoration: BoxDecoration(
+  //                     borderRadius: BorderRadius.circular(12.r),
+  //                     color: Colors.white,
+  //                     boxShadow: [
+  //                       BoxShadow(
+  //                         color: Colors.black.withOpacity(0.05),
+  //                         blurRadius: 8,
+  //                         offset: Offset(0, 2),
+  //                       ),
+  //                     ],
+  //                   ),
+  //                   child: TextField(
+  //                     controller: _searchController,
+  //                     decoration: InputDecoration(
+  //                       hintText: "Search tests...",
+  //                       prefixIcon: Icon(
+  //                         Icons.search,
+  //                         color: Colors.grey.shade500,
+  //                         size: 20.w,
+  //                       ),
+  //                       border: OutlineInputBorder(
+  //                         borderRadius: BorderRadius.circular(12.r),
+  //                         borderSide: BorderSide.none,
+  //                       ),
+  //                       filled: true,
+  //                       fillColor: Colors.white,
+  //                       contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+  //                     ),
+  //                     style: GoogleFonts.poppins(fontSize: 14.sp),
+  //                   ),
+  //                 ),
+  //               ),
+  //               Padding(
+  //                 padding: EdgeInsets.symmetric(
+  //                   horizontal: 16.w,
+  //                   vertical: 8.h,
+  //                 ),
+  //                 child: Row(
+  //                   children: [
+  //                     Icon(
+  //                       Icons.location_on,
+  //                       color: Colors.grey[600],
+  //                       size: 20.w,
+  //                     ),
+  //                     SizedBox(width: 8.w),
+  //                     Expanded(
+  //                       child: Text(
+  //                         widget.currentAddress,
+  //                         style: GoogleFonts.poppins(
+  //                           color: Colors.grey[600],
+  //                           fontSize: 14.sp,
+  //                         ),
+  //                         overflow: TextOverflow.ellipsis,
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //               if (_isLoadingTests)
+  //                 Padding(
+  //                   padding: EdgeInsets.all(16.w),
+  //                   child: Shimmer.fromColors(
+  //                     baseColor: Colors.grey[300]!,
+  //                     highlightColor: Colors.grey[100]!,
+  //                     child: ListView.builder(
+  //                       shrinkWrap: true,
+  //                       physics: const NeverScrollableScrollPhysics(),
+  //                       itemCount: 6,
+  //                       itemBuilder:
+  //                           (context, index) => _buildShimmerTestCard(),
+  //                     ),
+  //                   ),
+  //                 )
+  //               else if (_errorMessage != null)
+  //                 Padding(
+  //                   padding: EdgeInsets.all(16.w),
+  //                   child: Center(
+  //                     child: Column(
+  //                       mainAxisSize: MainAxisSize.min,
+  //                       children: [
+  //                         Text(
+  //                           _errorMessage!,
+  //                           style: GoogleFonts.poppins(
+  //                             fontSize: 16.sp,
+  //                             color: Colors.redAccent,
+  //                           ),
+  //                           textAlign: TextAlign.center,
+  //                         ),
+  //                         SizedBox(height: 12.h),
+  //                         ElevatedButton(
+  //                           onPressed: _fetchTests,
+  //                           style: ElevatedButton.styleFrom(
+  //                             backgroundColor: Color(0xFF3661E2),
+  //                             padding: EdgeInsets.symmetric(
+  //                               horizontal: 20.w,
+  //                               vertical: 10.h,
+  //                             ),
+  //                             shape: RoundedRectangleBorder(
+  //                               borderRadius: BorderRadius.circular(8.r),
+  //                             ),
+  //                           ),
+  //                           child: Text(
+  //                             "Retry",
+  //                             style: GoogleFonts.poppins(
+  //                               fontSize: 14.sp,
+  //                               fontWeight: FontWeight.w600,
+  //                               color: Colors.white,
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                   ),
+  //                 )
+  //               else
+  //                 Padding(
+  //                   padding: EdgeInsets.symmetric(
+  //                     horizontal: 16.w,
+  //                     vertical: 8.h,
+  //                   ),
+  //                   child: ListView.builder(
+  //                     shrinkWrap: true,
+  //                     physics: const NeverScrollableScrollPhysics(),
+  //                     itemCount: filteredTests.length,
+  //                     itemBuilder: (context, index) {
+  //                       final test = filteredTests[index];
+  //                       final testName = test["name"] ?? "Unknown Test";
+  //                       final isSelected = _selectedTests[testName] ?? false;
+  //                       final originalPrice = test["originalPrice"] ?? 0.0;
+  //                       final discountPrice = test["discountPrice"] ?? 0.0;
+  //                       final description = test['description'];
+  //                       final discount = test["discount"] ?? 0;
+  //                       final reportTime = test["reportTime"] ?? "24 hours";
+  //                       final itemId =
+  //                           '${widget.service["provider"]}_$testName';
+  //                       final cartItem = _cartModel.items.firstWhere(
+  //                             (item) => item['itemId'] == itemId,
+  //                         orElse: () => {},
+  //                       );
+  //                       final selectedPatientCount =
+  //                       isSelected && cartItem['selectedPatientIds'] != null
+  //                           ? (cartItem['selectedPatientIds'] as List)
+  //                           .length
+  //                           : 0;
+  //
+  //                       return GestureDetector(
+  //                         onTap: () {
+  //                           Navigator.push(
+  //                             context,
+  //                             CustomPageRoute(
+  //                               child: TestListDetails(
+  //                                 test: {
+  //                                   ...test, // Include all test data
+  //                                   "provider": widget.service["provider"],
+  //                                   "service": widget.service["service"],
+  //                                   "pointBalance":
+  //                                   widget.service["pointBalance"] ?? 0,
+  //                                   "walletAmtPercentage":
+  //                                   widget.service["walletAmtPercentage"]
+  //                                       ?.toDouble() ??
+  //                                       0.0,
+  //                                   'isWalletEnabled':
+  //                                   widget.service['isWalletEnabled'] ??
+  //                                       false,
+  //                                 },
+  //                                 provider: widget.service["provider"],
+  //                                 service: widget.service["service"],
+  //                                 userModel: widget.userModel,
+  //                               ),
+  //                               direction: AxisDirection.left,
+  //                             ),
+  //                           );
+  //                         },
+  //                         child: Container(
+  //                           margin: EdgeInsets.only(bottom: 16.h),
+  //                           decoration: BoxDecoration(
+  //                             color: Colors.white,
+  //                             borderRadius: BorderRadius.circular(12.r),
+  //                           ),
+  //                           child: Column(
+  //                             crossAxisAlignment: CrossAxisAlignment.start,
+  //                             children: [
+  //                               Padding(
+  //                                 padding: EdgeInsets.all(16.w),
+  //                                 child: Column(
+  //                                   crossAxisAlignment:
+  //                                   CrossAxisAlignment.start,
+  //                                   children: [
+  //                                     Text(
+  //                                       testName,
+  //                                       style: GoogleFonts.poppins(
+  //                                         fontSize: 18.sp,
+  //                                         fontWeight: FontWeight.bold,
+  //                                         color: Colors.black87,
+  //                                       ),
+  //                                     ),
+  //                                     if (description != null)
+  //                                       Text(
+  //                                         description,
+  //                                         style: GoogleFonts.poppins(
+  //                                           fontSize: 14,
+  //                                           color: Colors.grey[600],
+  //                                         ),
+  //                                       ),
+  //                                   ],
+  //                                 ),
+  //                               ),
+  //                               Divider(height: 1.h, color: Colors.grey[300]),
+  //                               Padding(
+  //                                 padding: EdgeInsets.all(16.w),
+  //                                 child: Row(
+  //                                   mainAxisAlignment:
+  //                                   MainAxisAlignment.spaceBetween,
+  //                                   children: [
+  //                                     Column(
+  //                                       crossAxisAlignment:
+  //                                       CrossAxisAlignment.start,
+  //                                       children: [
+  //                                         GestureDetector(
+  //                                           onTap:
+  //                                               () => _showTestParameters(
+  //                                             context,
+  //                                             test,
+  //                                           ),
+  //                                           child: Text(
+  //                                             "Includes ${test['testCount']} test${test['testCount'] == 1 ? '' : 's'}",
+  //                                             style: GoogleFonts.poppins(
+  //                                               fontSize: 14.sp,
+  //                                               color: Color(0xFF3661E2),
+  //                                             ),
+  //                                           ),
+  //                                         ),
+  //                                         SizedBox(height: 8.h),
+  //                                         Row(
+  //                                           children: [
+  //                                             Text(
+  //                                               "₹${discountPrice.toStringAsFixed(0)}",
+  //                                               style: GoogleFonts.poppins(
+  //                                                 fontSize: 18.sp,
+  //                                                 fontWeight: FontWeight.bold,
+  //                                                 color: Colors.black87,
+  //                                               ),
+  //                                             ),
+  //                                             SizedBox(width: 8.w),
+  //                                             Text(
+  //                                               "₹${originalPrice.toStringAsFixed(0)}",
+  //                                               style: GoogleFonts.poppins(
+  //                                                 fontSize: 14.sp,
+  //                                                 color: Colors.grey,
+  //                                                 decoration:
+  //                                                 TextDecoration
+  //                                                     .lineThrough,
+  //                                               ),
+  //                                             ),
+  //                                             SizedBox(width: 8.w),
+  //                                             Container(
+  //                                               padding: EdgeInsets.symmetric(
+  //                                                 horizontal: 6.w,
+  //                                                 vertical: 2.h,
+  //                                               ),
+  //                                               decoration: BoxDecoration(
+  //                                                 color: Color(
+  //                                                   0xFF3661E2,
+  //                                                 ).withOpacity(0.1),
+  //                                                 borderRadius:
+  //                                                 BorderRadius.circular(
+  //                                                   4.r,
+  //                                                 ),
+  //                                               ),
+  //                                               child: Text(
+  //                                                 "${discount.toStringAsFixed(0)}% OFF",
+  //                                                 style: GoogleFonts.poppins(
+  //                                                   fontSize: 12.sp,
+  //                                                   color: Color(0xFF3661E2),
+  //                                                   fontWeight: FontWeight.w600,
+  //                                                 ),
+  //                                               ),
+  //                                             ),
+  //                                           ],
+  //                                         ),
+  //                                       ],
+  //                                     ),
+  //                                     ElevatedButton(
+  //                                       onPressed:
+  //                                           () => _showPatientSelectionDialog(
+  //                                         context,
+  //                                         test,
+  //                                       ),
+  //                                       style: ElevatedButton.styleFrom(
+  //                                         backgroundColor:
+  //                                         selectedPatientCount > 0
+  //                                             ? Colors.white
+  //                                             : Color(0xFF3661E2),
+  //                                         padding: EdgeInsets.symmetric(
+  //                                           horizontal: 24.w,
+  //                                           vertical: 12.h,
+  //                                         ),
+  //                                         shape: RoundedRectangleBorder(
+  //                                           borderRadius: BorderRadius.circular(
+  //                                             8.r,
+  //                                           ),
+  //                                           side:
+  //                                           selectedPatientCount > 0
+  //                                               ? BorderSide(
+  //                                             color: Color(0xFF3661E2),
+  //                                             width: 1,
+  //                                           )
+  //                                               : BorderSide.none,
+  //                                         ),
+  //                                         elevation: 0,
+  //                                       ),
+  //                                       child: Text(
+  //                                         selectedPatientCount > 0
+  //                                             ? "$selectedPatientCount Patient${selectedPatientCount == 1 ? '' : 's'}"
+  //                                             : "Book Now",
+  //                                         style: GoogleFonts.poppins(
+  //                                           fontSize: 14.sp,
+  //                                           fontWeight: FontWeight.w600,
+  //                                           color:
+  //                                           selectedPatientCount > 0
+  //                                               ? Color(0xFF3661E2)
+  //                                               : Colors.white,
+  //                                         ),
+  //                                       ),
+  //                                     ),
+  //                                   ],
+  //                                 ),
+  //                               ),
+  //                               Container(
+  //                                 padding: EdgeInsets.all(16.w),
+  //                                 decoration: BoxDecoration(
+  //                                   color: Colors.grey[50],
+  //                                   borderRadius: BorderRadius.only(
+  //                                     bottomLeft: Radius.circular(12.r),
+  //                                     bottomRight: Radius.circular(12.r),
+  //                                   ),
+  //                                 ),
+  //                                 child: Row(
+  //                                   crossAxisAlignment:
+  //                                   CrossAxisAlignment.center,
+  //                                   children: [
+  //                                     Icon(
+  //                                       test["requiresFasting"]
+  //                                           ? Icons.fastfood
+  //                                           : Icons.no_food,
+  //                                       size: 16.w,
+  //                                       color: Colors.grey[600],
+  //                                     ),
+  //                                     SizedBox(width: 4.w),
+  //                                     Text(
+  //                                       test["requiresFasting"]
+  //                                           ? "Fasting required"
+  //                                           : "Fasting not required",
+  //                                       style: GoogleFonts.poppins(
+  //                                         fontSize: 12.sp,
+  //                                         color: Colors.grey[600],
+  //                                       ),
+  //                                     ),
+  //                                     SizedBox(width: 16.w),
+  //                                     Icon(
+  //                                       Icons.access_time,
+  //                                       size: 16.w,
+  //                                       color: Colors.grey[600],
+  //                                     ),
+  //                                     SizedBox(width: 4.w),
+  //                                     Text(
+  //                                       "Reports in ${test["reportTime"]}",
+  //                                       style: GoogleFonts.poppins(
+  //                                         fontSize: 12.sp,
+  //                                         color: Colors.grey[600],
+  //                                       ),
+  //                                     ),
+  //                                   ],
+  //                                 ),
+  //                               ),
+  //                             ],
+  //                           ),
+  //                         ),
+  //                       );
+  //                     },
+  //                   ),
+  //                 ),
+  //               SizedBox(height: 100.h),
+  //             ],
+  //           ),
+  //         ),
+  //         Align(
+  //           alignment: Alignment.bottomCenter,
+  //           child: Consumer<CartModel>(
+  //             builder: (context, cart, child) {
+  //               if (cart.itemCount == 0) return const SizedBox.shrink();
+  //               return Container(
+  //                 padding: EdgeInsets.symmetric(
+  //                   horizontal: 20.w,
+  //                   vertical: 12.h,
+  //                 ),
+  //                 decoration: BoxDecoration(
+  //                   color: Colors.white,
+  //                   borderRadius: BorderRadius.only(
+  //                     topLeft: Radius.circular(12.r),
+  //                     topRight: Radius.circular(12.r),
+  //                   ),
+  //                   boxShadow: [
+  //                     BoxShadow(
+  //                       color: Colors.black.withOpacity(0.1),
+  //                       blurRadius: 8,
+  //                       offset: const Offset(0, -2),
+  //                     ),
+  //                   ],
+  //                 ),
+  //                 child: Row(
+  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //                   children: [
+  //                     Column(
+  //                       mainAxisSize: MainAxisSize.min,
+  //                       crossAxisAlignment: CrossAxisAlignment.start,
+  //                       children: [
+  //                         Text(
+  //                           "${cart.itemCount} item${cart.itemCount == 1 ? '' : 's'} added",
+  //                           style: GoogleFonts.poppins(
+  //                             fontSize: 14.sp,
+  //                             fontWeight: FontWeight.w500,
+  //                             color: Colors.black87,
+  //                           ),
+  //                         ),
+  //                         Text(
+  //                           "₹${cart.totalPrice.toStringAsFixed(2)}",
+  //                           // "₹${cart.selectedTotalPrice.toStringAsFixed(2)}",
+  //                           style: GoogleFonts.poppins(
+  //                             fontSize: 16.sp,
+  //                             fontWeight: FontWeight.w700,
+  //                             color: Color(0xFF3661E2),
+  //                           ),
+  //                         ),
+  //                       ],
+  //                     ),
+  //                     ElevatedButton(
+  //                       onPressed: () {
+  //                         Navigator.push(
+  //                           context,
+  //                           CustomPageRoute(
+  //                             child: CartScreen(userModel: widget.userModel),
+  //                             direction: AxisDirection.left,
+  //                           ),
+  //                         );
+  //                       },
+  //                       style: ElevatedButton.styleFrom(
+  //                         backgroundColor: Color(0xFF3661E2),
+  //                         padding: EdgeInsets.symmetric(
+  //                           horizontal: 24.w,
+  //                           vertical: 12.h,
+  //                         ),
+  //                         shape: RoundedRectangleBorder(
+  //                           borderRadius: BorderRadius.circular(10.r),
+  //                         ),
+  //                         elevation: 2,
+  //                       ),
+  //                       child: Text(
+  //                         "Go to Cart",
+  //                         style: GoogleFonts.poppins(
+  //                           fontSize: 14.sp,
+  //                           fontWeight: FontWeight.w600,
+  //                           color: Colors.white,
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               );
+  //             },
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //     bottomNavigationBar: CustomBottomNavigationBar(
+  //       currentIndex: _selectedIndex,
+  //       onTap: _onItemTapped,
+  //       userModel: widget.userModel,
+  //     ),
+  //   );
+  // }
 
   Widget _buildShimmerTestCard() {
     return Container(
