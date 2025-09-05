@@ -6403,6 +6403,7 @@ import '../../models/UserModel/user_model.dart';
 import '../../models/CartModel/cart_model.dart';
 import '../../services/MemberService/AddMemberForm/add_member_form.dart';
 import '../../services/MemberService/member_service.dart';
+import '../../utils/Environment/environment.dart';
 import '../../utils/routes/custom_page_route.dart';
 import '../OrderSuccessPopup/order_success_popup.dart';
 import '../TestListScreen/TestListDetails/test_list_details.dart';
@@ -6974,9 +6975,18 @@ class CartScreen extends StatelessWidget {
 
     final addressController = TextEditingController(text: selectedAddress);
     final _formKey = GlobalKey<FormState>();
-    final String googleApiKey = 'AIzaSyC1GFWUpVW3J66nMDFhOHm09yRGFESAlVM';
+    final String googleApiKey = Environment.googleMapsApiKey;
     final Dio _dio = Dio();
 
+    if (googleApiKey.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Google Maps API key is not configured'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
     // Function to fetch autocomplete predictions using Dio
     Future<List<Map<String, dynamic>>> _fetchPlacePredictions(String input, CancelToken cancelToken) async {
       try {
@@ -10780,7 +10790,7 @@ class CartScreen extends StatelessWidget {
     });
 
     final options = {
-      'key': 'rzp_test_LeshFtPDPl49hb',
+      'key': Environment.razorpayKey,
       'amount': (payableAmount * 100).toInt(),
       'name': 'Aqure',
       'description': 'Payment for Aqure',
@@ -10789,7 +10799,6 @@ class CartScreen extends StatelessWidget {
         'email': userModel.currentUser?['email'] ?? '',
       },
     };
-
     try {
       razorpay.open(options);
     } catch (e) {

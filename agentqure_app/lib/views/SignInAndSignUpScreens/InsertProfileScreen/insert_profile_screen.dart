@@ -1409,6 +1409,7 @@
 //     );
 //   }
 // }
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -1744,26 +1745,30 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
                       // Email Input Field
                       TextFormField(
                         controller: _emailController,
-                        // cursorColor: Colors.black,
                         cursorColor: FormFieldUtils.cursorColor,
                         decoration: FormFieldUtils.buildInputDecoration(labelText:'Email',icon: Icons.email_outlined, hasError: _emailHasError),
-                        // decoration: _buildInputDecoration('Email *', Icons.email_outlined, hasError: _emailHasError),
                         keyboardType: TextInputType.emailAddress,
-                        // style: GoogleFonts.poppins(
-                        //   fontSize: 16.sp,
-                        //   fontWeight: FontWeight.w600,
-                        // ),
                         style: FormFieldUtils.formTextStyle(),
                         textInputAction: TextInputAction.next,
+                        // validator: (value) {
+                        //   bool hasError = false;
+                        //   if (value == null || value.isEmpty) {
+                        //     hasError = true;
+                        //   } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                        //     hasError = true;
+                        //   }
+                        //   setState(() => _emailHasError = hasError);
+                        //   return hasError ? 'Please enter a valid email' : null;
+                        // },
                         validator: (value) {
                           bool hasError = false;
                           if (value == null || value.isEmpty) {
                             hasError = true;
-                          } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                          } else if (!EmailValidator.validate(value)) {
                             hasError = true;
                           }
                           setState(() => _emailHasError = hasError);
-                          return hasError ? 'Please enter a valid email' : null;
+                          return hasError ? 'Please enter a valid email address' : null;
                         },
                       ),
                       SizedBox(height: 16.h),
