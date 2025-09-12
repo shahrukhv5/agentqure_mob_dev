@@ -1655,10 +1655,12 @@ class _OrganizationsScreenState extends State<OrganizationsScreen>
           if (body is Map<String, dynamic> && body.containsKey('data')) {
             data = body['data'] as List<dynamic>;
           } else {
-            throw Exception('Invalid body structure in API response');
+            // throw Exception('Invalid body structure in API response');
+            throw Exception('Unable to load providers at this time');
           }
         } else {
-          throw Exception('Unexpected response structure: $decodedResponse');
+          // throw Exception('Unexpected response structure: $decodedResponse');
+          throw Exception('Unable to load providers at this time');
         }
 
         if (data.isNotEmpty) {
@@ -1692,13 +1694,15 @@ class _OrganizationsScreenState extends State<OrganizationsScreen>
           });
         } else {
           setState(() {
-            _errorMessage = "No providers found in API response";
+            // _errorMessage = "No providers found in API response";
+            _errorMessage = "No lab partners available at the moment";
             _isLoading = false;
           });
         }
       } else {
         setState(() {
-          _errorMessage = "Failed to load providers: ${response.statusCode}";
+          // _errorMessage = "Failed to load providers: ${response.statusCode}";
+          _errorMessage = "Unable to load providers. Please try again.";
           _isLoading = false;
         });
       }
@@ -1708,7 +1712,8 @@ class _OrganizationsScreenState extends State<OrganizationsScreen>
       }
       if (!mounted) return;
       setState(() {
-        _errorMessage = "Error fetching providers: $e";
+        // _errorMessage = "Error fetching providers: $e";
+        _errorMessage = "Network error. Please check your connection.";
         _isLoading = false;
       });
     }

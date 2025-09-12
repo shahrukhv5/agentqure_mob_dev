@@ -265,6 +265,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../controllers/UserController/user_controller.dart';
 import '../../../models/UserModel/user_model.dart';
+import '../../../utils/ErrorUtils.dart';
 import '../../../utils/FormFieldUtils/form_field_utils.dart';
 import '../OTPScreen/otp_screen.dart';
 
@@ -570,14 +571,16 @@ class _LoginScreenState extends State<LoginScreen>
           ),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response['message'] ?? 'Failed to send OTP')),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text(response['message'] ?? 'Failed to send OTP')),
+        // );
+        ErrorUtils.showErrorSnackBar(context, 'Failed to send OTP. Please try again.');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: ${e.toString()}')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Error: ${e.toString()}')),
+      // );
+      ErrorUtils.showErrorSnackBar(context, 'Network error. Please check your connection.');
     } finally {
       setState(() => _isLoading = false);
     }

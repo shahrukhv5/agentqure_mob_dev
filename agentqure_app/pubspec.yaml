@@ -58,6 +58,7 @@ dependencies:
   app_links: ^6.4.1
   flutter_dotenv: ^6.0.0
   email_validator: ^3.0.0
+  flutter_local_notifications: ^19.4.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -1418,6 +1418,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../controllers/UserController/user_controller.dart';
 import '../../../models/UserModel/user_model.dart';
+import '../../../utils/ErrorUtils.dart';
 import '../../../utils/FormFieldUtils/form_field_utils.dart';
 
 class InsertProfileScreen extends StatefulWidget {
@@ -1426,7 +1427,7 @@ class InsertProfileScreen extends StatefulWidget {
   const InsertProfileScreen({
     required this.phoneNumber,
     this.pendingReferralCode,
-    super.key
+    super.key,
   });
 
   @override
@@ -1493,20 +1494,63 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
     super.dispose();
   }
 
+  // Future<void> _saveProfile() async {
+  //   if (_isLoading) return;
+  //   String? referralCode = _referralController.text.trim().isNotEmpty
+  //       ? _referralController.text.trim()
+  //       : null;
+  //
+  //   if (_formKey.currentState!.validate() &&
+  //       _selectedGender != null &&
+  //       _ageController.text.isNotEmpty) {
+  //     setState(() => _isLoading = true);
+  //     final controller = UserController(
+  //       Provider.of<UserModel>(context, listen: false),
+  //       context,
+  //     );
+  //     try {
+  //       await controller.saveProfile(
+  //         firstName: _firstNameController.text.trim(),
+  //         lastName: _lastNameController.text.trim(),
+  //         phoneNumber: widget.phoneNumber,
+  //         email: _emailController.text.trim(),
+  //         address: _addressController.text.trim(),
+  //         gender: _selectedGender!,
+  //         age: _ageController.text.isNotEmpty
+  //             ? int.tryParse(_ageController.text.trim())
+  //             : null,
+  //         isParent: true,
+  //         isNewUser: true,
+  //         referralCode: referralCode,
+  //       );
+  //       final prefs = await SharedPreferences.getInstance();
+  //       await prefs.remove('pending_referral_code');
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Failed to create profile: ${e.toString()}')),
+  //       );
+  //     } finally {
+  //       setState(() => _isLoading = false);
+  //     }
+  //   } else {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Please fill all fields correctly')),
+  //     );
+  //   }
+  // }
   Future<void> _saveProfile() async {
     if (_isLoading) return;
-    String? referralCode = _referralController.text.trim().isNotEmpty
-        ? _referralController.text.trim()
-        : null;
 
     if (_formKey.currentState!.validate() &&
         _selectedGender != null &&
         _ageController.text.isNotEmpty) {
       setState(() => _isLoading = true);
+
       final controller = UserController(
         Provider.of<UserModel>(context, listen: false),
         context,
       );
+
       try {
         await controller.saveProfile(
           firstName: _firstNameController.text.trim(),
@@ -1520,21 +1564,39 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
               : null,
           isParent: true,
           isNewUser: true,
-          referralCode: referralCode,
+          referralCode: _referralController.text.trim().isNotEmpty
+              ? _referralController.text.trim()
+              : null,
         );
+
         final prefs = await SharedPreferences.getInstance();
         await prefs.remove('pending_referral_code');
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to create profile: ${e.toString()}')),
+        ErrorUtils.showErrorSnackBar(
+          context,
+          'Failed to create profile. Please try again.',
         );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text('Registration failed: ${e.toString()}'),
+        //     duration: Duration(seconds: 5),
+        //     backgroundColor: Colors.red,
+        //   ),
+        // );
       } finally {
         setState(() => _isLoading = false);
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please fill all fields correctly')),
+      ErrorUtils.showErrorSnackBar(
+        context,
+        'Please fill all required fields correctly.',
       );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text('Please fill all required fields correctly'),
+      //     backgroundColor: Colors.orange,
+      //   ),
+      // );
     }
   }
 
@@ -1575,7 +1637,11 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
   }
 
   // Custom input decoration method
-  InputDecoration _buildInputDecoration(String labelText, IconData icon, {bool hasError = false}) {
+  InputDecoration _buildInputDecoration(
+    String labelText,
+    IconData icon, {
+    bool hasError = false,
+  }) {
     return InputDecoration(
       labelText: labelText,
       labelStyle: GoogleFonts.poppins(
@@ -1616,10 +1682,7 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
         borderSide: BorderSide(color: Colors.red),
       ),
       // contentPadding: EdgeInsets.symmetric(vertical: 16.h),
-      errorStyle: GoogleFonts.poppins(
-        fontSize: 12.sp,
-        color: Colors.red,
-      ),
+      errorStyle: GoogleFonts.poppins(fontSize: 12.sp, color: Colors.red),
       floatingLabelStyle: TextStyle(
         color: hasError ? Colors.red : Colors.black,
       ),
@@ -1652,7 +1715,9 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
                               shape: BoxShape.circle,
                               boxShadow: [
                                 BoxShadow(
-                                  color: Color(0xFF3661E2).withOpacity(0.1), // Changed to black
+                                  color: Color(
+                                    0xFF3661E2,
+                                  ).withOpacity(0.1), // Changed to black
                                   blurRadius: 12,
                                   spreadRadius: 4,
                                 ),
@@ -1713,7 +1778,9 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
                         validator: (value) {
                           final hasError = value == null || value.isEmpty;
                           setState(() => _firstNameHasError = hasError);
-                          return hasError ? 'Please enter your first name' : null;
+                          return hasError
+                              ? 'Please enter your first name'
+                              : null;
                         },
                       ),
                       SizedBox(height: 16.h),
@@ -1721,7 +1788,11 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
                       TextFormField(
                         controller: _lastNameController,
                         cursorColor: FormFieldUtils.cursorColor,
-                        decoration: FormFieldUtils.buildInputDecoration(labelText:'Last Name', icon:Icons.person_outline),
+                        decoration: FormFieldUtils.buildInputDecoration(
+                          labelText: 'Last Name',
+                          icon: Icons.person_outline,
+                          isOptional: true,
+                        ),
                         // style: GoogleFonts.poppins(
                         //   fontSize: 16.sp,
                         //   fontWeight: FontWeight.w600,
@@ -1746,7 +1817,11 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
                       TextFormField(
                         controller: _emailController,
                         cursorColor: FormFieldUtils.cursorColor,
-                        decoration: FormFieldUtils.buildInputDecoration(labelText:'Email',icon: Icons.email_outlined, hasError: _emailHasError),
+                        decoration: FormFieldUtils.buildInputDecoration(
+                          labelText: 'Email',
+                          icon: Icons.email_outlined,
+                          hasError: _emailHasError,
+                        ),
                         keyboardType: TextInputType.emailAddress,
                         style: FormFieldUtils.formTextStyle(),
                         textInputAction: TextInputAction.next,
@@ -1768,7 +1843,9 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
                             hasError = true;
                           }
                           setState(() => _emailHasError = hasError);
-                          return hasError ? 'Please enter a valid email address' : null;
+                          return hasError
+                              ? 'Please enter a valid email address'
+                              : null;
                         },
                       ),
                       SizedBox(height: 16.h),
@@ -1776,16 +1853,23 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
                       DropdownButtonFormField<String>(
                         dropdownColor: Colors.white,
                         value: _selectedGender,
-                        decoration: FormFieldUtils.buildInputDecoration(labelText:'Gender',icon:  Icons.transgender, hasError: _genderHasError).copyWith(
-                          suffixIcon: Padding(
-                            padding: EdgeInsets.only(right: 10.w),
-                            child: Icon(
-                              Icons.arrow_drop_down,
-                              color: _genderHasError ? Colors.red : Colors.black,
-                              size: 24.w,
+                        decoration:
+                            FormFieldUtils.buildInputDecoration(
+                              labelText: 'Gender',
+                              icon: Icons.transgender,
+                              hasError: _genderHasError,
+                            ).copyWith(
+                              suffixIcon: Padding(
+                                padding: EdgeInsets.only(right: 10.w),
+                                child: Icon(
+                                  Icons.arrow_drop_down,
+                                  color: _genderHasError
+                                      ? Colors.red
+                                      : Colors.black,
+                                  size: 24.w,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
                         style: FormFieldUtils.formTextStyle(),
                         // style: GoogleFonts.poppins(
                         //   fontSize: 16.sp,
@@ -1830,7 +1914,11 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
                                 FilteringTextInputFormatter.deny(RegExp(r'\s')),
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
-                              decoration: FormFieldUtils.buildInputDecoration(labelText:'Age',icon:  Icons.calendar_today_outlined, hasError: _ageHasError),
+                              decoration: FormFieldUtils.buildInputDecoration(
+                                labelText: 'Age',
+                                icon: Icons.calendar_today_outlined,
+                                hasError: _ageHasError,
+                              ),
                               keyboardType: TextInputType.number,
                               // style: GoogleFonts.poppins(
                               //   fontSize: 16.sp,
@@ -1844,10 +1932,13 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
                                   hasError = true;
                                 } else {
                                   final age = int.tryParse(value);
-                                  hasError = age == null || age <= 0 || age > 120;
+                                  hasError =
+                                      age == null || age <= 0 || age > 120;
                                 }
                                 setState(() => _ageHasError = hasError);
-                                return hasError ? 'Please enter a valid age (1-120)' : null;
+                                return hasError
+                                    ? 'Please enter a valid age (1-120)'
+                                    : null;
                               },
                             ),
                           ),
@@ -1869,7 +1960,11 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
                         controller: _addressController,
                         // cursorColor: Colors.black,
                         cursorColor: FormFieldUtils.cursorColor,
-                        decoration: FormFieldUtils.buildInputDecoration(labelText:'Address',icon:  Icons.location_on_outlined, hasError: _addressHasError),
+                        decoration: FormFieldUtils.buildInputDecoration(
+                          labelText: 'Address',
+                          icon: Icons.location_on_outlined,
+                          hasError: _addressHasError,
+                        ),
                         // style: GoogleFonts.poppins(
                         //   fontSize: 16.sp,
                         //   fontWeight: FontWeight.w600,
@@ -1889,9 +1984,9 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
                         // cursorColor: Colors.black,
                         cursorColor: FormFieldUtils.cursorColor,
                         decoration: FormFieldUtils.buildInputDecoration(
-                            labelText:'Referral Code',
-                            icon:  Icons.card_giftcard,
-                        isOptional: true
+                          labelText: 'Referral Code',
+                          icon: Icons.card_giftcard,
+                          isOptional: true,
                         ),
 
                         keyboardType: TextInputType.text,
@@ -1927,22 +2022,22 @@ class _InsertProfileScreenState extends State<InsertProfileScreen>
                             ),
                             child: _isLoading
                                 ? SizedBox(
-                              width: 24.w,
-                              height: 24.h,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 3,
-                                color: Colors.white,
-                              ),
-                            )
+                                    width: 24.w,
+                                    height: 24.h,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 3,
+                                      color: Colors.white,
+                                    ),
+                                  )
                                 : Text(
-                              "CONTINUE",
-                              style: GoogleFonts.poppins(
-                                fontSize: 16.sp,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.2,
-                                color: Colors.white,
-                              ),
-                            ),
+                                    "CONTINUE",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 1.2,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
                         ),
                       ),

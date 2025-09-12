@@ -196,7 +196,9 @@
 // }
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/UserModel/user_model.dart';
+import '../../utils/ErrorUtils.dart';
 import '../../views/SignInAndSignUpScreens/InsertProfileScreen/insert_profile_screen.dart';
 import '../../views/SignInAndSignUpScreens/LoginScreen/login_screen.dart';
 import '../../views/SignInAndSignUpScreens/OTPScreen/otp_screen.dart';
@@ -274,16 +276,18 @@ class UserController {
           response['data']['verificationStatus'] == 'VERIFICATION_COMPLETED') {
         await _handleSuccessfulVerification(phoneNumber, pendingReferralCode);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('OTP validation failed: ${response['message']}'),
-          ),
-        );
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(
+        //     content: Text('OTP validation failed: ${response['message']}'),
+        //   ),
+        // );
+        ErrorUtils.showErrorSnackBar(context, 'Invalid OTP. Please try again.');
       }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      // ScaffoldMessenger.of(
+      //   context,
+      // ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      ErrorUtils.showErrorSnackBar(context, 'Verification failed. Please try again.');
     }
   }
 
@@ -323,6 +327,59 @@ class UserController {
     }
   }
 
+  // Future<void> saveProfile({
+  //   required String firstName,
+  //   required String phoneNumber,
+  //   required String email,
+  //   String? lastName,
+  //   String? address,
+  //   required String gender,
+  //   required int? age,
+  //   String? parentChildRelation,
+  //   bool? isParent,
+  //   String? linkingId,
+  //   required bool isNewUser,
+  //   String? referralCode,
+  // }) async {
+  //   try {
+  //     if (isNewUser) {
+  //       await userModel.registerUser(
+  //         firstName: firstName,
+  //         lastName: lastName ?? '',
+  //         phoneNumber: phoneNumber,
+  //         email: email,
+  //         address: address ?? '',
+  //         gender: gender,
+  //         age: age,
+  //         parentChildRelation: parentChildRelation,
+  //         isParent: isParent,
+  //         linkingId: linkingId,
+  //         referralCode: referralCode,
+  //       );
+  //     } else {
+  //       await userModel.updateUser(
+  //         firstName: firstName,
+  //         lastName: lastName ?? '',
+  //         phoneNumber: phoneNumber,
+  //         email: email,
+  //         address: address ?? '',
+  //         gender: gender,
+  //         age: age,
+  //         parentChildRelation: parentChildRelation,
+  //         isParent: isParent,
+  //         linkingId: linkingId,
+  //       );
+  //     }
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => HomeScreen()),
+  //     );
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(
+  //       context,
+  //     ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+  //   }
+  // }
   Future<void> saveProfile({
     required String firstName,
     required String phoneNumber,
@@ -352,6 +409,15 @@ class UserController {
           linkingId: linkingId,
           referralCode: referralCode,
         );
+        // flag to show welcome notification for new users
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('showWelcomeNotification', true);
+        // Verify that user was actually created before proceeding
+        final userExists = await userModel.checkUserExists(phoneNumber);
+        if (!userExists) {
+          throw Exception('Registration failed. Please try again.');
+        }
+        ErrorUtils.showSuccessSnackBar(context, 'Profile created successfully!');
       } else {
         await userModel.updateUser(
           firstName: firstName,
@@ -365,24 +431,40 @@ class UserController {
           isParent: isParent,
           linkingId: linkingId,
         );
+        ErrorUtils.showSuccessSnackBar(context, 'Profile updated successfully!');
       }
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      // ScaffoldMessenger.of(
+      //   context,
+      // ).showSnackBar(SnackBar(
+      //   content: Text('Error: ${e.toString()}'),
+      //   duration: Duration(seconds: 5),
+      // ));
+      ErrorUtils.showErrorSnackBar(context, 'Failed to save profile. Please try again.');
+      // rethrow;
     }
   }
-
   Future<void> logout() async {
-    await userModel.logout();
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => LoginScreen()),
-          (Route<dynamic> route) => false,
-    );
+    // await userModel.logout();
+    // Navigator.pushAndRemoveUntil(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => LoginScreen()),
+    //       (Route<dynamic> route) => false,
+    // );
+    try {
+      await userModel.logout();
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginScreen()),
+            (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      ErrorUtils.showErrorSnackBar(context, 'Logout failed. Please try again.');
+    }
   }
 }

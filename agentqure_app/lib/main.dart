@@ -270,8 +270,8 @@
 //     );
 //   }
 // }
+import 'package:agentqure/services/NotificationService/notification_service.dart';
 import 'package:agentqure/utils/FormFieldUtils/form_field_utils.dart';
-import 'package:agentqure/views/SignInAndSignUpScreens/InsertProfileScreen/insert_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -284,13 +284,13 @@ import 'views/PermissionsScreen/permissions_screen.dart';
 import 'views/UserDashboard/HomeScreen/home_screen.dart';
 import 'views/SignInAndSignUpScreens/LoginScreen/login_screen.dart';
 import 'package:app_links/app_links.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart'; // Add this import
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-
-  // Load environment variables before anything else
+  final notificationService = NotificationService();
+  await notificationService.initialize();
   await dotenv.load(fileName: ".env");
 
   SystemChrome.setPreferredOrientations([
@@ -328,7 +328,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _initAppLinks();
-    _validateEnvironment(); // Validate environment variables
+    _validateEnvironment();
   }
 
   // Validate that required environment variables are present
@@ -426,7 +426,6 @@ class _MyAppState extends State<MyApp> {
               } else {
                 return PermissionHandlerScreen(
                   nextScreen: LoginScreen(),
-                  // nextScreen: InsertProfileScreen(phoneNumber: '',),
                   pendingReferralCode: _pendingReferralCode,
                 );
               }

@@ -1155,7 +1155,7 @@ class _TestListScreenState extends State<TestListScreen> {
                                               child: Text(
                                                 selectedPatientCount > 0
                                                     ? "$selectedPatientCount Patient${selectedPatientCount == 1 ? '' : 's'}"
-                                                    : "Book Now",
+                                                    : "Add to Cart",
                                                 style: GoogleFonts.poppins(
                                                   fontSize: 14.sp,
                                                   fontWeight: FontWeight.w600,

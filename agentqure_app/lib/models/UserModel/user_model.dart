@@ -3,6 +3,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../services/NotificationService/notification_service.dart';
+
 class UserModel with ChangeNotifier {
   Map<String, dynamic>? _currentUser;
   bool _isLoggedIn = false;
@@ -345,6 +347,10 @@ class UserModel with ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
       await prefs.setString('phoneNumber', phoneNumber);
+      // if (_pointBalance != null) {
+      //   final notificationService = NotificationService();
+      //   await notificationService.showWelcomeNotification(_pointBalance!);
+      // }
       print('User logged in with phone: $phoneNumber');
       notifyListeners();
     } else {
@@ -364,6 +370,63 @@ class UserModel with ChangeNotifier {
     notifyListeners();
   }
 
+  // Future<void> registerUser({
+  //   required String firstName,
+  //   required String lastName,
+  //   required String phoneNumber,
+  //   required String email,
+  //   required String address,
+  //   required String gender,
+  //   required int? age,
+  //   String? parentChildRelation,
+  //   bool? isParent,
+  //   String? linkingId,
+  //   String? referralCode,
+  // }) async {
+  //   try {
+  //     final data = {
+  //       "firstName": firstName,
+  //       "lastName": lastName,
+  //       "emailId": email,
+  //       "address": address,
+  //       "gender": gender,
+  //       "age": age,
+  //       if (parentChildRelation != null)
+  //         "parent_child_relation": parentChildRelation,
+  //       if (isParent != null) "is_parent": isParent ? 1 : 0,
+  //       if (linkingId != null) "linking_id": linkingId,
+  //       if (referralCode != null) "referralCode": referralCode,
+  //     };
+  //
+  //     if (phoneNumber.isNotEmpty) {
+  //       data["contactNumber"] = phoneNumber;
+  //     }
+  //
+  //     final response = await _dio.post('/register-app-user', data: data);
+  //     print('registerUser response: ${response.data}');
+  //
+  //     if (response.data != null) {
+  //       _currentUser = {
+  //         'firstName': firstName,
+  //         'lastName': lastName,
+  //         'contactNumber': phoneNumber.isNotEmpty ? phoneNumber : null,
+  //         'emailId': email,
+  //         'address': address,
+  //         'gender': gender,
+  //         'age': age,
+  //         'parent_child_relation': parentChildRelation,
+  //         'is_parent': isParent,
+  //         'linking_id': linkingId,
+  //         'referralCode': referralCode,
+  //         'children': [],
+  //       };
+  //       await login(phoneNumber.isNotEmpty ? phoneNumber : (linkingId ?? ''));
+  //     }
+  //   } catch (e) {
+  //     print('Error registering user: $e');
+  //     rethrow;
+  //   }
+  // }
   Future<void> registerUser({
     required String firstName,
     required String lastName,
@@ -399,7 +462,15 @@ class UserModel with ChangeNotifier {
       final response = await _dio.post('/register-app-user', data: data);
       print('registerUser response: ${response.data}');
 
+      // ERROR CHECKING
       if (response.data != null) {
+        // Check if the response indicates success
+        if (response.data['statusCode'] == 400 ||
+            response.data['body']?['status'] == 'failed') {
+          throw Exception(response.data['body']?['message'] ?? 'Registration failed');
+        }
+
+        // Only proceed if registration was successful
         _currentUser = {
           'firstName': firstName,
           'lastName': lastName,
@@ -414,14 +485,21 @@ class UserModel with ChangeNotifier {
           'referralCode': referralCode,
           'children': [],
         };
-        await login(phoneNumber.isNotEmpty ? phoneNumber : (linkingId ?? ''));
+
+        // Only login if registration was truly successful
+        if (phoneNumber.isNotEmpty) {
+          await login(phoneNumber);
+        } else if (linkingId != null) {
+          await login(linkingId);
+        }
+      } else {
+        throw Exception('Empty response from server');
       }
     } catch (e) {
       print('Error registering user: $e');
       rethrow;
     }
   }
-
   Future<void> updateUser({
     required String firstName,
     required String lastName,

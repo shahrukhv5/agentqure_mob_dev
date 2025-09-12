@@ -357,6 +357,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../controllers/UserController/user_controller.dart';
 import '../../../models/UserModel/user_model.dart';
+import '../../../utils/ErrorUtils.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
@@ -452,7 +453,8 @@ class _OtpScreenState extends State<OtpScreen> with SingleTickerProviderStateMix
         widget.pendingReferralCode,
       );
     } catch (e) {
-      setState(() => _errorMessage = e.toString());
+      // setState(() => _errorMessage = e.toString());
+      setState(() => _errorMessage = 'Invalid OTP. Please try again.');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
@@ -568,13 +570,14 @@ class _OtpScreenState extends State<OtpScreen> with SingleTickerProviderStateMix
                 ),
                 if (_errorMessage != null) ...[
                   SizedBox(height: 8.h),
-                  Text(
-                    _errorMessage!,
-                    style: GoogleFonts.poppins(
-                      fontSize: 12.sp,
-                      color: Colors.red,
-                    ),
-                  ),
+                  ErrorUtils.buildErrorContainer(_errorMessage!),
+                  // Text(
+                  //   _errorMessage!,
+                  //   style: GoogleFonts.poppins(
+                  //     fontSize: 12.sp,
+                  //     color: Colors.red,
+                  //   ),
+                  // ),
                 ],
                 SizedBox(height: 32.h),
                 Row(

@@ -4,10 +4,13 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../controllers/UserController/user_controller.dart';
 import '../../../models/CartModel/cart_model.dart';
 import '../../../models/UserModel/user_model.dart';
+import '../../../services/NotificationService/notification_service.dart';
 import '../../../utils/CustomBottomNavigationBar/custom_bottom_navigation_bar.dart';
+import '../../../utils/ErrorUtils.dart';
 import '../../../utils/NavigationUtils/navigation_utils.dart';
 import '../../CartScreen/cart_screen.dart';
 import '../OrganizationsScreen/organizations_screen.dart';
@@ -27,18 +30,46 @@ class _HomeScreenState extends State<HomeScreen> {
   String _searchQuery = '';
   int _selectedIndex = 0;
   bool _isLoggingOut = false;
+  bool _hasShownWelcomeNotification = false;
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
     _searchController.addListener(_onSearchChanged);
+    _checkAndShowWelcomeNotification();
   }
 
   void _onSearchChanged() {
     setState(() {
       _searchQuery = _searchController.text;
     });
+  }
+  Future<void> _checkAndShowWelcomeNotification() async {
+    final prefs = await SharedPreferences.getInstance();
+    final shouldShowWelcome = prefs.getBool('showWelcomeNotification') ?? false;
+
+    if (shouldShowWelcome) {
+      // Get the user's point balance
+      final userModel = Provider.of<UserModel>(context, listen: false);
+      final user = userModel.currentUser;
+
+      if (user != null) {
+        // Fetch point balance first
+        await userModel.fetchPointBalance(user['appUserId'].toString());
+
+        // Show welcome notification
+        final notificationService = NotificationService();
+        await notificationService.showWelcomeNotification(userModel.pointBalance ?? 0.0);
+
+        // Clear the flag so it doesn't show again
+        await prefs.remove('showWelcomeNotification');
+
+        setState(() {
+          _hasShownWelcomeNotification = true;
+        });
+      }
+    }
   }
 
   Future<void> _getCurrentLocation() async {
@@ -137,9 +168,10 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       await controller.logout();
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error logging out: ${e.toString()}')),
-      );
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Error logging out: ${e.toString()}')),
+      // );
+      ErrorUtils.showErrorSnackBar(context, 'Logout failed. Please try again.');
     } finally {
       if (mounted) {
         setState(() => _isLoggingOut = false);

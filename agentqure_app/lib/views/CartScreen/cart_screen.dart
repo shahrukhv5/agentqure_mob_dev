@@ -10798,6 +10798,9 @@ class CartScreen extends StatelessWidget {
         'contact': userModel.currentUser?['contactNumber'] ?? '',
         'email': userModel.currentUser?['email'] ?? '',
       },
+      'external': {
+        'wallets': ['phonepe', 'gpay', 'paytm']
+      }
     };
     try {
       razorpay.open(options);

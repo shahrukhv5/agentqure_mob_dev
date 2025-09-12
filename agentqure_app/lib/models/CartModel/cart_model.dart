@@ -861,6 +861,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../models/UserModel/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+
+import '../../services/NotificationService/notification_service.dart';
 class CartModel extends ChangeNotifier {
   final List<Map<String, dynamic>> _items = [];
   final Dio _dio = Dio();
@@ -1486,7 +1488,12 @@ class CartModel extends ChangeNotifier {
           if (responseBody['status'] == 'success') {
             final message =
                 responseBody['message'] ?? 'Order placed successfully';
-
+            // Show order notification
+            final notificationService = NotificationService();
+            await notificationService.showOrderNotification(
+                requestId ?? 'N/A',
+                totalAmountPaid
+            );
             // Add to order history
             orderHistory.add({
               'id':
@@ -1645,6 +1652,9 @@ class CartModel extends ChangeNotifier {
       orderHistory[orderIndex]['status'] = status;
       await _saveOrderHistory();
       notifyListeners();
+      // Show status update notification
+      // final notificationService = NotificationService();
+      // await notificationService.showOrderStatusNotification(status, requestId);
     }
   }
 
