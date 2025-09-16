@@ -112,7 +112,7 @@ class NotificationService {
 
   Future<void> initialize() async {
     const AndroidInitializationSettings androidSettings =
-    AndroidInitializationSettings('@drawable/ic_stat_white_logo');
+    AndroidInitializationSettings('@drawable/ic_launcher');
 
     const DarwinInitializationSettings iosSettings =
     DarwinInitializationSettings(
