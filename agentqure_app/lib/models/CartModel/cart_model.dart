@@ -1317,15 +1317,22 @@ class CartModel extends ChangeNotifier {
       final walletBalance = isWalletEnabled ? walletAmount : 0.0;
       final walletDiscountPercentage =
       isWalletEnabled ? this.walletDiscountPercentage : 0.0;
-      final walletDiscount =
-      isWalletEnabled && walletBalance > 0
+
+// NEW: Calculate wallet discount with proper capping
+      final walletDiscount = isWalletEnabled && walletBalance > 0
           ? subtotal * (walletDiscountPercentage / 100)
           : 0.0;
-      final totalAmountPaid = subtotal - walletDiscount;
-      final hasWalletDiscount =
-          isWalletEnabled && walletBalance > 0 && walletDiscount > 0;
 
-      // Determine payment status and mode
+// NEW: Use actual discount that can be applied (cap at wallet balance)
+      final actualWalletDiscount = walletDiscount <= walletBalance
+          ? walletDiscount
+          : walletBalance;
+
+      final totalAmountPaid = subtotal - actualWalletDiscount;
+      final hasWalletDiscount =
+          isWalletEnabled && walletBalance > 0 && actualWalletDiscount > 0;
+
+// Determine payment status and mode
       String paymentStatus;
       String displayPaymentMode;
       double remainingAmount;
@@ -1336,7 +1343,7 @@ class CartModel extends ChangeNotifier {
         paymentStatus = 'Paid';
         displayPaymentMode = 'Online';
         remainingAmount = 0.0;
-        advancePayment = (walletDiscount + totalAmountPaid).toStringAsFixed(0);
+        advancePayment = (actualWalletDiscount + totalAmountPaid).toStringAsFixed(0); // Use actual discount
         totalPaymentAmount = subtotal;
       } else {
         if (hasWalletDiscount) {
@@ -1348,9 +1355,48 @@ class CartModel extends ChangeNotifier {
         }
         remainingAmount = totalAmountPaid;
         advancePayment =
-        hasWalletDiscount ? walletDiscount.toStringAsFixed(0) : '0';
+        hasWalletDiscount ? actualWalletDiscount.toStringAsFixed(0) : '0'; // Use actual discount
         totalPaymentAmount = totalAmountPaid;
       }
+      // final isWalletEnabled =
+      //     items.isNotEmpty && items.first['isWalletEnabled'] == true;
+      // final walletBalance = isWalletEnabled ? walletAmount : 0.0;
+      // final walletDiscountPercentage =
+      // isWalletEnabled ? this.walletDiscountPercentage : 0.0;
+      // final walletDiscount =
+      // isWalletEnabled && walletBalance > 0
+      //     ? subtotal * (walletDiscountPercentage / 100)
+      //     : 0.0;
+      // final totalAmountPaid = subtotal - walletDiscount;
+      // final hasWalletDiscount =
+      //     isWalletEnabled && walletBalance > 0 && walletDiscount > 0;
+      //
+      // // Determine payment status and mode
+      // String paymentStatus;
+      // String displayPaymentMode;
+      // double remainingAmount;
+      // String advancePayment;
+      // double totalPaymentAmount;
+      //
+      // if (paymentMode == 'Pay Now') {
+      //   paymentStatus = 'Paid';
+      //   displayPaymentMode = 'Online';
+      //   remainingAmount = 0.0;
+      //   advancePayment = (walletDiscount + totalAmountPaid).toStringAsFixed(0);
+      //   totalPaymentAmount = subtotal;
+      // } else {
+      //   if (hasWalletDiscount) {
+      //     paymentStatus = 'Partial';
+      //     displayPaymentMode = 'Partial';
+      //   } else {
+      //     paymentStatus = 'Pay Later';
+      //     displayPaymentMode = 'Pay Later';
+      //   }
+      //   remainingAmount = totalAmountPaid;
+      //   advancePayment =
+      //   hasWalletDiscount ? walletDiscount.toStringAsFixed(0) : '0';
+      //   totalPaymentAmount = totalAmountPaid;
+      // }
 
       // Build invoice payments
       final List<Map<String, dynamic>> invoicePayments = [];
@@ -1359,7 +1405,8 @@ class CartModel extends ChangeNotifier {
           invoicePayments.add({
             'payment_mode': 'Wallet',
             'dateandtime': invoiceDate,
-            'amount': walletDiscount.toStringAsFixed(0),
+            // 'amount': walletDiscount.toStringAsFixed(0),
+            'amount': actualWalletDiscount.toStringAsFixed(0),
           });
         }
         if (totalAmountPaid > 0) {
@@ -1374,7 +1421,8 @@ class CartModel extends ChangeNotifier {
           invoicePayments.add({
             'payment_mode': 'Partial',
             'dateandtime': invoiceDate,
-            'amount': walletDiscount.toStringAsFixed(0),
+            // 'amount': walletDiscount.toStringAsFixed(0),
+            'amount': actualWalletDiscount.toStringAsFixed(0),
           });
         } else {
           invoicePayments.add({
@@ -1421,12 +1469,13 @@ class CartModel extends ChangeNotifier {
           'labPartner': null,
           'discountBy': 'Lab',
           'discountGiven':
-          hasWalletDiscount ? walletDiscount.toStringAsFixed(0) : '0',
+          hasWalletDiscount ? actualWalletDiscount.toStringAsFixed(0) : '0',
           'discountReason': hasWalletDiscount ? 'Wallet discount' : '0',
           'paymentInformation': {
             'invoiceDate': invoiceDate,
             'totalPrice': subtotal.toStringAsFixed(0),
-            'totalDiscount': walletDiscount.toStringAsFixed(0),
+            // 'totalDiscount': walletDiscount.toStringAsFixed(0),
+            'totalDiscount': actualWalletDiscount.toStringAsFixed(0),
             'createdBy': primaryUserId,
             'updatedBy': primaryUserId,
             'organizationId': orgId,
@@ -1434,7 +1483,8 @@ class CartModel extends ChangeNotifier {
             'advancePayment': advancePayment,
             'invoicepayments': invoicePayments,
             'pointsBalance': walletBalance.toStringAsFixed(0),
-            'pointsUsed': hasWalletDiscount ? walletDiscount : 0,
+            // 'pointsUsed': hasWalletDiscount ? walletDiscount : 0,
+            'pointsUsed': hasWalletDiscount ? actualWalletDiscount : 0,
           },
           'services':
           services.map((service) {
@@ -1506,13 +1556,18 @@ class CartModel extends ChangeNotifier {
               'requiresHomeCollection': _requiresHomeCollection,
               'status': paymentMode == 'Pay Now' ? 'Accepted' : 'Pending',
               'subtotal': subtotal,
-              'discount': walletDiscount,
+              // 'discount': walletDiscount,
+              'discount': actualWalletDiscount,
               'totalAmountPaid': totalAmountPaid,
               'paymentMode': displayPaymentMode,
               'paymentStatus': paymentStatus,
+              // 'pointsBalanceAfterDeduction':
+              // (isWalletEnabled && walletBalance >= walletDiscount)
+              //     ? walletBalance - walletDiscount
+              //     : walletBalance,
               'pointsBalanceAfterDeduction':
-              (isWalletEnabled && walletBalance >= walletDiscount)
-                  ? walletBalance - walletDiscount
+              (isWalletEnabled && walletBalance >= actualWalletDiscount)
+                  ? walletBalance - actualWalletDiscount
                   : walletBalance,
               'walletAmtPercentage': walletDiscountPercentage,
             });

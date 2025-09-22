@@ -748,6 +748,329 @@ class _MembersScreenState extends State<MembersScreen> {
     );
   }
 
+  // void _showEditMemberForm(Map<String, dynamic> member) {
+  //   final formKey = GlobalKey<FormState>();
+  //   final firstNameController = TextEditingController(
+  //     text: member['firstName'],
+  //   );
+  //   final lastNameController = TextEditingController(
+  //     text: member['lastName'] ?? '',
+  //   );
+  //   final ageController = TextEditingController(
+  //     text: member['age']?.toString() ?? '',
+  //   );
+  //   final contactController = TextEditingController(
+  //     text: member['contactNumber'] ?? '',
+  //   );
+  //   final emailController = TextEditingController(
+  //     text: member['emailId'] ?? '',
+  //   );
+  //   final addressController = TextEditingController(
+  //     text: member['address'] ?? '',
+  //   );
+  //   String? gender = member['gender'];
+  //   String? selectedRelationId = member['parent_child_relation']?.toString();
+  //
+  //   // Method to show date picker and calculate age
+  //   Future<void> _selectDate() async {
+  //     final DateTime? picked = await showDatePicker(
+  //       context: context,
+  //       initialDate: DateTime.now().subtract(Duration(days: 365 * 30)),
+  //       firstDate: DateTime(1900),
+  //       lastDate: DateTime.now(),
+  //       builder: (context, child) {
+  //         return Theme(
+  //           data: Theme.of(context).copyWith(
+  //             colorScheme: ColorScheme.light(
+  //               primary: Color(0xFF3661E2),
+  //               onPrimary: Colors.white,
+  //               surface: Colors.white,
+  //             ),
+  //             textButtonTheme: TextButtonThemeData(
+  //               style: TextButton.styleFrom(foregroundColor: Color(0xFF3661E2)),
+  //             ),
+  //           ),
+  //           child: child!,
+  //         );
+  //       },
+  //     );
+  //     if (picked != null && mounted) {
+  //       final now = DateTime.now();
+  //       int age = now.year - picked.year;
+  //       // Adjust age if birthday hasn't occurred this year
+  //       if (now.month < picked.month ||
+  //           (now.month == picked.month && now.day < picked.day)) {
+  //         age--;
+  //       }
+  //       ageController.text = age.toString();
+  //     }
+  //   }
+  //
+  //   showModalBottomSheet(
+  //     context: context,
+  //     isScrollControlled: true,
+  //     backgroundColor: Colors.white,
+  //     shape: RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
+  //     ),
+  //     builder: (context) {
+  //       return StatefulBuilder(
+  //         builder: (context, setState) {
+  //           return SingleChildScrollView(
+  //             padding: EdgeInsets.only(
+  //               bottom: MediaQuery.of(context).viewInsets.bottom,
+  //             ),
+  //             child: Padding(
+  //               padding: EdgeInsets.all(20.w),
+  //               child: Form(
+  //                 key: formKey,
+  //                 child: Column(
+  //                   mainAxisSize: MainAxisSize.min,
+  //                   children: [
+  //                     Center(
+  //                       child: Container(
+  //                         width: 60.w,
+  //                         height: 4.h,
+  //                         margin: EdgeInsets.only(bottom: 16.h),
+  //                         decoration: BoxDecoration(
+  //                           color: Colors.grey[300],
+  //                           borderRadius: BorderRadius.circular(2.r),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                     Text(
+  //                       'Edit Family Member',
+  //                       style: GoogleFonts.poppins(
+  //                         fontSize: 20.sp,
+  //                         fontWeight: FontWeight.bold,
+  //                       ),
+  //                     ),
+  //                     SizedBox(height: 20.h),
+  //                     // First Name
+  //                     TextFormField(
+  //                       controller: firstNameController,
+  //                       decoration: InputDecoration(
+  //                         labelText: 'First Name*',
+  //                         border: OutlineInputBorder(
+  //                           borderRadius: BorderRadius.circular(10.r),
+  //                         ),
+  //                         prefixIcon: Icon(Icons.person, size: 20.w),
+  //                       ),
+  //                       validator:
+  //                           (value) =>
+  //                       value?.isEmpty ?? true ? 'Required' : null,
+  //                     ),
+  //                     SizedBox(height: 16.h),
+  //                     // Last Name
+  //                     TextFormField(
+  //                       controller: lastNameController,
+  //                       decoration: InputDecoration(
+  //                         labelText: 'Last Name',
+  //                         border: OutlineInputBorder(
+  //                           borderRadius: BorderRadius.circular(10.r),
+  //                         ),
+  //                         prefixIcon: Icon(Icons.person_outline, size: 20.w),
+  //                       ),
+  //                     ),
+  //                     SizedBox(height: 16.h),
+  //                     // Age with Date Picker
+  //                     Row(
+  //                       children: [
+  //                         Expanded(
+  //                           child: TextFormField(
+  //                             controller: ageController,
+  //                             inputFormatters: [
+  //                               FilteringTextInputFormatter.deny(RegExp(r'\s')),
+  //                               FilteringTextInputFormatter.digitsOnly,
+  //                             ],
+  //                             decoration: InputDecoration(
+  //                               labelText: 'Age*',
+  //                               border: OutlineInputBorder(
+  //                                 borderRadius: BorderRadius.circular(10.r),
+  //                               ),
+  //                               prefixIcon: Icon(Icons.cake, size: 20.w),
+  //                             ),
+  //                             keyboardType: TextInputType.number,
+  //                             validator: (value) {
+  //                               if (value == null || value.isEmpty) {
+  //                                 return 'Required';
+  //                               }
+  //                               final age = int.tryParse(value);
+  //                               if (age == null || age <= 0 || age > 120) {
+  //                                 return 'Please enter a valid age (1-120)';
+  //                               }
+  //                               return null;
+  //                             },
+  //                           ),
+  //                         ),
+  //                         SizedBox(width: 8.w),
+  //                         IconButton(
+  //                           onPressed: _selectDate,
+  //                           icon: Icon(
+  //                             Icons.calendar_today,
+  //                             color: Color(0xFF3661E2),
+  //                             size: 24.w,
+  //                           ),
+  //                           tooltip: "Select Date of Birth",
+  //                         ),
+  //                       ],
+  //                     ),
+  //                     SizedBox(height: 16.h),
+  //                     // Gender
+  //                     DropdownButtonFormField<String>(
+  //                       decoration: InputDecoration(
+  //                         labelText: 'Gender*',
+  //                         border: OutlineInputBorder(
+  //                           borderRadius: BorderRadius.circular(10.r),
+  //                         ),
+  //                         prefixIcon: Icon(Icons.transgender, size: 20.w),
+  //                       ),
+  //                       value: gender,
+  //                       items:
+  //                       ['Male', 'Female', 'Other']
+  //                           .map(
+  //                             (String value) => DropdownMenuItem<String>(
+  //                           value: value,
+  //                           child: Text(
+  //                             value,
+  //                             style: GoogleFonts.poppins(
+  //                               fontSize: 14.sp,
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       )
+  //                           .toList(),
+  //                       onChanged: (value) => setState(() => gender = value),
+  //                       validator: (value) => value == null ? 'Required' : null,
+  //                     ),
+  //                     SizedBox(height: 16.h),
+  //                     // Relation
+  //                     DropdownButtonFormField<String>(
+  //                       decoration: InputDecoration(
+  //                         labelText: 'Relation to Primary Member*',
+  //                         border: OutlineInputBorder(
+  //                           borderRadius: BorderRadius.circular(10.r),
+  //                         ),
+  //                         prefixIcon: Icon(Icons.group, size: 20.w),
+  //                       ),
+  //                       value: selectedRelationId,
+  //                       items:
+  //                       relations
+  //                           .map(
+  //                             (relation) => DropdownMenuItem<String>(
+  //                           value: relation['id'].toString(),
+  //                           child: Text(
+  //                             relation['relationName'],
+  //                             style: GoogleFonts.poppins(
+  //                               fontSize: 14.sp,
+  //                             ),
+  //                           ),
+  //                         ),
+  //                       )
+  //                           .toList(),
+  //                       onChanged:
+  //                           (value) =>
+  //                           setState(() => selectedRelationId = value),
+  //                       validator: (value) => value == null ? 'Required' : null,
+  //                     ),
+  //                     SizedBox(height: 16.h),
+  //                     // Contact Number
+  //                     TextFormField(
+  //                       maxLength: 10,
+  //                       controller: contactController,
+  //                       inputFormatters: [
+  //                         FilteringTextInputFormatter.deny(RegExp(r'\s')),
+  //                         FilteringTextInputFormatter.digitsOnly,
+  //                       ],
+  //                       decoration: InputDecoration(
+  //                         labelText: 'Contact Number*',
+  //                         border: OutlineInputBorder(
+  //                           borderRadius: BorderRadius.circular(10.r),
+  //                         ),
+  //                         prefixIcon: Icon(Icons.phone, size: 20.w),
+  //                       ),
+  //                       keyboardType: TextInputType.phone,
+  //                       validator: (value) {
+  //                         if (value == null || value.isEmpty) {
+  //                           return 'Contact number is required';
+  //                         }
+  //                         return null;
+  //                       },
+  //                     ),
+  //                     SizedBox(height: 16.h),
+  //                     // Email
+  //                     TextFormField(
+  //                       controller: emailController,
+  //                       decoration: InputDecoration(
+  //                         labelText: 'Email',
+  //                         border: OutlineInputBorder(
+  //                           borderRadius: BorderRadius.circular(10.r),
+  //                         ),
+  //                         prefixIcon: Icon(Icons.email, size: 20.w),
+  //                       ),
+  //                       keyboardType: TextInputType.emailAddress,
+  //                     ),
+  //                     SizedBox(height: 16.h),
+  //                     // Address
+  //                     TextFormField(
+  //                       controller: addressController,
+  //                       decoration: InputDecoration(
+  //                         labelText: 'Address',
+  //                         border: OutlineInputBorder(
+  //                           borderRadius: BorderRadius.circular(10.r),
+  //                         ),
+  //                         prefixIcon: Icon(Icons.home, size: 20.w),
+  //                       ),
+  //                       maxLines: 2,
+  //                     ),
+  //                     SizedBox(height: 24.h),
+  //                     // Update Button
+  //                     SizedBox(
+  //                       width: double.infinity,
+  //                       height: 50.h,
+  //                       child: ElevatedButton(
+  //                         style: ElevatedButton.styleFrom(
+  //                           backgroundColor: Color(0xFF3661E2),
+  //                           shape: RoundedRectangleBorder(
+  //                             borderRadius: BorderRadius.circular(10.r),
+  //                           ),
+  //                         ),
+  //                         onPressed: () async {
+  //                           if (formKey.currentState!.validate()) {
+  //                             Navigator.pop(context);
+  //                             await _updateMember(
+  //                               member: member,
+  //                               firstName: firstNameController.text,
+  //                               lastName: lastNameController.text,
+  //                               age: int.tryParse(ageController.text),
+  //                               gender: gender!,
+  //                               relationId: selectedRelationId!,
+  //                               contactNumber: contactController.text,
+  //                               email: emailController.text,
+  //                               address: addressController.text,
+  //                             );
+  //                           }
+  //                         },
+  //                         child: Text(
+  //                           'Update Member',
+  //                           style: GoogleFonts.poppins(
+  //                             fontSize: 16.sp,
+  //                             fontWeight: FontWeight.w600,
+  //                             color: Colors.white,
+  //                           ),
+  //                         ),
+  //                       ),
+  //                     ),
+  //                   ],
+  //                 ),
+  //               ),
+  //             ),
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
   void _showEditMemberForm(Map<String, dynamic> member) {
     final formKey = GlobalKey<FormState>();
     final firstNameController = TextEditingController(
@@ -770,6 +1093,13 @@ class _MembersScreenState extends State<MembersScreen> {
     );
     String? gender = member['gender'];
     String? selectedRelationId = member['parent_child_relation']?.toString();
+
+    // Track error states for each field
+    bool firstNameHasError = false;
+    bool ageHasError = false;
+    bool genderHasError = false;
+    bool relationHasError = false;
+    bool contactHasError = false;
 
     // Method to show date picker and calculate age
     Future<void> _selectDate() async {
@@ -794,16 +1124,81 @@ class _MembersScreenState extends State<MembersScreen> {
           );
         },
       );
-      if (picked != null && mounted) {
+      if (picked != null) {
         final now = DateTime.now();
         int age = now.year - picked.year;
-        // Adjust age if birthday hasn't occurred this year
         if (now.month < picked.month ||
             (now.month == picked.month && now.day < picked.day)) {
           age--;
         }
+        // Just update the controller text without setState since we're in a StatefulBuilder
         ageController.text = age.toString();
       }
+    }
+    // Future<void> _selectDate() async {
+    //   final DateTime? picked = await showDatePicker(
+    //     context: context,
+    //     initialDate: DateTime.now().subtract(Duration(days: 365 * 30)),
+    //     firstDate: DateTime(1900),
+    //     lastDate: DateTime.now(),
+    //     builder: (context, child) {
+    //       return Theme(
+    //         data: Theme.of(context).copyWith(
+    //           colorScheme: ColorScheme.light(
+    //             primary: Color(0xFF3661E2),
+    //             onPrimary: Colors.white,
+    //             surface: Colors.white,
+    //           ),
+    //           textButtonTheme: TextButtonThemeData(
+    //             style: TextButton.styleFrom(foregroundColor: Color(0xFF3661E2)),
+    //           ),
+    //         ),
+    //         child: child!,
+    //       );
+    //     },
+    //   );
+    //   if (picked != null && mounted) {
+    //     final now = DateTime.now();
+    //     int age = now.year - picked.year;
+    //     // Adjust age if birthday hasn't occurred this year
+    //     if (now.month < picked.month ||
+    //         (now.month == picked.month && now.day < picked.day)) {
+    //       age--;
+    //     }
+    //     ageController.text = age.toString();
+    //   }
+    // }
+
+    InputDecoration _buildInputDecoration(String labelText, IconData icon, {bool hasError = false}) {
+      return InputDecoration(
+        labelText: labelText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: BorderSide(color: hasError ? Colors.red : Colors.black),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: BorderSide(color: hasError ? Colors.red : Colors.grey),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: BorderSide(color: hasError ? Colors.red : Color(0xFF3661E2), width: 2.w),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10.r),
+          borderSide: BorderSide(color: Colors.red),
+        ),
+        labelStyle: TextStyle(color: hasError ? Colors.red : Colors.grey[600]),
+        floatingLabelStyle: TextStyle(
+          color: hasError ? Colors.red : Colors.black,
+        ),
+        prefixIcon: Icon(icon, size: 20.w, color: hasError ? Colors.red : Color(0xFF3661E2)),
+        errorStyle: TextStyle(color: Colors.red),
+      );
     }
 
     showModalBottomSheet(
@@ -816,252 +1211,238 @@ class _MembersScreenState extends State<MembersScreen> {
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setState) {
-            return SingleChildScrollView(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-              ),
-              child: Padding(
-                padding: EdgeInsets.all(20.w),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Center(
-                        child: Container(
-                          width: 60.w,
-                          height: 4.h,
-                          margin: EdgeInsets.only(bottom: 16.h),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            borderRadius: BorderRadius.circular(2.r),
-                          ),
-                        ),
-                      ),
-                      Text(
-                        'Edit Family Member',
-                        style: GoogleFonts.poppins(
-                          fontSize: 20.sp,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 20.h),
-                      // First Name
-                      TextFormField(
-                        controller: firstNameController,
-                        decoration: InputDecoration(
-                          labelText: 'First Name*',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          prefixIcon: Icon(Icons.person, size: 20.w),
-                        ),
-                        validator:
-                            (value) =>
-                        value?.isEmpty ?? true ? 'Required' : null,
-                      ),
-                      SizedBox(height: 16.h),
-                      // Last Name
-                      TextFormField(
-                        controller: lastNameController,
-                        decoration: InputDecoration(
-                          labelText: 'Last Name',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          prefixIcon: Icon(Icons.person_outline, size: 20.w),
-                        ),
-                      ),
-                      SizedBox(height: 16.h),
-                      // Age with Date Picker
-                      Row(
+            return GestureDetector(
+              onTap: () => FocusScope.of(context).unfocus(),
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: SingleChildScrollView(
+                  physics: ClampingScrollPhysics(),
+                  child: Padding(
+                    padding: EdgeInsets.all(20.w),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: ageController,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                                FilteringTextInputFormatter.digitsOnly,
-                              ],
-                              decoration: InputDecoration(
-                                labelText: 'Age*',
-                                border: OutlineInputBorder(
+                          Center(
+                            child: Container(
+                              width: 60.w,
+                              height: 4.h,
+                              margin: EdgeInsets.only(bottom: 16.h),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[300],
+                                borderRadius: BorderRadius.circular(2.r),
+                              ),
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Edit Family Member',
+                                style: GoogleFonts.poppins(
+                                    fontSize: 20.sp,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF3661E2)
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.close),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20.h),
+                          // First Name
+                          TextFormField(
+                            controller: firstNameController,
+                            cursorColor: Colors.black,
+                            decoration: _buildInputDecoration('First Name*', Icons.person, hasError: firstNameHasError),
+                            validator: (value) {
+                              final trimmedValue = value?.trim();
+                              final hasError = trimmedValue?.isEmpty ?? true;
+                              setState(() => firstNameHasError = hasError);
+                              return hasError ? 'Required' : null;
+                            },
+                          ),
+                          SizedBox(height: 16.h),
+                          // Last Name
+                          TextFormField(
+                            controller: lastNameController,
+                            cursorColor: Colors.black,
+                            decoration: _buildInputDecoration('Last Name', Icons.person_outline),
+                          ),
+                          SizedBox(height: 16.h),
+                          // Age with Date Picker
+                          Row(
+                            children: [
+                              Expanded(
+                                child: TextFormField(
+                                  controller: ageController,
+                                  cursorColor: Colors.black,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                  ],
+                                  decoration: _buildInputDecoration('Age*', Icons.cake, hasError: ageHasError),
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) {
+                                    bool hasError = false;
+                                    if (value == null || value.isEmpty) {
+                                      hasError = true;
+                                    } else {
+                                      final age = int.tryParse(value);
+                                      hasError = age == null || age <= 0 || age > 120;
+                                    }
+                                    setState(() => ageHasError = hasError);
+                                    return hasError ? 'Please enter a valid age (1-120)' : null;
+                                  },
+                                ),
+                              ),
+                              SizedBox(width: 8.w),
+                              IconButton(
+                                onPressed: _selectDate,
+                                icon: Icon(
+                                  Icons.calendar_today,
+                                  color: Color(0xFF3661E2),
+                                  size: 24.w,
+                                ),
+                                tooltip: "Select Date of Birth",
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 16.h),
+                          // Gender
+                          DropdownButtonFormField<String>(
+                            dropdownColor: Colors.white,
+                            decoration: _buildInputDecoration('Gender*', Icons.transgender, hasError: genderHasError),
+                            value: gender,
+                            items: ['Male', 'Female', 'Other'].map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: GoogleFonts.poppins(fontSize: 14.sp),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                gender = value;
+                                genderHasError = false;
+                              });
+                            },
+                            validator: (value) {
+                              final hasError = value == null;
+                              setState(() => genderHasError = hasError);
+                              return hasError ? 'Required' : null;
+                            },
+                          ),
+                          SizedBox(height: 16.h),
+                          // Relation
+                          DropdownButtonFormField<String>(
+                            dropdownColor: Colors.white,
+                            decoration: _buildInputDecoration('Relation to Primary Member*', Icons.group, hasError: relationHasError),
+                            value: selectedRelationId,
+                            items: relations.map((relation) {
+                              return DropdownMenuItem<String>(
+                                value: relation['id'].toString(),
+                                child: Text(
+                                  relation['relationName'],
+                                  style: GoogleFonts.poppins(fontSize: 14.sp),
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              setState(() {
+                                selectedRelationId = value;
+                                relationHasError = false;
+                              });
+                            },
+                            validator: (value) {
+                              final hasError = value == null;
+                              setState(() => relationHasError = hasError);
+                              return hasError ? 'Required' : null;
+                            },
+                          ),
+                          SizedBox(height: 16.h),
+                          // Contact Number
+                          TextFormField(
+                            maxLength: 10,
+                            controller: contactController,
+                            cursorColor: Colors.black,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.digitsOnly,
+                            ],
+                            decoration: _buildInputDecoration('Contact Number*', Icons.phone, hasError: contactHasError),
+                            keyboardType: TextInputType.phone,
+                            validator: (value) {
+                              final trimmedValue = value?.trim();
+                              final hasError = trimmedValue?.isEmpty ?? true;
+                              setState(() => contactHasError = hasError);
+                              return hasError ? 'Contact number is required' : null;
+                            },
+                          ),
+                          SizedBox(height: 16.h),
+                          // Email
+                          TextFormField(
+                            controller: emailController,
+                            cursorColor: Colors.black,
+                            decoration: _buildInputDecoration('Email', Icons.email),
+                            keyboardType: TextInputType.emailAddress,
+                          ),
+                          SizedBox(height: 16.h),
+                          // Address
+                          TextFormField(
+                            controller: addressController,
+                            cursorColor: Colors.black,
+                            decoration: _buildInputDecoration('Address', Icons.home),
+                            maxLines: 2,
+                          ),
+                          SizedBox(height: 24.h),
+                          // Update Button
+                          SizedBox(
+                            width: double.infinity,
+                            height: 50.h,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Color(0xFF3661E2),
+                                shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(10.r),
                                 ),
-                                prefixIcon: Icon(Icons.cake, size: 20.w),
                               ),
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Required';
+                              onPressed: () async {
+                                if (formKey.currentState!.validate()) {
+                                  Navigator.pop(context);
+                                  await _updateMember(
+                                    member: member,
+                                    firstName: firstNameController.text.trim(),
+                                    lastName: lastNameController.text.trim(),
+                                    age: int.tryParse(ageController.text),
+                                    gender: gender!,
+                                    relationId: selectedRelationId!,
+                                    contactNumber: contactController.text.trim(),
+                                    email: emailController.text.trim(),
+                                    address: addressController.text.trim(),
+                                  );
                                 }
-                                final age = int.tryParse(value);
-                                if (age == null || age <= 0 || age > 120) {
-                                  return 'Please enter a valid age (1-120)';
-                                }
-                                return null;
                               },
-                            ),
-                          ),
-                          SizedBox(width: 8.w),
-                          IconButton(
-                            onPressed: _selectDate,
-                            icon: Icon(
-                              Icons.calendar_today,
-                              color: Color(0xFF3661E2),
-                              size: 24.w,
-                            ),
-                            tooltip: "Select Date of Birth",
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 16.h),
-                      // Gender
-                      DropdownButtonFormField<String>(
-                        decoration: InputDecoration(
-                          labelText: 'Gender*',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          prefixIcon: Icon(Icons.transgender, size: 20.w),
-                        ),
-                        value: gender,
-                        items:
-                        ['Male', 'Female', 'Other']
-                            .map(
-                              (String value) => DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(
-                              value,
-                              style: GoogleFonts.poppins(
-                                fontSize: 14.sp,
+                              child: Text(
+                                'Update Member',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
-                        )
-                            .toList(),
-                        onChanged: (value) => setState(() => gender = value),
-                        validator: (value) => value == null ? 'Required' : null,
-                      ),
-                      SizedBox(height: 16.h),
-                      // Relation
-                      DropdownButtonFormField<String>(
-                        decoration: InputDecoration(
-                          labelText: 'Relation to Primary Member*',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          prefixIcon: Icon(Icons.group, size: 20.w),
-                        ),
-                        value: selectedRelationId,
-                        items:
-                        relations
-                            .map(
-                              (relation) => DropdownMenuItem<String>(
-                            value: relation['id'].toString(),
-                            child: Text(
-                              relation['relationName'],
-                              style: GoogleFonts.poppins(
-                                fontSize: 14.sp,
-                              ),
-                            ),
-                          ),
-                        )
-                            .toList(),
-                        onChanged:
-                            (value) =>
-                            setState(() => selectedRelationId = value),
-                        validator: (value) => value == null ? 'Required' : null,
-                      ),
-                      SizedBox(height: 16.h),
-                      // Contact Number
-                      TextFormField(
-                        maxLength: 10,
-                        controller: contactController,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                          FilteringTextInputFormatter.digitsOnly,
+                          SizedBox(height: 16.h),
                         ],
-                        decoration: InputDecoration(
-                          labelText: 'Contact Number*',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          prefixIcon: Icon(Icons.phone, size: 20.w),
-                        ),
-                        keyboardType: TextInputType.phone,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Contact number is required';
-                          }
-                          return null;
-                        },
                       ),
-                      SizedBox(height: 16.h),
-                      // Email
-                      TextFormField(
-                        controller: emailController,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          prefixIcon: Icon(Icons.email, size: 20.w),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      SizedBox(height: 16.h),
-                      // Address
-                      TextFormField(
-                        controller: addressController,
-                        decoration: InputDecoration(
-                          labelText: 'Address',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10.r),
-                          ),
-                          prefixIcon: Icon(Icons.home, size: 20.w),
-                        ),
-                        maxLines: 2,
-                      ),
-                      SizedBox(height: 24.h),
-                      // Update Button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 50.h,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFF3661E2),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.r),
-                            ),
-                          ),
-                          onPressed: () async {
-                            if (formKey.currentState!.validate()) {
-                              Navigator.pop(context);
-                              await _updateMember(
-                                member: member,
-                                firstName: firstNameController.text,
-                                lastName: lastNameController.text,
-                                age: int.tryParse(ageController.text),
-                                gender: gender!,
-                                relationId: selectedRelationId!,
-                                contactNumber: contactController.text,
-                                email: emailController.text,
-                                address: addressController.text,
-                              );
-                            }
-                          },
-                          child: Text(
-                            'Update Member',
-                            style: GoogleFonts.poppins(
-                              fontSize: 16.sp,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -1071,7 +1452,6 @@ class _MembersScreenState extends State<MembersScreen> {
       },
     );
   }
-
   Future<void> _updateMember({
     required Map<String, dynamic> member,
     required String firstName,
@@ -1164,11 +1544,23 @@ class _MembersScreenState extends State<MembersScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Cancel'),
+            style: ButtonStyle(
+              overlayColor: MaterialStateProperty.all(Colors.grey.withOpacity(0.2)),
+            ),
+            child: Text('Cancel',style: GoogleFonts.poppins(
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+            ),),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Remove', style: TextStyle(color: Colors.red)),
+            style: ButtonStyle(
+              overlayColor: MaterialStateProperty.all(Colors.red.withOpacity(0.2)),
+            ),
+            child: Text('Remove',  style: GoogleFonts.poppins(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+            ),),
           ),
         ],
         shape: RoundedRectangleBorder(
