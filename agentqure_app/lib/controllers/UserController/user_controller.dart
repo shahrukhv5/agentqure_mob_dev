@@ -194,6 +194,280 @@
 //     );
 //   }
 // }
+// import 'package:flutter/material.dart';
+// import 'package:permission_handler/permission_handler.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
+// import '../../models/UserModel/user_model.dart';
+// import '../../utils/ErrorUtils.dart';
+// import '../../views/SignInAndSignUpScreens/InsertProfileScreen/insert_profile_screen.dart';
+// import '../../views/SignInAndSignUpScreens/LoginScreen/login_screen.dart';
+// import '../../views/SignInAndSignUpScreens/OTPScreen/otp_screen.dart';
+// import '../../views/UserDashboard/HomeScreen/home_screen.dart';
+//
+// class UserController {
+//   final UserModel userModel;
+//   final BuildContext context;
+//
+//   UserController(this.userModel, this.context);
+//
+//   Future<void> requestPermissions() async {
+//     Map<Permission, PermissionStatus> statuses =
+//     await [Permission.storage, Permission.camera].request();
+//
+//     statuses.forEach((permission, status) {
+//       print('${permission.toString()}: ${status.toString()}');
+//     });
+//   }
+//
+//   // Future<void> sendOtp(String phoneNumber) async {
+//   //   try {
+//   //     final response = await userModel.sendOtp('91', phoneNumber);
+//   //
+//   //     if (response['message'] == 'SUCCESS') {
+//   //       Navigator.push(
+//   //         context,
+//   //         MaterialPageRoute(
+//   //           builder:
+//   //               (context) => OtpScreen(
+//   //             phoneNumber: phoneNumber,
+//   //             verificationId: response['data']['verificationId'],
+//   //           ),
+//   //         ),
+//   //       );
+//   //     } else {
+//   //       ScaffoldMessenger.of(context).showSnackBar(
+//   //         SnackBar(content: Text(response['message'] ?? 'Failed to send OTP')),
+//   //       );
+//   //     }
+//   //   } catch (e) {
+//   //     ScaffoldMessenger.of(
+//   //       context,
+//   //     ).showSnackBar(SnackBar(content: Text(e.toString())));
+//   //   }
+//   // }
+//   Future<Map<String, dynamic>> sendOtp(String phoneNumber) async {
+//     try {
+//       final response = await userModel.sendOtp('91', phoneNumber);
+//       return response;
+//     } catch (e) {
+//       rethrow;
+//     }
+//   }
+//   void handleLogin(String phoneNumber) {
+//     if (phoneNumber.length == 10) {
+//       sendOtp(phoneNumber);
+//     } else {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Contact number must be 10 digits')),
+//       );
+//     }
+//   }
+//
+//   Future<void> verifyOtp(
+//       String otp,
+//       String phoneNumber,
+//       String verificationId,
+//       String? pendingReferralCode,
+//       ) async {
+//     try {
+//       final response = await userModel.validateOtp(verificationId, otp);
+//
+//       if (response['message'] == 'SUCCESS' &&
+//           response['data']['verificationStatus'] == 'VERIFICATION_COMPLETED') {
+//         await _handleSuccessfulVerification(phoneNumber, pendingReferralCode);
+//       } else {
+//         // ScaffoldMessenger.of(context).showSnackBar(
+//         //   SnackBar(
+//         //     content: Text('OTP validation failed: ${response['message']}'),
+//         //   ),
+//         // );
+//         ErrorUtils.showErrorSnackBar(context, 'Invalid OTP. Please try again.');
+//       }
+//     } catch (e) {
+//       // ScaffoldMessenger.of(
+//       //   context,
+//       // ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+//       ErrorUtils.showErrorSnackBar(context, 'Verification failed. Please try again.');
+//     }
+//   }
+//
+//   Future<void> _handleSuccessfulVerification(
+//       String phoneNumber,
+//       String? pendingReferralCode
+//       ) async {
+//     try {
+//       final userExists = await userModel.checkUserExists(phoneNumber);
+//
+//       if (userExists) {
+//         final user = await userModel.getUserByPhone(phoneNumber);
+//         if (user != null) {
+//           await userModel.login(phoneNumber);
+//           Navigator.pushAndRemoveUntil(
+//             context,
+//             MaterialPageRoute(builder: (context) => HomeScreen()),
+//                 (route) => false,
+//           );
+//           return;
+//         }
+//       }
+//
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(
+//           builder: (context) => InsertProfileScreen(
+//             phoneNumber: phoneNumber,
+//             pendingReferralCode: pendingReferralCode,
+//           ),
+//         ),
+//       );
+//     } catch (e) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         SnackBar(content: Text('Error after verification: ${e.toString()}')),
+//       );
+//     }
+//   }
+//
+//   // Future<void> saveProfile({
+//   //   required String firstName,
+//   //   required String phoneNumber,
+//   //   required String email,
+//   //   String? lastName,
+//   //   String? address,
+//   //   required String gender,
+//   //   required int? age,
+//   //   String? parentChildRelation,
+//   //   bool? isParent,
+//   //   String? linkingId,
+//   //   required bool isNewUser,
+//   //   String? referralCode,
+//   // }) async {
+//   //   try {
+//   //     if (isNewUser) {
+//   //       await userModel.registerUser(
+//   //         firstName: firstName,
+//   //         lastName: lastName ?? '',
+//   //         phoneNumber: phoneNumber,
+//   //         email: email,
+//   //         address: address ?? '',
+//   //         gender: gender,
+//   //         age: age,
+//   //         parentChildRelation: parentChildRelation,
+//   //         isParent: isParent,
+//   //         linkingId: linkingId,
+//   //         referralCode: referralCode,
+//   //       );
+//   //     } else {
+//   //       await userModel.updateUser(
+//   //         firstName: firstName,
+//   //         lastName: lastName ?? '',
+//   //         phoneNumber: phoneNumber,
+//   //         email: email,
+//   //         address: address ?? '',
+//   //         gender: gender,
+//   //         age: age,
+//   //         parentChildRelation: parentChildRelation,
+//   //         isParent: isParent,
+//   //         linkingId: linkingId,
+//   //       );
+//   //     }
+//   //     Navigator.pushReplacement(
+//   //       context,
+//   //       MaterialPageRoute(builder: (context) => HomeScreen()),
+//   //     );
+//   //   } catch (e) {
+//   //     ScaffoldMessenger.of(
+//   //       context,
+//   //     ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+//   //   }
+//   // }
+//   Future<void> saveProfile({
+//     required String firstName,
+//     required String phoneNumber,
+//     required String email,
+//     String? lastName,
+//     String? address,
+//     required String gender,
+//     required int? age,
+//     String? parentChildRelation,
+//     bool? isParent,
+//     String? linkingId,
+//     required bool isNewUser,
+//     String? referralCode,
+//   }) async {
+//     try {
+//       if (isNewUser) {
+//         await userModel.registerUser(
+//           firstName: firstName,
+//           lastName: lastName ?? '',
+//           phoneNumber: phoneNumber,
+//           email: email,
+//           address: address ?? '',
+//           gender: gender,
+//           age: age,
+//           parentChildRelation: parentChildRelation,
+//           isParent: isParent,
+//           linkingId: linkingId,
+//           referralCode: referralCode,
+//         );
+//         // flag to show welcome notification for new users
+//         final prefs = await SharedPreferences.getInstance();
+//         await prefs.setBool('showWelcomeNotification', true);
+//         // Verify that user was actually created before proceeding
+//         final userExists = await userModel.checkUserExists(phoneNumber);
+//         if (!userExists) {
+//           throw Exception('Registration failed. Please try again.');
+//         }
+//         ErrorUtils.showSuccessSnackBar(context, 'Profile created successfully!');
+//       } else {
+//         await userModel.updateUser(
+//           firstName: firstName,
+//           lastName: lastName ?? '',
+//           phoneNumber: phoneNumber,
+//           email: email,
+//           address: address ?? '',
+//           gender: gender,
+//           age: age,
+//           parentChildRelation: parentChildRelation,
+//           isParent: isParent,
+//           linkingId: linkingId,
+//         );
+//         ErrorUtils.showSuccessSnackBar(context, 'Profile updated successfully!');
+//       }
+//
+//       Navigator.pushReplacement(
+//         context,
+//         MaterialPageRoute(builder: (context) => HomeScreen()),
+//       );
+//     } catch (e) {
+//       // ScaffoldMessenger.of(
+//       //   context,
+//       // ).showSnackBar(SnackBar(
+//       //   content: Text('Error: ${e.toString()}'),
+//       //   duration: Duration(seconds: 5),
+//       // ));
+//       ErrorUtils.showErrorSnackBar(context, 'Failed to save profile. Please try again.');
+//       // rethrow;
+//     }
+//   }
+//   Future<void> logout() async {
+//     // await userModel.logout();
+//     // Navigator.pushAndRemoveUntil(
+//     //   context,
+//     //   MaterialPageRoute(builder: (context) => LoginScreen()),
+//     //       (Route<dynamic> route) => false,
+//     // );
+//     try {
+//       await userModel.logout();
+//       Navigator.pushAndRemoveUntil(
+//         context,
+//         MaterialPageRoute(builder: (context) => LoginScreen()),
+//             (Route<dynamic> route) => false,
+//       );
+//     } catch (e) {
+//       ErrorUtils.showErrorSnackBar(context, 'Logout failed. Please try again.');
+//     }
+//   }
+// }
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -211,106 +485,70 @@ class UserController {
   UserController(this.userModel, this.context);
 
   Future<void> requestPermissions() async {
-    Map<Permission, PermissionStatus> statuses =
-    await [Permission.storage, Permission.camera].request();
-
+    Map<Permission, PermissionStatus> statuses = await [Permission.storage, Permission.camera].request();
     statuses.forEach((permission, status) {
       print('${permission.toString()}: ${status.toString()}');
     });
   }
 
-  // Future<void> sendOtp(String phoneNumber) async {
-  //   try {
-  //     final response = await userModel.sendOtp('91', phoneNumber);
-  //
-  //     if (response['message'] == 'SUCCESS') {
-  //       Navigator.push(
-  //         context,
-  //         MaterialPageRoute(
-  //           builder:
-  //               (context) => OtpScreen(
-  //             phoneNumber: phoneNumber,
-  //             verificationId: response['data']['verificationId'],
-  //           ),
-  //         ),
-  //       );
-  //     } else {
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text(response['message'] ?? 'Failed to send OTP')),
-  //       );
-  //     }
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(
-  //       context,
-  //     ).showSnackBar(SnackBar(content: Text(e.toString())));
-  //   }
-  // }
   Future<Map<String, dynamic>> sendOtp(String phoneNumber) async {
     try {
       final response = await userModel.sendOtp('91', phoneNumber);
+      print('sendOtp response: ${response.toString()}');
       return response;
     } catch (e) {
+      print('Error in sendOtp: $e');
+      ErrorUtils.showErrorSnackBar(context, 'Failed to send OTP. Please try again.');
       rethrow;
     }
   }
+
   void handleLogin(String phoneNumber) {
     if (phoneNumber.length == 10) {
       sendOtp(phoneNumber);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Contact number must be 10 digits')),
-      );
+      ErrorUtils.showErrorSnackBar(context, 'Contact number must be 10 digits');
     }
   }
 
-  Future<void> verifyOtp(
-      String otp,
-      String phoneNumber,
-      String verificationId,
-      String? pendingReferralCode,
-      ) async {
+  Future<void> verifyOtp(String otp, String phoneNumber, String verificationId, String? pendingReferralCode) async {
     try {
       final response = await userModel.validateOtp(verificationId, otp);
+      print('verifyOtp response: ${response.toString()}');
 
-      if (response['message'] == 'SUCCESS' &&
-          response['data']['verificationStatus'] == 'VERIFICATION_COMPLETED') {
+      if (response['message'] == 'SUCCESS' && response['data']['verificationStatus'] == 'VERIFICATION_COMPLETED') {
         await _handleSuccessfulVerification(phoneNumber, pendingReferralCode);
       } else {
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(
-        //     content: Text('OTP validation failed: ${response['message']}'),
-        //   ),
-        // );
         ErrorUtils.showErrorSnackBar(context, 'Invalid OTP. Please try again.');
       }
     } catch (e) {
-      // ScaffoldMessenger.of(
-      //   context,
-      // ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
+      print('Error in verifyOtp: $e');
       ErrorUtils.showErrorSnackBar(context, 'Verification failed. Please try again.');
     }
   }
 
-  Future<void> _handleSuccessfulVerification(
-      String phoneNumber,
-      String? pendingReferralCode
-      ) async {
+  Future<void> _handleSuccessfulVerification(String phoneNumber, String? pendingReferralCode) async {
     try {
       final userExists = await userModel.checkUserExists(phoneNumber);
+      print('User exists: $userExists for phone: $phoneNumber');
 
       if (userExists) {
         final user = await userModel.getUserByPhone(phoneNumber);
         if (user != null) {
           await userModel.login(phoneNumber);
+          print('Navigating to HomeScreen after successful login');
           Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => HomeScreen()),
                 (route) => false,
           );
           return;
+        } else {
+          throw Exception('User data could not be retrieved');
         }
       }
 
+      print('Navigating to InsertProfileScreen for new user');
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -321,65 +559,11 @@ class UserController {
         ),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error after verification: ${e.toString()}')),
-      );
+      print('Error in _handleSuccessfulVerification: $e');
+      ErrorUtils.showErrorSnackBar(context, 'Error after verification: ${e.toString()}');
     }
   }
 
-  // Future<void> saveProfile({
-  //   required String firstName,
-  //   required String phoneNumber,
-  //   required String email,
-  //   String? lastName,
-  //   String? address,
-  //   required String gender,
-  //   required int? age,
-  //   String? parentChildRelation,
-  //   bool? isParent,
-  //   String? linkingId,
-  //   required bool isNewUser,
-  //   String? referralCode,
-  // }) async {
-  //   try {
-  //     if (isNewUser) {
-  //       await userModel.registerUser(
-  //         firstName: firstName,
-  //         lastName: lastName ?? '',
-  //         phoneNumber: phoneNumber,
-  //         email: email,
-  //         address: address ?? '',
-  //         gender: gender,
-  //         age: age,
-  //         parentChildRelation: parentChildRelation,
-  //         isParent: isParent,
-  //         linkingId: linkingId,
-  //         referralCode: referralCode,
-  //       );
-  //     } else {
-  //       await userModel.updateUser(
-  //         firstName: firstName,
-  //         lastName: lastName ?? '',
-  //         phoneNumber: phoneNumber,
-  //         email: email,
-  //         address: address ?? '',
-  //         gender: gender,
-  //         age: age,
-  //         parentChildRelation: parentChildRelation,
-  //         isParent: isParent,
-  //         linkingId: linkingId,
-  //       );
-  //     }
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => HomeScreen()),
-  //     );
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(
-  //       context,
-  //     ).showSnackBar(SnackBar(content: Text('Error: ${e.toString()}')));
-  //   }
-  // }
   Future<void> saveProfile({
     required String firstName,
     required String phoneNumber,
@@ -409,10 +593,8 @@ class UserController {
           linkingId: linkingId,
           referralCode: referralCode,
         );
-        // flag to show welcome notification for new users
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('showWelcomeNotification', true);
-        // Verify that user was actually created before proceeding
         final userExists = await userModel.checkUserExists(phoneNumber);
         if (!userExists) {
           throw Exception('Registration failed. Please try again.');
@@ -434,36 +616,28 @@ class UserController {
         ErrorUtils.showSuccessSnackBar(context, 'Profile updated successfully!');
       }
 
+      print('Navigating to HomeScreen after saveProfile');
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeScreen()),
       );
     } catch (e) {
-      // ScaffoldMessenger.of(
-      //   context,
-      // ).showSnackBar(SnackBar(
-      //   content: Text('Error: ${e.toString()}'),
-      //   duration: Duration(seconds: 5),
-      // ));
+      print('Error in saveProfile: $e');
       ErrorUtils.showErrorSnackBar(context, 'Failed to save profile. Please try again.');
-      // rethrow;
     }
   }
+
   Future<void> logout() async {
-    // await userModel.logout();
-    // Navigator.pushAndRemoveUntil(
-    //   context,
-    //   MaterialPageRoute(builder: (context) => LoginScreen()),
-    //       (Route<dynamic> route) => false,
-    // );
     try {
       await userModel.logout();
+      print('Navigating to LoginScreen after logout');
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => LoginScreen()),
             (Route<dynamic> route) => false,
       );
     } catch (e) {
+      print('Error in logout: $e');
       ErrorUtils.showErrorSnackBar(context, 'Logout failed. Please try again.');
     }
   }
