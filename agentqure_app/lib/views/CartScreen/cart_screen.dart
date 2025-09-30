@@ -4111,8 +4111,8 @@ class CartScreen extends StatelessWidget {
     final options = {
       'key': Environment.razorpayKey,
       'amount': (payableAmount * 100).toInt(),
-      'name': 'Aqure',
-      'description': 'Payment for Aqure',
+      'name': 'AgentQure',
+      'description': 'Payment for AgentQure',
       'prefill': {
         'contact': userModel.currentUser?['contactNumber'] ?? '',
         'email': userModel.currentUser?['email'] ?? '',

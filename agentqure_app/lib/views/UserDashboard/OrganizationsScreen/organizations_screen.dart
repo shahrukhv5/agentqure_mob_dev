@@ -1642,7 +1642,8 @@ class _OrganizationsScreenState extends State<OrganizationsScreen>
         },
         cancelToken: _cancelToken,
       );
-
+      print('API Status Code: ${response.statusCode}');
+      print('API Response Body: ${response.data}');
       if (!mounted) return;
 
       if (response.statusCode == 200) {

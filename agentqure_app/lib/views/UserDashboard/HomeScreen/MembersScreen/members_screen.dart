@@ -443,19 +443,19 @@ class _MembersScreenState extends State<MembersScreen> {
                       color: Colors.grey.shade50,
                       itemBuilder:
                           (context) => [
-                        PopupMenuItem(
-                          value: 'edit',
-                          child: Row(
-                            children: [
-                              Icon(Icons.edit, size: 20.w),
-                              SizedBox(width: 8.w),
-                              Text(
-                                'Edit',
-                                style: GoogleFonts.poppins(fontSize: 14.sp),
-                              ),
-                            ],
-                          ),
-                        ),
+                        // PopupMenuItem(
+                        //   value: 'edit',
+                        //   child: Row(
+                        //     children: [
+                        //       Icon(Icons.edit, size: 20.w),
+                        //       SizedBox(width: 8.w),
+                        //       Text(
+                        //         'Edit',
+                        //         style: GoogleFonts.poppins(fontSize: 14.sp),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
                         PopupMenuItem(
                           value: 'delete',
                           child: Row(
@@ -621,14 +621,14 @@ class _MembersScreenState extends State<MembersScreen> {
                         ],
                       ),
                     ),
-                    if (!isPrimary)
-                      IconButton(
-                        icon: Icon(Icons.edit, size: 24.w),
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _showEditMemberForm(member);
-                        },
-                      ),
+                    // if (!isPrimary)
+                    //   IconButton(
+                    //     icon: Icon(Icons.edit, size: 24.w),
+                    //     onPressed: () {
+                    //       Navigator.pop(context);
+                    //       _showEditMemberForm(member);
+                    //     },
+                    //   ),
                   ],
                 ),
                 SizedBox(height: 20.h),
