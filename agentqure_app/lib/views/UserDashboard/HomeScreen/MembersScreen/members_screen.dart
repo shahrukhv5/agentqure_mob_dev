@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../../models/UserModel/user_model.dart';
+import '../../../../services/ApiService/api_service.dart';
 import '../../../../services/MemberService/AddMemberForm/add_member_form.dart';
 import '../../../../services/MemberService/member_service.dart'
     show MemberService;
@@ -26,7 +26,6 @@ class _MembersScreenState extends State<MembersScreen> {
   bool _isProcessing = false;
   bool _isProcessingFullScreen = false;
   List<Map<String, dynamic>> relations = [];
-  final Dio _dio = Dio();
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -44,26 +43,9 @@ class _MembersScreenState extends State<MembersScreen> {
 
   Future<void> _loadData() async {
     try {
-      final response = await _dio.get(
-        'https://77kxt00j0l.execute-api.us-east-1.amazonaws.com/dev/relation/list-relations',
-      );
-      print('Relations API response: ${response.data}');
-
-      if (response.data != null &&
-          response.data['body'] != null &&
-          response.data['body']['data'] != null) {
-        relations = List<Map<String, dynamic>>.from(
-          response.data['body']['data'].map(
-                (item) => {
-              'id': item['id'].toString(),
-              'relationName': item['relationName'],
-            },
-          ),
-        );
-        print('Relations loaded: $relations');
-      } else {
-        print('No relations data found in response');
-      }
+      final apiService = ApiService();
+      relations = await apiService.getRelations();
+      print('Relations loaded: $relations');
 
       final prefs = await SharedPreferences.getInstance();
       final phone = prefs.getString('phoneNumber');
@@ -718,7 +700,7 @@ class _MembersScreenState extends State<MembersScreen> {
   }
 
   void _showAddMemberForm() {
-    final memberService = MemberService(Dio());
+    final memberService = MemberService();
     final primaryUser = userModel.currentUser;
 
     if (primaryUser == null) return;
@@ -748,329 +730,6 @@ class _MembersScreenState extends State<MembersScreen> {
     );
   }
 
-  // void _showEditMemberForm(Map<String, dynamic> member) {
-  //   final formKey = GlobalKey<FormState>();
-  //   final firstNameController = TextEditingController(
-  //     text: member['firstName'],
-  //   );
-  //   final lastNameController = TextEditingController(
-  //     text: member['lastName'] ?? '',
-  //   );
-  //   final ageController = TextEditingController(
-  //     text: member['age']?.toString() ?? '',
-  //   );
-  //   final contactController = TextEditingController(
-  //     text: member['contactNumber'] ?? '',
-  //   );
-  //   final emailController = TextEditingController(
-  //     text: member['emailId'] ?? '',
-  //   );
-  //   final addressController = TextEditingController(
-  //     text: member['address'] ?? '',
-  //   );
-  //   String? gender = member['gender'];
-  //   String? selectedRelationId = member['parent_child_relation']?.toString();
-  //
-  //   // Method to show date picker and calculate age
-  //   Future<void> _selectDate() async {
-  //     final DateTime? picked = await showDatePicker(
-  //       context: context,
-  //       initialDate: DateTime.now().subtract(Duration(days: 365 * 30)),
-  //       firstDate: DateTime(1900),
-  //       lastDate: DateTime.now(),
-  //       builder: (context, child) {
-  //         return Theme(
-  //           data: Theme.of(context).copyWith(
-  //             colorScheme: ColorScheme.light(
-  //               primary: Color(0xFF3661E2),
-  //               onPrimary: Colors.white,
-  //               surface: Colors.white,
-  //             ),
-  //             textButtonTheme: TextButtonThemeData(
-  //               style: TextButton.styleFrom(foregroundColor: Color(0xFF3661E2)),
-  //             ),
-  //           ),
-  //           child: child!,
-  //         );
-  //       },
-  //     );
-  //     if (picked != null && mounted) {
-  //       final now = DateTime.now();
-  //       int age = now.year - picked.year;
-  //       // Adjust age if birthday hasn't occurred this year
-  //       if (now.month < picked.month ||
-  //           (now.month == picked.month && now.day < picked.day)) {
-  //         age--;
-  //       }
-  //       ageController.text = age.toString();
-  //     }
-  //   }
-  //
-  //   showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     backgroundColor: Colors.white,
-  //     shape: RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.vertical(top: Radius.circular(20.r)),
-  //     ),
-  //     builder: (context) {
-  //       return StatefulBuilder(
-  //         builder: (context, setState) {
-  //           return SingleChildScrollView(
-  //             padding: EdgeInsets.only(
-  //               bottom: MediaQuery.of(context).viewInsets.bottom,
-  //             ),
-  //             child: Padding(
-  //               padding: EdgeInsets.all(20.w),
-  //               child: Form(
-  //                 key: formKey,
-  //                 child: Column(
-  //                   mainAxisSize: MainAxisSize.min,
-  //                   children: [
-  //                     Center(
-  //                       child: Container(
-  //                         width: 60.w,
-  //                         height: 4.h,
-  //                         margin: EdgeInsets.only(bottom: 16.h),
-  //                         decoration: BoxDecoration(
-  //                           color: Colors.grey[300],
-  //                           borderRadius: BorderRadius.circular(2.r),
-  //                         ),
-  //                       ),
-  //                     ),
-  //                     Text(
-  //                       'Edit Family Member',
-  //                       style: GoogleFonts.poppins(
-  //                         fontSize: 20.sp,
-  //                         fontWeight: FontWeight.bold,
-  //                       ),
-  //                     ),
-  //                     SizedBox(height: 20.h),
-  //                     // First Name
-  //                     TextFormField(
-  //                       controller: firstNameController,
-  //                       decoration: InputDecoration(
-  //                         labelText: 'First Name*',
-  //                         border: OutlineInputBorder(
-  //                           borderRadius: BorderRadius.circular(10.r),
-  //                         ),
-  //                         prefixIcon: Icon(Icons.person, size: 20.w),
-  //                       ),
-  //                       validator:
-  //                           (value) =>
-  //                       value?.isEmpty ?? true ? 'Required' : null,
-  //                     ),
-  //                     SizedBox(height: 16.h),
-  //                     // Last Name
-  //                     TextFormField(
-  //                       controller: lastNameController,
-  //                       decoration: InputDecoration(
-  //                         labelText: 'Last Name',
-  //                         border: OutlineInputBorder(
-  //                           borderRadius: BorderRadius.circular(10.r),
-  //                         ),
-  //                         prefixIcon: Icon(Icons.person_outline, size: 20.w),
-  //                       ),
-  //                     ),
-  //                     SizedBox(height: 16.h),
-  //                     // Age with Date Picker
-  //                     Row(
-  //                       children: [
-  //                         Expanded(
-  //                           child: TextFormField(
-  //                             controller: ageController,
-  //                             inputFormatters: [
-  //                               FilteringTextInputFormatter.deny(RegExp(r'\s')),
-  //                               FilteringTextInputFormatter.digitsOnly,
-  //                             ],
-  //                             decoration: InputDecoration(
-  //                               labelText: 'Age*',
-  //                               border: OutlineInputBorder(
-  //                                 borderRadius: BorderRadius.circular(10.r),
-  //                               ),
-  //                               prefixIcon: Icon(Icons.cake, size: 20.w),
-  //                             ),
-  //                             keyboardType: TextInputType.number,
-  //                             validator: (value) {
-  //                               if (value == null || value.isEmpty) {
-  //                                 return 'Required';
-  //                               }
-  //                               final age = int.tryParse(value);
-  //                               if (age == null || age <= 0 || age > 120) {
-  //                                 return 'Please enter a valid age (1-120)';
-  //                               }
-  //                               return null;
-  //                             },
-  //                           ),
-  //                         ),
-  //                         SizedBox(width: 8.w),
-  //                         IconButton(
-  //                           onPressed: _selectDate,
-  //                           icon: Icon(
-  //                             Icons.calendar_today,
-  //                             color: Color(0xFF3661E2),
-  //                             size: 24.w,
-  //                           ),
-  //                           tooltip: "Select Date of Birth",
-  //                         ),
-  //                       ],
-  //                     ),
-  //                     SizedBox(height: 16.h),
-  //                     // Gender
-  //                     DropdownButtonFormField<String>(
-  //                       decoration: InputDecoration(
-  //                         labelText: 'Gender*',
-  //                         border: OutlineInputBorder(
-  //                           borderRadius: BorderRadius.circular(10.r),
-  //                         ),
-  //                         prefixIcon: Icon(Icons.transgender, size: 20.w),
-  //                       ),
-  //                       value: gender,
-  //                       items:
-  //                       ['Male', 'Female', 'Other']
-  //                           .map(
-  //                             (String value) => DropdownMenuItem<String>(
-  //                           value: value,
-  //                           child: Text(
-  //                             value,
-  //                             style: GoogleFonts.poppins(
-  //                               fontSize: 14.sp,
-  //                             ),
-  //                           ),
-  //                         ),
-  //                       )
-  //                           .toList(),
-  //                       onChanged: (value) => setState(() => gender = value),
-  //                       validator: (value) => value == null ? 'Required' : null,
-  //                     ),
-  //                     SizedBox(height: 16.h),
-  //                     // Relation
-  //                     DropdownButtonFormField<String>(
-  //                       decoration: InputDecoration(
-  //                         labelText: 'Relation to Primary Member*',
-  //                         border: OutlineInputBorder(
-  //                           borderRadius: BorderRadius.circular(10.r),
-  //                         ),
-  //                         prefixIcon: Icon(Icons.group, size: 20.w),
-  //                       ),
-  //                       value: selectedRelationId,
-  //                       items:
-  //                       relations
-  //                           .map(
-  //                             (relation) => DropdownMenuItem<String>(
-  //                           value: relation['id'].toString(),
-  //                           child: Text(
-  //                             relation['relationName'],
-  //                             style: GoogleFonts.poppins(
-  //                               fontSize: 14.sp,
-  //                             ),
-  //                           ),
-  //                         ),
-  //                       )
-  //                           .toList(),
-  //                       onChanged:
-  //                           (value) =>
-  //                           setState(() => selectedRelationId = value),
-  //                       validator: (value) => value == null ? 'Required' : null,
-  //                     ),
-  //                     SizedBox(height: 16.h),
-  //                     // Contact Number
-  //                     TextFormField(
-  //                       maxLength: 10,
-  //                       controller: contactController,
-  //                       inputFormatters: [
-  //                         FilteringTextInputFormatter.deny(RegExp(r'\s')),
-  //                         FilteringTextInputFormatter.digitsOnly,
-  //                       ],
-  //                       decoration: InputDecoration(
-  //                         labelText: 'Contact Number*',
-  //                         border: OutlineInputBorder(
-  //                           borderRadius: BorderRadius.circular(10.r),
-  //                         ),
-  //                         prefixIcon: Icon(Icons.phone, size: 20.w),
-  //                       ),
-  //                       keyboardType: TextInputType.phone,
-  //                       validator: (value) {
-  //                         if (value == null || value.isEmpty) {
-  //                           return 'Contact number is required';
-  //                         }
-  //                         return null;
-  //                       },
-  //                     ),
-  //                     SizedBox(height: 16.h),
-  //                     // Email
-  //                     TextFormField(
-  //                       controller: emailController,
-  //                       decoration: InputDecoration(
-  //                         labelText: 'Email',
-  //                         border: OutlineInputBorder(
-  //                           borderRadius: BorderRadius.circular(10.r),
-  //                         ),
-  //                         prefixIcon: Icon(Icons.email, size: 20.w),
-  //                       ),
-  //                       keyboardType: TextInputType.emailAddress,
-  //                     ),
-  //                     SizedBox(height: 16.h),
-  //                     // Address
-  //                     TextFormField(
-  //                       controller: addressController,
-  //                       decoration: InputDecoration(
-  //                         labelText: 'Address',
-  //                         border: OutlineInputBorder(
-  //                           borderRadius: BorderRadius.circular(10.r),
-  //                         ),
-  //                         prefixIcon: Icon(Icons.home, size: 20.w),
-  //                       ),
-  //                       maxLines: 2,
-  //                     ),
-  //                     SizedBox(height: 24.h),
-  //                     // Update Button
-  //                     SizedBox(
-  //                       width: double.infinity,
-  //                       height: 50.h,
-  //                       child: ElevatedButton(
-  //                         style: ElevatedButton.styleFrom(
-  //                           backgroundColor: Color(0xFF3661E2),
-  //                           shape: RoundedRectangleBorder(
-  //                             borderRadius: BorderRadius.circular(10.r),
-  //                           ),
-  //                         ),
-  //                         onPressed: () async {
-  //                           if (formKey.currentState!.validate()) {
-  //                             Navigator.pop(context);
-  //                             await _updateMember(
-  //                               member: member,
-  //                               firstName: firstNameController.text,
-  //                               lastName: lastNameController.text,
-  //                               age: int.tryParse(ageController.text),
-  //                               gender: gender!,
-  //                               relationId: selectedRelationId!,
-  //                               contactNumber: contactController.text,
-  //                               email: emailController.text,
-  //                               address: addressController.text,
-  //                             );
-  //                           }
-  //                         },
-  //                         child: Text(
-  //                           'Update Member',
-  //                           style: GoogleFonts.poppins(
-  //                             fontSize: 16.sp,
-  //                             fontWeight: FontWeight.w600,
-  //                             color: Colors.white,
-  //                           ),
-  //                         ),
-  //                       ),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //       );
-  //     },
-  //   );
-  // }
   void _showEditMemberForm(Map<String, dynamic> member) {
     final formKey = GlobalKey<FormState>();
     final firstNameController = TextEditingController(
@@ -1135,39 +794,6 @@ class _MembersScreenState extends State<MembersScreen> {
         ageController.text = age.toString();
       }
     }
-    // Future<void> _selectDate() async {
-    //   final DateTime? picked = await showDatePicker(
-    //     context: context,
-    //     initialDate: DateTime.now().subtract(Duration(days: 365 * 30)),
-    //     firstDate: DateTime(1900),
-    //     lastDate: DateTime.now(),
-    //     builder: (context, child) {
-    //       return Theme(
-    //         data: Theme.of(context).copyWith(
-    //           colorScheme: ColorScheme.light(
-    //             primary: Color(0xFF3661E2),
-    //             onPrimary: Colors.white,
-    //             surface: Colors.white,
-    //           ),
-    //           textButtonTheme: TextButtonThemeData(
-    //             style: TextButton.styleFrom(foregroundColor: Color(0xFF3661E2)),
-    //           ),
-    //         ),
-    //         child: child!,
-    //       );
-    //     },
-    //   );
-    //   if (picked != null && mounted) {
-    //     final now = DateTime.now();
-    //     int age = now.year - picked.year;
-    //     // Adjust age if birthday hasn't occurred this year
-    //     if (now.month < picked.month ||
-    //         (now.month == picked.month && now.day < picked.day)) {
-    //       age--;
-    //     }
-    //     ageController.text = age.toString();
-    //   }
-    // }
 
     InputDecoration _buildInputDecoration(String labelText, IconData icon, {bool hasError = false}) {
       return InputDecoration(
@@ -1465,21 +1091,19 @@ class _MembersScreenState extends State<MembersScreen> {
   }) async {
     setState(() => _isProcessingFullScreen = true);
     try {
-      final response = await _dio.put(
-        'https://2sflw15kpf.execute-api.us-east-1.amazonaws.com/dev/app-user/register-app-user',
-        data: {
-          "appUserId": member['appUserId'],
-          "firstName": firstName,
-          "lastName": lastName,
-          "contactNumber": contactNumber,
-          "emailId": email,
-          "address": address,
-          "gender": gender,
-          "age": age,
-          "parent_child_relation": relationId,
-        },
-      );
-      print('Update member response: ${response.data}');
+      final apiService = ApiService();
+      final data = {
+        "appUserId": member['appUserId'],
+        "firstName": firstName,
+        "lastName": lastName,
+        "contactNumber": contactNumber,
+        "emailId": email,
+        "address": address,
+        "gender": gender,
+        "age": age,
+        "parent_child_relation": relationId,
+      };
+      await apiService.updateUser(data);
 
       final primaryUser = userModel.currentUser;
       if (primaryUser != null) {
@@ -1575,10 +1199,8 @@ class _MembersScreenState extends State<MembersScreen> {
     setState(() => _isProcessingFullScreen = true);
 
     try {
-      final response = await _dio.delete(
-        'https://2sflw15kpf.execute-api.us-east-1.amazonaws.com/dev/app-user/register-app-user?id=${member['appUserId']}',
-      );
-      print('Delete member response: ${response.data}');
+      final apiService = ApiService();
+      await apiService.deleteUser(member['appUserId'].toString());
 
       if (!mounted) return;
       await userModel.getUserByPhone(primaryUser['contactNumber']);

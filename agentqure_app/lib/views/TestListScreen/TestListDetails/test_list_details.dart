@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:dio/dio.dart';
 
 import '../../../models/CartModel/cart_model.dart';
 import '../../../models/UserModel/user_model.dart';
@@ -33,15 +32,12 @@ class _TestListDetailsState extends State<TestListDetails> {
   bool _isSelected = false;
   late CartModel _cartModel;
   bool _isDisposed = false;
-  final Dio _dio = Dio();
-  CancelToken? _cancelToken;
   late ScaffoldMessengerState _scaffoldMessenger;
-  final MemberService _memberService = MemberService(Dio());
+  final MemberService _memberService = MemberService();
 
   @override
   void initState() {
     super.initState();
-    _cancelToken = CancelToken();
     _initializeCartModel();
   }
 
@@ -62,8 +58,6 @@ class _TestListDetailsState extends State<TestListDetails> {
   void dispose() {
     _isDisposed = true;
     _cartModel.removeListener(_syncWithCart);
-    _cancelToken?.cancel();
-    _dio.close();
     super.dispose();
   }
 
@@ -264,7 +258,7 @@ class _TestListDetailsState extends State<TestListDetails> {
                           color: Color(0xFF3661E2),
                         ),
                         label: Text(
-                          "Add Patient",
+                          "Add New Patient",
                           style: GoogleFonts.poppins(
                             fontSize: 14.sp,
                             fontWeight: FontWeight.w500,

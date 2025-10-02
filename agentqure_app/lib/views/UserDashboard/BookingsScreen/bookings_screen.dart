@@ -10,6 +10,7 @@ import 'dart:io';
 import '../../../models/UserModel/user_model.dart';
 import '../../../utils/CustomBottomNavigationBar/custom_bottom_navigation_bar.dart';
 import '../../../utils/NavigationUtils/navigation_utils.dart';
+import '../../../services/ApiService/api_service.dart';
 
 class BookingsScreen extends StatefulWidget {
   final UserModel userModel;
@@ -33,6 +34,7 @@ class _BookingsScreenState extends State<BookingsScreen> {
   bool _dateParsingError = false;
   late CancelToken _cancelToken;
   final TextEditingController _searchController = TextEditingController();
+  final ApiService _apiService = ApiService();
 
   @override
   void initState() {
@@ -47,12 +49,15 @@ class _BookingsScreenState extends State<BookingsScreen> {
         setState(() => _isLoading = true);
       }
 
-      final dio = Dio();
-      final response = await dio.get(
-        'https://2sflw15kpf.execute-api.us-east-1.amazonaws.com/dev/app-user/user-bookings',
-        queryParameters: {'id': widget.userModel.currentUser?['appUserId']},
-        cancelToken: _cancelToken,
-      );
+      final userId = widget.userModel.currentUser?['appUserId'];
+      if (userId == null) {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+        return;
+      }
+
+      final response = await _apiService.fetchUserBookings(userId.toString());
 
       if (response.statusCode == 200) {
         final responseData = response.data['body'];
@@ -111,79 +116,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
     }
   }
 
-  // Future<void> _cancelBooking(dynamic booking) async {
-  //   try {
-  //     final bookingTestId = booking['bookingTestId']?.toString();
-  //     if (bookingTestId == null || bookingTestId.isEmpty) {
-  //       _showSnackBar(
-  //         'Cannot cancel booking: Invalid booking ID',
-  //         Colors.red[600]!,
-  //       );
-  //       return;
-  //     }
-  //
-  //     // Show confirmation dialog
-  //     final bool confirmCancel = await showDialog(
-  //       context: context,
-  //       builder:
-  //           (context) => AlertDialog(
-  //             title: Text('Confirm Cancellation', style: GoogleFonts.poppins()),
-  //             content: Text(
-  //               'Are you sure you want to cancel this booking? This action cannot be undone.',
-  //               style: GoogleFonts.poppins(),
-  //             ),
-  //             actions: [
-  //               TextButton(
-  //                 onPressed: () => Navigator.pop(context, false),
-  //                 child: Text('No', style: GoogleFonts.poppins()),
-  //               ),
-  //               TextButton(
-  //                 onPressed: () => Navigator.pop(context, true),
-  //                 child: Text(
-  //                   'Yes, Cancel',
-  //                   style: GoogleFonts.poppins(color: Colors.red),
-  //                 ),
-  //               ),
-  //             ],
-  //           ),
-  //     );
-  //
-  //     if (confirmCancel != true) return;
-  //
-  //     _showSnackBar('Cancelling booking...', Colors.blue[600]!);
-  //
-  //     final dio = Dio();
-  //     final response = await dio.post(
-  //       'https://77kxt00j0l.execute-api.us-east-1.amazonaws.com/dev/process/update-processing-status',
-  //       data: {
-  //         'bookingTestId': bookingTestId,
-  //         'processingStatus': 'Cancelled',
-  //         'reportBase64': '',
-  //       },
-  //       options: Options(headers: {'Content-Type': 'application/json'}),
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       _showSnackBar('Booking cancelled successfully', Colors.green[600]!);
-  //       // Reload orders to reflect the change
-  //       _loadOrders();
-  //     } else {
-  //       _showSnackBar('Failed to cancel booking', Colors.red[600]!);
-  //     }
-  //   } on DioException catch (e) {
-  //     print('Dio error cancelling booking: ${e.message}');
-  //     _showSnackBar(
-  //       'Error cancelling booking: ${e.message ?? 'Network error'}',
-  //       Colors.red[600]!,
-  //     );
-  //   } catch (e) {
-  //     print('Error cancelling booking: $e');
-  //     _showSnackBar(
-  //       'Error cancelling booking: ${e.toString()}',
-  //       Colors.red[600]!,
-  //     );
-  //   }
-  // }
   Future<void> _cancelBooking(dynamic booking) async {
     try {
       final bookingId = booking['bookingId']?.toString();
@@ -224,16 +156,12 @@ class _BookingsScreenState extends State<BookingsScreen> {
 
       _showSnackBar('Cancelling booking...', Colors.blue[600]!);
 
-      final dio = Dio();
-      final response = await dio.put(
-        'https://77kxt00j0l.execute-api.us-east-1.amazonaws.com/dev/bookings/booking-status',
-        data: {
-          'bookingId': bookingId,
-          'bookingStatus': 'Cancelled',
-          'notes': 'Cancelled by user',
-        },
-        options: Options(headers: {'Content-Type': 'application/json'}),
-      );
+      final data = {
+        'bookingId': bookingId,
+        'bookingStatus': 'Cancelled',
+        'notes': 'Cancelled by user',
+      };
+      final response = await _apiService.updateBookingStatus(data);
 
       if (response.statusCode == 200) {
         _showSnackBar('Booking cancelled successfully', Colors.green[600]!);
@@ -367,51 +295,57 @@ class _BookingsScreenState extends State<BookingsScreen> {
     if (date == null || date.isEmpty) return null;
 
     try {
-      // Handle YYYY-MM-DD format (e.g., "2025-08-26")
-      if (date.contains('-') && date.length == 10) {
-        final parts = date.split('-');
-        if (parts.length == 3) {
-          // Check if first part is 4 digits (year)
-          if (parts[0].length == 4) {
-            final year = int.tryParse(parts[0]);
-            final month = int.tryParse(parts[1]);
-            final day = int.tryParse(parts[2]);
+      // First try DateTime.parse as fallback
+      final parsed = DateTime.tryParse(date);
+      if (parsed != null) return parsed;
 
-            if (year != null && month != null && day != null) {
-              return DateTime(year, month, day);
-            }
-          }
-          // Check if last part is 4 digits (year) - DD-MM-YYYY format
-          else if (parts[2].length == 4) {
-            final day = int.tryParse(parts[0]);
-            final month = int.tryParse(parts[1]);
-            final year = int.tryParse(parts[2]);
+      List<String> parts;
+      bool isSlash = date.contains('/');
+      bool isDash = date.contains('-');
 
-            if (day != null && month != null && year != null) {
-              return DateTime(year, month, day);
-            }
-          }
+      if (!isSlash && !isDash) return null;
+
+      parts = date.split(isSlash ? '/' : '-');
+
+      if (parts.length != 3) return null;
+
+      int? year, month, day;
+
+      // If first part is 4 digits, assume YYYY separator MM separator DD
+      if (parts[0].length == 4) {
+        year = int.tryParse(parts[0]);
+        month = int.tryParse(parts[1]);
+        day = int.tryParse(parts[2]);
+      }
+      // If last part is 4 digits, assume DD separator MM separator YYYY
+      else if (parts[2].length == 4) {
+        day = int.tryParse(parts[0]);
+        month = int.tryParse(parts[1]);
+        year = int.tryParse(parts[2]);
+      }
+      // If middle is month, check ranges
+      else {
+        day = int.tryParse(parts[0]);
+        month = int.tryParse(parts[1]);
+        year = int.tryParse(parts[2]);
+        if (month == null || month < 1 || month > 12) {
+          // Swap day and month if invalid
+          final temp = day;
+          day = month;
+          month = temp;
+          if (month == null || month < 1 || month > 12) return null;
         }
       }
 
-      // Handle DD-MM-YYYY format with slashes (e.g., "22/08/2025")
-      if (date.contains('/')) {
-        final parts = date.split('/');
-        if (parts.length == 3) {
-          final day = int.tryParse(parts[0]);
-          final month = int.tryParse(parts[1]);
-          final year = int.tryParse(parts[2]);
+      if (year == null || month == null || day == null) return null;
 
-          if (day != null && month != null && year != null) {
-            // Handle 2-digit years
-            final fullYear = year < 100 ? 2000 + year : year;
-            return DateTime(fullYear, month, day);
-          }
-        }
-      }
+      // Handle 2-digit years
+      if (year < 100) year += 2000;
 
-      // Fallback to DateTime.parse for other formats
-      return DateTime.tryParse(date);
+      // Validate date
+      if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+
+      return DateTime(year, month, day);
     } catch (e) {
       print('Date parsing error for "$date": $e');
       return null;
@@ -713,36 +647,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
                   child: Row(
                     children: [
                       Expanded(
-                        // child: TextField(
-                        //   controller: _searchController,
-                        //   onChanged: (value) {
-                        //     setState(() {
-                        //       _searchQuery = value;
-                        //       _filterBookings();
-                        //     });
-                        //   },
-                        //   decoration: InputDecoration(
-                        //     hintText: 'Search by $_searchType...',
-                        //     hintStyle: GoogleFonts.poppins(
-                        //       color: Colors.grey[500],
-                        //       fontSize: 14.sp,
-                        //     ),
-                        //     prefixIcon: Icon(
-                        //       Icons.search_rounded,
-                        //       color: Colors.grey[500],
-                        //       size: 22.w,
-                        //     ),
-                        //     border: InputBorder.none,
-                        //     contentPadding: EdgeInsets.symmetric(
-                        //       horizontal: 16.w,
-                        //       vertical: 14.h,
-                        //     ),
-                        //   ),
-                        //   style: GoogleFonts.poppins(
-                        //     fontSize: 14.sp,
-                        //     color: Colors.grey[800],
-                        //   ),
-                        // ),
                         child: TextField(
                           controller: _searchController,
                           onChanged: (value) {
@@ -1372,52 +1276,6 @@ class _BookingsScreenState extends State<BookingsScreen> {
                                     ),
                                   ),
                                 ],
-                                // Rest of your existing code for cancel button and report buttons...
-                                // if (_canCancelBooking(booking)) ...[
-                                //   SizedBox(height: 16.h),
-                                //   Divider(
-                                //     height: 1,
-                                //     thickness: 1,
-                                //     color: Colors.grey[300],
-                                //   ),
-                                //   SizedBox(height: 16.h),
-                                //   SizedBox(
-                                //     width: double.infinity,
-                                //     child: OutlinedButton(
-                                //       onPressed: () => _cancelBooking(booking),
-                                //       style: OutlinedButton.styleFrom(
-                                //         foregroundColor: Colors.red,
-                                //         side: BorderSide(
-                                //           color: Colors.red,
-                                //           width: 1.5,
-                                //         ),
-                                //         padding: EdgeInsets.symmetric(
-                                //           vertical: 12.h,
-                                //         ),
-                                //         shape: RoundedRectangleBorder(
-                                //           borderRadius: BorderRadius.circular(12.r),
-                                //         ),
-                                //       ),
-                                //       child: Row(
-                                //         mainAxisAlignment: MainAxisAlignment.center,
-                                //         children: [
-                                //           Icon(
-                                //             Icons.cancel,
-                                //             size: 18.w,
-                                //           ),
-                                //           SizedBox(width: 8.w),
-                                //           Text(
-                                //             'Cancel Booking',
-                                //             style: GoogleFonts.poppins(
-                                //               fontSize: 14.sp,
-                                //               fontWeight: FontWeight.w600,
-                                //             ),
-                                //           ),
-                                //         ],
-                                //       ),
-                                //     ),
-                                //   ),
-                                // ],
                                 if (bookingStatus == 'Completed' && booking['isReportSent'] == true) ...[
                                   SizedBox(height: 16.h),
                                   Divider(
@@ -1700,365 +1558,3 @@ class StatusFilterBottomSheet extends StatelessWidget {
     );
   }
 }
-
-// return FadeInUp(
-//   duration: Duration(
-//     milliseconds: 300 + (index * 100),
-//   ),
-//   child: Container(
-//     decoration: BoxDecoration(
-//       borderRadius: BorderRadius.circular(16.r),
-//       color: Colors.white,
-//     ),
-//     child: Material(
-//       color: Colors.transparent,
-//       child: InkWell(
-//         borderRadius: BorderRadius.circular(16.r),
-//         onTap: () {
-//           // Add navigation to details screen
-//         },
-//         highlightColor: const Color(
-//           0xFF3661E2,
-//         ).withOpacity(0.05),
-//         splashColor: const Color(
-//           0xFF3661E2,
-//         ).withOpacity(0.1),
-//         child: Padding(
-//           padding: EdgeInsets.all(16.w),
-//           child: Column(
-//             crossAxisAlignment:
-//             CrossAxisAlignment.start,
-//             children: [
-//               Row(
-//                 mainAxisAlignment:
-//                 MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   Flexible(
-//                     child: Text(
-//                       orgName,
-//                       style: GoogleFonts.poppins(
-//                         fontSize: 15.sp,
-//                         fontWeight: FontWeight.w600,
-//                         color: Colors.grey[700],
-//                       ),
-//                       maxLines: 1,
-//                       overflow: TextOverflow.ellipsis,
-//                     ),
-//                   ),
-//                   if (bookingStatus.isNotEmpty)
-//                     SizedBox(width: 8.w),
-//                   if (bookingStatus.isNotEmpty)
-//                     Container(
-//                       padding: EdgeInsets.symmetric(
-//                         horizontal: 12.w,
-//                         vertical: 6.h,
-//                       ),
-//                       decoration: BoxDecoration(
-//                         color: _getStatusBgColor(
-//                           bookingStatus,
-//                         ),
-//                         borderRadius:
-//                         BorderRadius.circular(
-//                           20.r,
-//                         ),
-//                       ),
-//                       child: Row(
-//                         mainAxisSize:
-//                         MainAxisSize.min,
-//                         children: [
-//                           Icon(
-//                             _getStatusIcon(
-//                               bookingStatus,
-//                             ),
-//                             size: 16.w,
-//                             color: _getStatusColor(
-//                               bookingStatus,
-//                             ),
-//                           ),
-//                           SizedBox(width: 6.w),
-//                           Text(
-//                             bookingStatus,
-//                             style:
-//                             GoogleFonts.poppins(
-//                               fontSize: 12.sp,
-//                               fontWeight:
-//                               FontWeight.w600,
-//                               color:
-//                               _getStatusColor(
-//                                 bookingStatus,
-//                               ),
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ),
-//                 ],
-//               ),
-//               SizedBox(height: 12.h),
-//               Text(
-//                 testName,
-//                 style: GoogleFonts.poppins(
-//                   fontSize: 18.sp,
-//                   fontWeight: FontWeight.w700,
-//                   color: Colors.grey[900],
-//                   height: 1.3,
-//                 ),
-//               ),
-//               SizedBox(height: 16.h),
-//               Row(
-//                 mainAxisAlignment:
-//                 MainAxisAlignment.spaceBetween,
-//                 children: [
-//                   Row(
-//                     children: [
-//                       Icon(
-//                         Icons.person_outline,
-//                         size: 25.w,
-//                         color: Colors.black,
-//                       ),
-//                       SizedBox(width: 10.w),
-//                       Column(
-//                         crossAxisAlignment:
-//                         CrossAxisAlignment.start,
-//                         children: [
-//                           Text(
-//                             isChildBooking
-//                                 ? 'Patient'
-//                                 : 'Patient',
-//                             style:
-//                             GoogleFonts.poppins(
-//                               fontSize: 12.sp,
-//                               color:
-//                               Colors
-//                                   .grey[700],
-//                             ),
-//                           ),
-//                           Text(
-//                             userName.isNotEmpty
-//                                 ? userName
-//                                 : 'Unknown',
-//                             style:
-//                             GoogleFonts.poppins(
-//                               fontSize: 14.sp,
-//                               fontWeight:
-//                               FontWeight.w600,
-//                               color:
-//                               Colors
-//                                   .grey[800],
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                   Row(
-//                     children: [
-//                       Icon(
-//                         Icons.calendar_today,
-//                         size: 20.w,
-//                         color: Colors.black,
-//                       ),
-//                       SizedBox(width: 10.w),
-//                       Column(
-//                         crossAxisAlignment:
-//                         CrossAxisAlignment.start,
-//                         children: [
-//                           Text(
-//                             'Date',
-//                             style:
-//                             GoogleFonts.poppins(
-//                               fontSize: 12.sp,
-//                               color:
-//                               Colors
-//                                   .grey[700],
-//                             ),
-//                           ),
-//                           Text(
-//                             formattedDate,
-//                             style:
-//                             GoogleFonts.poppins(
-//                               fontSize: 14.sp,
-//                               fontWeight:
-//                               FontWeight.w600,
-//                               color:
-//                               Colors
-//                                   .grey[800],
-//                             ),
-//                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                 ],
-//               ),
-//               // if (_canCancelBooking(booking)) ...[
-//               //   SizedBox(height: 16.h),
-//               //   Divider(
-//               //     height: 1,
-//               //     thickness: 1,
-//               //     color: Colors.grey[300],
-//               //   ),
-//               //   SizedBox(height: 16.h),
-//               //   SizedBox(
-//               //     width: double.infinity,
-//               //     child: OutlinedButton(
-//               //       onPressed:
-//               //           () => _cancelBooking(booking),
-//               //       style: OutlinedButton.styleFrom(
-//               //         foregroundColor: Colors.red,
-//               //         side: BorderSide(
-//               //           color: Colors.red,
-//               //           width: 1.5,
-//               //         ),
-//               //         padding: EdgeInsets.symmetric(
-//               //           vertical: 12.h,
-//               //         ),
-//               //         shape: RoundedRectangleBorder(
-//               //           borderRadius:
-//               //               BorderRadius.circular(
-//               //                 12.r,
-//               //               ),
-//               //         ),
-//               //       ),
-//               //       child: Row(
-//               //         mainAxisAlignment:
-//               //             MainAxisAlignment.center,
-//               //         children: [
-//               //           Icon(
-//               //             Icons.cancel,
-//               //             size: 18.w,
-//               //           ),
-//               //           SizedBox(width: 8.w),
-//               //           Text(
-//               //             'Cancel Booking',
-//               //             style: GoogleFonts.poppins(
-//               //               fontSize: 14.sp,
-//               //               fontWeight:
-//               //                   FontWeight.w600,
-//               //             ),
-//               //           ),
-//               //         ],
-//               //       ),
-//               //     ),
-//               //   ),
-//               // ],
-//               if (bookingStatus == 'Completed' &&
-//                   booking['isReportSent'] ==
-//                       true) ...[
-//                 SizedBox(height: 16.h),
-//                 Divider(
-//                   height: 1,
-//                   thickness: 1,
-//                   color: Colors.grey[300],
-//                 ),
-//                 SizedBox(height: 16.h),
-//                 if (booking['reportUrl'] != null &&
-//                     booking['reportUrl'].isNotEmpty)
-//                   Row(
-//                     children: [
-//                       Expanded(
-//                         child: OutlinedButton.icon(
-//                           onPressed:
-//                               () => _viewReport(
-//                             booking,
-//                           ),
-//                           style: OutlinedButton.styleFrom(
-//                             foregroundColor:
-//                             const Color(
-//                               0xFF3661E2,
-//                             ),
-//                             side: BorderSide(
-//                               color: const Color(
-//                                 0xFF3661E2,
-//                               ),
-//                               width: 1.5,
-//                             ),
-//                             padding:
-//                             EdgeInsets.symmetric(
-//                               vertical: 12.h,
-//                             ),
-//                             shape: RoundedRectangleBorder(
-//                               borderRadius:
-//                               BorderRadius.circular(
-//                                 12.r,
-//                               ),
-//                             ),
-//                           ),
-//                           icon: Icon(
-//                             Icons.remove_red_eye,
-//                             size: 18.w,
-//                           ),
-//                           label: Text(
-//                             'View Report',
-//                             style:
-//                             GoogleFonts.poppins(
-//                               fontSize: 14.sp,
-//                               fontWeight:
-//                               FontWeight.w600,
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                       SizedBox(width: 12.w),
-//                       Expanded(
-//                         child: ElevatedButton.icon(
-//                           onPressed:
-//                               () => _downloadReport(
-//                             booking,
-//                           ),
-//                           style: ElevatedButton.styleFrom(
-//                             backgroundColor:
-//                             const Color(
-//                               0xFF3661E2,
-//                             ),
-//                             foregroundColor:
-//                             Colors.white,
-//                             padding:
-//                             EdgeInsets.symmetric(
-//                               vertical: 12.h,
-//                             ),
-//                             shape: RoundedRectangleBorder(
-//                               borderRadius:
-//                               BorderRadius.circular(
-//                                 12.r,
-//                               ),
-//                             ),
-//                             elevation: 2,
-//                             shadowColor: const Color(
-//                               0xFF3661E2,
-//                             ).withOpacity(0.3),
-//                           ),
-//                           icon: Icon(
-//                             Icons.download,
-//                             size: 18.w,
-//                           ),
-//                           label: Text(
-//                             'Download',
-//                             style:
-//                             GoogleFonts.poppins(
-//                               fontSize: 14.sp,
-//                               fontWeight:
-//                               FontWeight.w600,
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 if (booking['reportUrl'] == null ||
-//                     booking['reportUrl'].isEmpty)
-//                   Text(
-//                     'Report not yet available',
-//                     style: GoogleFonts.poppins(
-//                       fontSize: 14.sp,
-//                       color: Colors.grey[600],
-//                     ),
-//                   ),
-//               ],
-//             ],
-//           ),
-//         ),
-//       ),
-//     ),
-//   ),
-// );

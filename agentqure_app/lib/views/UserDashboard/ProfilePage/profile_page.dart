@@ -8,8 +8,11 @@
 // import 'package:share_plus/share_plus.dart';
 // import '../../../controllers/UserController/user_controller.dart';
 // import '../../../models/UserModel/user_model.dart';
+// import '../../../services/ApiService/api_service.dart';
 // import '../../../utils/CustomBottomNavigationBar/custom_bottom_navigation_bar.dart';
+// import '../../../utils/Environment/environment.dart';
 // import '../../../utils/ErrorUtils.dart';
+// import '../../../utils/FormFieldUtils/form_field_utils.dart';
 // import '../../../utils/NavigationUtils/navigation_utils.dart';
 //
 // class ProfileScreen extends StatefulWidget {
@@ -32,12 +35,19 @@
 //   bool _isEditing = false;
 //   bool _isUpdating = false;
 //   bool _isLoggingOut = false;
+//   bool _isDeleting = false;
+//   bool _blockNavigation = false;
 //   late AnimationController _animationController;
 //   late Animation<double> _fadeAnimation;
 //   late Animation<double> _scaleAnimation;
 //   Map<String, dynamic>? _userData;
 //   int _selectedIndex = 2;
-//   bool _isDeleting = false;
+//   final ApiService _apiService = ApiService();
+//   final String _googleApiKey = Environment.googleMapsApiKey;
+//   List<Map<String, dynamic>> _placePredictions = [];
+//   bool _isSearching = false;
+//   CancelToken? _searchCancelToken;
+//   bool _addressHasError = false;
 //   @override
 //   void initState() {
 //     super.initState();
@@ -103,6 +113,208 @@
 //       }
 //     }
 //   }
+//   // Google Places API Methods
+//   Future<void> _searchPlaces(String query) async {
+//     if (query.length < 3) {
+//       setState(() {
+//         _placePredictions.clear();
+//         _isSearching = false;
+//       });
+//       return;
+//     }
+//
+//     // Cancel previous search
+//     _searchCancelToken?.cancel();
+//     _searchCancelToken = CancelToken();
+//
+//     setState(() {
+//       _isSearching = true;
+//     });
+//
+//     try {
+//       final predictions = await _apiService.getPlacePredictions(
+//         query,
+//         _googleApiKey,
+//         cancelToken: _searchCancelToken,
+//       );
+//
+//       if (mounted) {
+//         setState(() {
+//           _placePredictions = predictions;
+//           _isSearching = false;
+//         });
+//       }
+//     } catch (e) {
+//       if (e is! DioException || e.type != DioExceptionType.cancel) {
+//         if (mounted) {
+//           setState(() {
+//             _isSearching = false;
+//           });
+//         }
+//         print('Error searching places: $e');
+//       }
+//     }
+//   }
+//
+//   Future<void> _selectPlace(Map<String, dynamic> prediction) async {
+//     setState(() {
+//       _isSearching = true;
+//       _placePredictions.clear();
+//     });
+//
+//     try {
+//       final placeDetails = await _apiService.getPlaceDetails(
+//         prediction['place_id'],
+//         _googleApiKey,
+//       );
+//
+//       if (mounted && placeDetails != null) {
+//         setState(() {
+//           _addressController.text = placeDetails['formatted_address'] ?? prediction['description'];
+//           _addressHasError = false;
+//           _isSearching = false;
+//         });
+//       }
+//     } catch (e) {
+//       if (mounted) {
+//         setState(() {
+//           _addressController.text = prediction['description'];
+//           _addressHasError = false;
+//           _isSearching = false;
+//         });
+//       }
+//       print('Error getting place details: $e');
+//     }
+//   }
+//
+//   void _clearSearch() {
+//     setState(() {
+//       _placePredictions.clear();
+//       _isSearching = false;
+//     });
+//     _searchCancelToken?.cancel();
+//   }
+//   Widget _buildAddressInput() {
+//     return Column(
+//       crossAxisAlignment: CrossAxisAlignment.start,
+//       children: [
+//         TextFormField(
+//           controller: _addressController,
+//           cursorColor: FormFieldUtils.cursorColor,
+//           decoration: FormFieldUtils.buildInputDecoration(
+//             labelText: 'Address ',
+//             icon: Icons.location_on_outlined,
+//             hasError: _addressHasError,
+//           ).copyWith(
+//             suffixIcon: _isSearching
+//                 ? Padding(
+//               padding: EdgeInsets.all(12.w),
+//               child: SizedBox(
+//                 width: 16.w,
+//                 height: 16.w,
+//                 child: CircularProgressIndicator(
+//                   strokeWidth: 2,
+//                   color: Color(0xFF3661E2),
+//                 ),
+//               ),
+//             )
+//                 : _addressController.text.isNotEmpty
+//                 ? IconButton(
+//               icon: Icon(Icons.clear, size: 20.w),
+//               onPressed: () {
+//                 _addressController.clear();
+//                 _clearSearch();
+//               },
+//             )
+//                 : null,
+//           ),
+//           style: FormFieldUtils.formTextStyle(),
+//           textInputAction: TextInputAction.done,
+//           onChanged: _searchPlaces,
+//           validator: (value) {
+//             final hasError = value == null || value.isEmpty;
+//             setState(() => _addressHasError = hasError);
+//             return hasError ? 'Please enter your address' : null;
+//           },
+//         ),
+//
+//         // Search Results
+//         if (_placePredictions.isNotEmpty)
+//           Container(
+//             margin: EdgeInsets.only(top: 8.h),
+//             decoration: BoxDecoration(
+//               color: Colors.white,
+//               borderRadius: BorderRadius.circular(8.r),
+//               boxShadow: [
+//                 BoxShadow(
+//                   color: Colors.black.withOpacity(0.1),
+//                   blurRadius: 8,
+//                   offset: Offset(0, 2),
+//                 ),
+//               ],
+//             ),
+//             constraints: BoxConstraints(maxHeight: 200.h),
+//             child: ListView.builder(
+//               shrinkWrap: true,
+//               physics: BouncingScrollPhysics(),
+//               itemCount: _placePredictions.length,
+//               itemBuilder: (context, index) {
+//                 final prediction = _placePredictions[index];
+//                 final mainText = prediction['structured_formatting']?['main_text'] ??
+//                     prediction['description'].split(',').first;
+//                 final secondaryText = prediction['structured_formatting']?['secondary_text'] ??
+//                     prediction['description'].replaceFirst(mainText, '').replaceFirst(', ', '');
+//
+//                 return ListTile(
+//                   leading: Icon(
+//                     Icons.location_on,
+//                     color: Color(0xFF3661E2),
+//                     size: 20.w,
+//                   ),
+//                   title: Text(
+//                     mainText,
+//                     style: GoogleFonts.poppins(
+//                       fontSize: 14.sp,
+//                       fontWeight: FontWeight.w500,
+//                       color: Colors.black87,
+//                     ),
+//                   ),
+//                   subtitle: secondaryText.isNotEmpty
+//                       ? Text(
+//                     secondaryText,
+//                     style: GoogleFonts.poppins(
+//                       fontSize: 12.sp,
+//                       color: Colors.grey[600],
+//                     ),
+//                     maxLines: 2,
+//                     overflow: TextOverflow.ellipsis,
+//                   )
+//                       : null,
+//                   onTap: () => _selectPlace(prediction),
+//                   contentPadding: EdgeInsets.symmetric(
+//                     horizontal: 16.w,
+//                     vertical: 8.h,
+//                   ),
+//                 );
+//               },
+//             ),
+//           ),
+//
+//         // Search Info
+//         if (_addressController.text.isNotEmpty && _placePredictions.isEmpty && !_isSearching)
+//           Padding(
+//             padding: EdgeInsets.only(top: 8.h),
+//             child: Text(
+//               "No results found. You can continue typing your address manually.",
+//               style: GoogleFonts.poppins(
+//                 fontSize: 12.sp,
+//                 color: Colors.grey[600],
+//               ),
+//             ),
+//           ),
+//       ],
+//     );
+//   }
 //
 //   @override
 //   void dispose() {
@@ -111,6 +323,7 @@
 //     _addressController.dispose();
 //     _ageController.dispose();
 //     _animationController.dispose();
+//     _searchCancelToken?.cancel();
 //     super.dispose();
 //   }
 //
@@ -140,8 +353,7 @@
 //           email: _userData?['emailId'] ?? '',
 //           address: _addressController.text.trim(),
 //           gender: _userData?['gender'] ?? '',
-//           age:
-//           _ageController.text.trim().isNotEmpty
+//           age: _ageController.text.trim().isNotEmpty
 //               ? int.tryParse(_ageController.text.trim())
 //               : null,
 //           isNewUser: false,
@@ -168,83 +380,15 @@
 //     await controller.logout();
 //     setState(() => _isLoggingOut = false);
 //   }
-//   void _deleteAccount() async {
-//     final bool? confirm = await showDialog(
-//       context: context,
-//       builder: (BuildContext context) {
-//         return AlertDialog(
-//           backgroundColor: Colors.white,
-//           title: Text(
-//             "Delete Account",
-//             style: GoogleFonts.poppins(
-//               fontWeight: FontWeight.bold,
-//               color: Colors.red,
-//             ),
-//           ),
-//           content: Text(
-//             "Are you sure you want to delete your account? This action is permanent and cannot be undone. All your data will be lost.",
-//             style: GoogleFonts.poppins(),
-//           ),
-//           actions: [
-//             TextButton(
-//               onPressed: () => Navigator.of(context).pop(false),
-//               child: Text(
-//                 "CANCEL",
-//                 style: GoogleFonts.poppins(color: Colors.grey,fontWeight: FontWeight.bold),
-//               ),
-//             ),
-//             TextButton(
-//               onPressed: () => Navigator.of(context).pop(true),
-//               child: Text(
-//                 "DELETE",
-//                 style: GoogleFonts.poppins(color: Colors.red, fontWeight: FontWeight.bold),
-//               ),
-//             ),
-//           ],
-//         );
-//       },
-//     );
 //
-//     if (confirm == true) {
-//       setState(() => _isDeleting = true);
-//
-//       try {
-//         final userModel = Provider.of<UserModel>(context, listen: false);
-//         final userId = userModel.currentUser?['appUserId']?.toString();
-//
-//         if (userId == null) {
-//           throw Exception("User ID not found");
-//         }
-//
-//         // Call the delete API using Dio
-//         final dio = Dio();
-//         final response = await dio.delete(
-//           'https://2sflw15kpf.execute-api.us-east-1.amazonaws.com/dev/app-user/register-app-user?id=$userId',
-//           options: Options(headers: {'Content-Type': 'application/json'}),
-//         );
-//
-//         if (response.statusCode == 200) {
-//           // Account deleted successfully, now logout
-//           ErrorUtils.showSuccessSnackBar(context, 'Account deleted successfully');
-//
-//           final controller = UserController(userModel, context);
-//           await controller.logout();
-//         } else {
-//           throw Exception('Failed to delete account: ${response.statusCode}');
-//         }
-//       } on DioException catch (e) {
-//         final errorMessage = e.response?.data?['message'] ?? e.message ?? 'Unknown error';
-//         ErrorUtils.showErrorSnackBar(context, 'Error deleting account: $errorMessage');
-//       } catch (e) {
-//         ErrorUtils.showErrorSnackBar(context, 'Error deleting account: ${e.toString()}');
-//       } finally {
-//         if (mounted) {
-//           setState(() => _isDeleting = false);
-//         }
-//       }
-//     }
-//   }
 //   void _onItemTapped(int index) {
+//     if (_blockNavigation) {
+//       ErrorUtils.showErrorSnackBar(
+//         context,
+//         'Please wait while we process your account deletion',
+//       );
+//       return;
+//     }
 //     NavigationUtils.handleNavigation(
 //       context,
 //       index,
@@ -289,313 +433,497 @@
 //     }
 //   }
 //
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       backgroundColor: Colors.grey[50],
-//       appBar: AppBar(
-//         title: Center(
-//           child: Text(
-//             'Profile',
-//             style: TextStyle(
-//               color: Colors.white,
-//               fontSize: 25.sp,
+//   void _deleteAccount() async {
+//     final bool? confirm = await showDialog(
+//       context: context,
+//       builder: (BuildContext context) {
+//         return AlertDialog(
+//           backgroundColor: Colors.white,
+//           title: Text(
+//             "Delete Account",
+//             style: GoogleFonts.poppins(
 //               fontWeight: FontWeight.bold,
+//               color: Colors.red,
 //             ),
 //           ),
+//           content: Text(
+//             "Are you sure you want to delete your account? This action is permanent and cannot be undone. All your data will be lost.",
+//             style: GoogleFonts.poppins(),
+//           ),
+//           actions: [
+//             TextButton(
+//               onPressed: () => Navigator.of(context).pop(false),
+//               style: ButtonStyle(
+//                 overlayColor: MaterialStateProperty.all(Colors.grey.withOpacity(0.2)),
+//               ),
+//               child: Text(
+//                 "CANCEL",
+//                 style: GoogleFonts.poppins(
+//                   color: Colors.grey,
+//                   fontWeight: FontWeight.bold,
+//                 ),
+//               ),
+//             ),
+//             TextButton(
+//               onPressed: () => Navigator.of(context).pop(true),
+//               style: ButtonStyle(
+//                 overlayColor: MaterialStateProperty.all(Colors.red.withOpacity(0.2)),
+//               ),
+//               child: Text(
+//                 "DELETE",
+//                 style: GoogleFonts.poppins(
+//                   color: Colors.red,
+//                   fontWeight: FontWeight.bold,
+//                 ),
+//               ),
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//
+//     if (!mounted) return;
+//
+//     if (confirm == true) {
+//       // Block navigation
+//       setState(() {
+//         _isDeleting = true;
+//         _blockNavigation = true;
+//       });
+//
+//       // Show processing dialog
+//       showDialog(
+//         context: context,
+//         barrierDismissible: false,
+//         builder: (BuildContext context) {
+//           return AlertDialog(
+//             backgroundColor: Colors.white,
+//             title: Text("Processing", style: GoogleFonts.poppins()),
+//             content: Column(
+//               mainAxisSize: MainAxisSize.min,
+//               children: [
+//                 CircularProgressIndicator(color: Color(0xFF3661E2)),
+//                 SizedBox(height: 16.h),
+//                 Text(
+//                   "Deleting your account. Please wait...",
+//                   style: GoogleFonts.poppins(),
+//                 ),
+//               ],
+//             ),
+//           );
+//         },
+//       );
+//
+//       try {
+//         final userModel = Provider.of<UserModel>(context, listen: false);
+//         final userId = userModel.currentUser?['appUserId']?.toString();
+//
+//         if (userId == null) {
+//           throw Exception("User ID not found");
+//         }
+//
+//         final apiService = ApiService();
+//         final response = await apiService.deleteUser(userId);
+//
+//         if (mounted) {
+//           Navigator.of(context).pop();
+//         }
+//
+//         if (response.statusCode == 200) {
+//           ErrorUtils.showSuccessSnackBar(
+//             context,
+//             'Account deleted successfully',
+//           );
+//
+//           final controller = UserController(userModel, context);
+//           await controller.logout();
+//         } else {
+//           throw Exception('Failed to delete account: ${response.statusCode}');
+//         }
+//       } on DioException catch (e) {
+//         if (mounted) {
+//           Navigator.of(context).pop();
+//         }
+//
+//         final errorMessage =
+//             e.response?.data?['message'] ?? e.message ?? 'Unknown error';
+//         ErrorUtils.showErrorSnackBar(
+//           context,
+//           'Error deleting account: $errorMessage',
+//         );
+//       } catch (e) {
+//         if (mounted) {
+//           Navigator.of(context).pop();
+//         }
+//
+//         ErrorUtils.showErrorSnackBar(
+//           context,
+//           'Error deleting account: ${e.toString()}',
+//         );
+//       } finally {
+//         if (mounted) {
+//           setState(() {
+//             _isDeleting = false;
+//             _blockNavigation = false;
+//           });
+//         }
+//       }
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return WillPopScope(
+//       onWillPop: () async {
+//         if (_blockNavigation) {
+//           ErrorUtils.showErrorSnackBar(
+//             context,
+//             'Please wait while we process your account deletion',
+//           );
+//           return false;
+//         }
+//         return true;
+//       },
+//       child: Scaffold(
+//         backgroundColor: Colors.grey[50],
+//         appBar: AppBar(
+//           title: Center(
+//             child: Text(
+//               'Profile',
+//               style: TextStyle(
+//                 color: Colors.white,
+//                 fontSize: 25.sp,
+//                 fontWeight: FontWeight.bold,
+//               ),
+//             ),
+//           ),
+//           backgroundColor: const Color(0xFF3661E2),
+//           automaticallyImplyLeading: false,
 //         ),
-//         backgroundColor: const Color(0xFF3661E2),
-//         automaticallyImplyLeading: false,
-//       ),
-//       body: SingleChildScrollView(
-//         child: FadeTransition(
-//           opacity: _fadeAnimation,
-//           child: ScaleTransition(
-//             scale: _scaleAnimation,
-//             child: Padding(
-//               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 20.h),
-//               child: Form(
-//                 key: _formKey,
-//                 child: Column(
-//                   mainAxisAlignment: MainAxisAlignment.center,
-//                   children: [
-//                     _buildEnhancedWalletCard(),
-//                     SizedBox(height: 16.h),
-//                     _buildReferralCard(),
-//                     Text(
-//                       "Manage your profile information",
-//                       style: GoogleFonts.poppins(
-//                         fontSize: 14.sp,
-//                         color: Colors.grey[600],
-//                       ),
+//         body: Stack(
+//           children: [
+//             SingleChildScrollView(
+//               child: FadeTransition(
+//                 opacity: _fadeAnimation,
+//                 child: ScaleTransition(
+//                   scale: _scaleAnimation,
+//                   child: Padding(
+//                     padding: EdgeInsets.symmetric(
+//                       horizontal: 24.w,
+//                       vertical: 20.h,
 //                     ),
-//                     SizedBox(height: 8.h),
-//                     _isEditing
-//                         ? Row(
-//                       children: [
-//                         Expanded(
-//                           child: _buildEditableField(
-//                             controller: _firstNameController,
-//                             label: "First Name *",
-//                             icon: Icons.person_outline,
-//                             validator:
-//                                 (value) =>
-//                             value == null || value.isEmpty
-//                                 ? "Please enter your first name"
-//                                 : null,
-//                             textInputAction: TextInputAction.next,
+//                     child: Form(
+//                       key: _formKey,
+//                       child: Column(
+//                         mainAxisAlignment: MainAxisAlignment.center,
+//                         children: [
+//                           _buildEnhancedWalletCard(),
+//                           SizedBox(height: 16.h),
+//                           _buildReferralCard(),
+//                           Text(
+//                             "Manage your profile information",
+//                             style: GoogleFonts.poppins(
+//                               fontSize: 14.sp,
+//                               color: Colors.grey[600],
+//                             ),
 //                           ),
-//                         ),
-//                         SizedBox(width: 12.w),
-//                         Expanded(
-//                           child: _buildEditableField(
-//                             controller: _lastNameController,
-//                             label: "Last Name",
+//                           SizedBox(height: 8.h),
+//                           _isEditing
+//                               ? Row(
+//                             children: [
+//                               Expanded(
+//                                 child: _buildEditableField(
+//                                   controller: _firstNameController,
+//                                   label: "First Name *",
+//                                   icon: Icons.person_outline,
+//                                   validator: (value) =>
+//                                   value == null || value.isEmpty
+//                                       ? "Please enter your first name"
+//                                       : null,
+//                                   textInputAction: TextInputAction.next,
+//                                 ),
+//                               ),
+//                               SizedBox(width: 12.w),
+//                               Expanded(
+//                                 child: _buildEditableField(
+//                                   controller: _lastNameController,
+//                                   label: "Last Name",
+//                                   icon: Icons.person_outline,
+//                                   validator: (value) => null,
+//                                   textInputAction: TextInputAction.next,
+//                                 ),
+//                               ),
+//                             ],
+//                           )
+//                               : _buildDetailCard(
 //                             icon: Icons.person_outline,
-//                             validator: (value) => null,
-//                             textInputAction: TextInputAction.next,
+//                             label: "Name",
+//                             value:
+//                             "${_userData?['firstName'] ?? ''} ${_userData?['lastName'] ?? ''}"
+//                                 .trim(),
 //                           ),
-//                         ),
-//                       ],
-//                     )
-//                         : _buildDetailCard(
-//                       icon: Icons.person_outline,
-//                       label: "Name",
-//                       value:
-//                       "${_userData?['firstName'] ?? ''} ${_userData?['lastName'] ?? ''}"
-//                           .trim(),
-//                     ),
-//                     SizedBox(height: 12.h),
-//                     // Row(
-//                     //   children: [
-//                     //     Expanded(
-//                     //       child:
-//                     //       _isEditing
-//                     //           ? Row(
-//                     //         children: [
-//                     //           Expanded(
-//                     //             child: _buildEditableField(
-//                     //               controller: _ageController,
-//                     //               label: "Age",
-//                     //               icon: Icons.cake_outlined,
-//                     //               validator: (value) {
-//                     //                 if (value != null &&
-//                     //                     value.isNotEmpty) {
-//                     //                   final age = int.tryParse(value);
-//                     //                   if (age == null ||
-//                     //                       age <= 0 ||
-//                     //                       age > 120) {
-//                     //                     return "Please enter a valid age";
-//                     //                   }
-//                     //                 }
-//                     //                 return null;
-//                     //               },
-//                     //               keyboardType: TextInputType.number,
-//                     //               textInputAction: TextInputAction.next,
-//                     //               inputFormatters: [
-//                     //                 FilteringTextInputFormatter.deny(
-//                     //                   RegExp(r'\s'),
-//                     //                 ),
-//                     //                 FilteringTextInputFormatter
-//                     //                     .digitsOnly,
-//                     //               ],
-//                     //             ),
-//                     //           ),
-//                     //           SizedBox(width: 8.w),
-//                     //           IconButton(
-//                     //             onPressed: _selectDate,
-//                     //             icon: Icon(
-//                     //               Icons.calendar_today,
-//                     //               color: Color(0xFF3661E2),
-//                     //               size: 24.w,
-//                     //             ),
-//                     //             tooltip: "Select Date of Birth",
-//                     //           ),
-//                     //         ],
-//                     //       )
-//                     //           : _buildDetailCard(
-//                     //         icon: Icons.cake_outlined,
-//                     //         label: "Age",
-//                     //         value:
-//                     //         _userData?['age']?.toString() ??
-//                     //             'Not provided',
-//                     //       ),
-//                     //     ),
-//                     //     SizedBox(width: 12.w),
-//                     //     Expanded(
-//                     //       child: _buildDetailCard(
-//                     //         icon: Icons.transgender,
-//                     //         label: "Gender",
-//                     //         value: _userData?['gender'] ?? 'Not specified',
-//                     //       ),
-//                     //     ),
-//                     //   ],
-//                     // ),
-//                     SizedBox(height: 12.h),
-//                     _isEditing
-//                         ? Column(
-//                       children: [
-//                         Row(
-//                           children: [
-//                             Expanded(
-//                               child: _buildEditableField(
-//                                 controller: _ageController,
-//                                 label: "Age",
-//                                 icon: Icons.cake_outlined,
-//                                 validator: (value) {
-//                                   if (value != null && value.isNotEmpty) {
-//                                     final age = int.tryParse(value);
-//                                     if (age == null || age <= 0 || age > 120) {
-//                                       return "Please enter a valid age";
-//                                     }
-//                                   }
-//                                   return null;
-//                                 },
-//                                 keyboardType: TextInputType.number,
-//                                 textInputAction: TextInputAction.next,
-//                                 inputFormatters: [
-//                                   FilteringTextInputFormatter.deny(RegExp(r'\s')),
-//                                   FilteringTextInputFormatter.digitsOnly,
+//                           SizedBox(height: 12.h),
+//                           _isEditing
+//                               ? Column(
+//                             children: [
+//                               Row(
+//                                 children: [
+//                                   Expanded(
+//                                     child: _buildEditableField(
+//                                       controller: _ageController,
+//                                       label: "Age",
+//                                       icon: Icons.cake_outlined,
+//                                       validator: (value) {
+//                                         if (value != null &&
+//                                             value.isNotEmpty) {
+//                                           final age = int.tryParse(value);
+//                                           if (age == null ||
+//                                               age <= 0 ||
+//                                               age > 120) {
+//                                             return "Please enter a valid age";
+//                                           }
+//                                         }
+//                                         return null;
+//                                       },
+//                                       keyboardType: TextInputType.number,
+//                                       textInputAction:
+//                                       TextInputAction.next,
+//                                       inputFormatters: [
+//                                         FilteringTextInputFormatter.deny(
+//                                           RegExp(r'\s'),
+//                                         ),
+//                                         FilteringTextInputFormatter
+//                                             .digitsOnly,
+//                                       ],
+//                                     ),
+//                                   ),
+//                                   SizedBox(width: 8.w),
+//                                   IconButton(
+//                                     onPressed: _selectDate,
+//                                     icon: Icon(
+//                                       Icons.calendar_today,
+//                                       color: Color(0xFF3661E2),
+//                                       size: 24.w,
+//                                     ),
+//                                     tooltip: "Select Date of Birth",
+//                                   ),
 //                                 ],
 //                               ),
-//                             ),
-//                             SizedBox(width: 8.w),
-//                             IconButton(
-//                               onPressed: _selectDate,
-//                               icon: Icon(
-//                                 Icons.calendar_today,
-//                                 color: Color(0xFF3661E2),
-//                                 size: 24.w,
+//                               SizedBox(height: 12.h),
+//                               _buildDetailCard(
+//                                 icon: Icons.transgender,
+//                                 label: "Gender",
+//                                 value:
+//                                 _userData?['gender'] ??
+//                                     'Not specified',
 //                               ),
-//                               tooltip: "Select Date of Birth",
-//                             ),
-//                           ],
-//                         ),
-//                         SizedBox(height: 12.h),
-//                         _buildDetailCard(
-//                           icon: Icons.transgender,
-//                           label: "Gender",
-//                           value: _userData?['gender'] ?? 'Not specified',
-//                         ),
-//                       ],
-//                     )
-//                         : Row(
-//                       children: [
-//                         Expanded(
-//                           child: _buildDetailCard(
-//                             icon: Icons.cake_outlined,
-//                             label: "Age",
-//                             value: _userData?['age']?.toString() ?? 'Not provided',
+//                             ],
+//                           )
+//                               : Row(
+//                             children: [
+//                               Expanded(
+//                                 child: _buildDetailCard(
+//                                   icon: Icons.cake_outlined,
+//                                   label: "Age",
+//                                   value:
+//                                   _userData?['age']?.toString() ??
+//                                       'Not provided',
+//                                 ),
+//                               ),
+//                               SizedBox(width: 12.w),
+//                               Expanded(
+//                                 child: _buildDetailCard(
+//                                   icon: Icons.transgender,
+//                                   label: "Gender",
+//                                   value:
+//                                   _userData?['gender'] ??
+//                                       'Not specified',
+//                                 ),
+//                               ),
+//                             ],
 //                           ),
-//                         ),
-//                         SizedBox(width: 12.w),
-//                         Expanded(
-//                           child: _buildDetailCard(
-//                             icon: Icons.transgender,
-//                             label: "Gender",
-//                             value: _userData?['gender'] ?? 'Not specified',
+//                           SizedBox(height: 12.h),
+//                           _buildDetailCard(
+//                             icon: Icons.phone,
+//                             label: "Contact Number",
+//                             value: _userData?['contactNumber'] ?? '',
 //                           ),
-//                         ),
-//                       ],
-//                     ),
-//                     SizedBox(height: 12.h),
-//                     _buildDetailCard(
-//                       icon: Icons.phone,
-//                       label: "Contact Number",
-//                       value: _userData?['contactNumber'] ?? '',
-//                     ),
-//                     SizedBox(height: 12.h),
-//                     _buildDetailCard(
-//                       icon: Icons.email_outlined,
-//                       label: "Email",
-//                       value: _userData?['emailId'] ?? '',
-//                     ),
-//                     SizedBox(height: 12.h),
-//                     _isEditing
-//                         ? _buildEditableField(
-//                       controller: _addressController,
-//                       label: "Address *",
-//                       icon: Icons.location_on_outlined,
-//                       validator:
-//                           (value) =>
-//                       value == null || value.isEmpty
-//                           ? "Please enter your address"
-//                           : null,
-//                       textInputAction: TextInputAction.done,
-//                       onSubmitted: (_) => _updateProfile(),
-//                     )
-//                         : _buildDetailCard(
-//                       icon: Icons.location_on_outlined,
-//                       label: "Address",
-//                       value: _userData?['address'] ?? '',
-//                     ),
-//                     SizedBox(height: 20.h),
-//                     Row(
-//                       children: [
-//                         if (_isEditing) ...[
-//                           Expanded(
-//                             child: Material(
-//                               elevation: 4,
-//                               borderRadius: BorderRadius.circular(12.r),
-//                               child: Container(
-//                                 decoration: BoxDecoration(
+//                           SizedBox(height: 12.h),
+//                           _buildDetailCard(
+//                             icon: Icons.email_outlined,
+//                             label: "Email",
+//                             value: _userData?['emailId'] ?? '',
+//                           ),
+//                           SizedBox(height: 12.h),
+//                           _isEditing
+//                               ? _buildAddressInput()
+//                               : _buildDetailCard(
+//                             icon: Icons.location_on_outlined,
+//                             label: "Address",
+//                             value: _userData?['address'] ?? '',
+//                           ),
+//                           //     ? _buildEditableField(
+//                           //   controller: _addressController,
+//                           //   label: "Address *",
+//                           //   icon: Icons.location_on_outlined,
+//                           //   validator: (value) =>
+//                           //   value == null || value.isEmpty
+//                           //       ? "Please enter your address"
+//                           //       : null,
+//                           //   textInputAction: TextInputAction.done,
+//                           //   onSubmitted: (_) => _updateProfile(),
+//                           // )
+//                           //     : _buildDetailCard(
+//                           //   icon: Icons.location_on_outlined,
+//                           //   label: "Address",
+//                           //   value: _userData?['address'] ?? '',
+//                           // ),
+//                           SizedBox(height: 20.h),
+//                           Row(
+//                             children: [
+//                               if (_isEditing) ...[
+//                                 Expanded(
+//                                   child: Material(
+//                                     elevation: 4,
+//                                     borderRadius: BorderRadius.circular(12.r),
+//                                     child: Container(
+//                                       decoration: BoxDecoration(
+//                                         borderRadius: BorderRadius.circular(
+//                                           12.r,
+//                                         ),
+//                                         color: Colors.white,
+//                                       ),
+//                                       child: OutlinedButton(
+//                                         onPressed: _blockNavigation
+//                                             ? null
+//                                             : _toggleEdit,
+//                                         style: OutlinedButton.styleFrom(
+//                                           foregroundColor: const Color(
+//                                             0xFF3661E2,
+//                                           ),
+//                                           side: BorderSide(
+//                                             color: const Color(0xFF3661E2),
+//                                           ),
+//                                           padding: EdgeInsets.symmetric(
+//                                             vertical: 16.h,
+//                                           ),
+//                                           shape: RoundedRectangleBorder(
+//                                             borderRadius: BorderRadius.circular(
+//                                               12.r,
+//                                             ),
+//                                           ),
+//                                           backgroundColor: Colors.transparent,
+//                                           shadowColor: Colors.transparent,
+//                                         ),
+//                                         child: Text(
+//                                           "CANCEL",
+//                                           style: GoogleFonts.poppins(
+//                                             fontSize: 16.sp,
+//                                             fontWeight: FontWeight.bold,
+//                                             letterSpacing: 1.2,
+//                                             color: Color(0xFF3661E2),
+//                                           ),
+//                                         ),
+//                                       ),
+//                                     ),
+//                                   ),
+//                                 ),
+//                                 SizedBox(width: 16.w),
+//                               ],
+//                               Expanded(
+//                                 child: Material(
+//                                   elevation: 4,
 //                                   borderRadius: BorderRadius.circular(12.r),
-//                                   color: Colors.white,
-//                                 ),
-//                                 child: OutlinedButton(
-//                                   onPressed: _toggleEdit,
-//                                   style: OutlinedButton.styleFrom(
-//                                     foregroundColor: const Color(0xFF3661E2),
-//                                     side: BorderSide(
-//                                       color: const Color(0xFF3661E2),
-//                                     ),
-//                                     padding: EdgeInsets.symmetric(
-//                                       vertical: 16.h,
-//                                     ),
-//                                     shape: RoundedRectangleBorder(
+//                                   child: Container(
+//                                     decoration: BoxDecoration(
 //                                       borderRadius: BorderRadius.circular(12.r),
+//                                       gradient: _blockNavigation
+//                                           ? LinearGradient(
+//                                         colors: [
+//                                           Colors.grey,
+//                                           Colors.grey[400]!,
+//                                         ],
+//                                       )
+//                                           : LinearGradient(
+//                                         colors: [
+//                                           const Color(0xFF3661E2),
+//                                           const Color(0xFF5B8DF1),
+//                                         ],
+//                                         begin: Alignment.topLeft,
+//                                         end: Alignment.bottomRight,
+//                                       ),
 //                                     ),
-//                                     backgroundColor: Colors.transparent,
-//                                     shadowColor: Colors.transparent,
-//                                   ),
-//                                   child: Text(
-//                                     "CANCEL",
-//                                     style: GoogleFonts.poppins(
-//                                       fontSize: 16.sp,
-//                                       fontWeight: FontWeight.bold,
-//                                       letterSpacing: 1.2,
-//                                       color: Color(0xFF3661E2),
+//                                     child: ElevatedButton(
+//                                       onPressed: _blockNavigation
+//                                           ? null
+//                                           : (_isUpdating
+//                                           ? null
+//                                           : (_isEditing
+//                                           ? _updateProfile
+//                                           : _toggleEdit)),
+//                                       style: ElevatedButton.styleFrom(
+//                                         padding: EdgeInsets.symmetric(
+//                                           vertical: 16.h,
+//                                         ),
+//                                         shape: RoundedRectangleBorder(
+//                                           borderRadius: BorderRadius.circular(
+//                                             12.r,
+//                                           ),
+//                                         ),
+//                                         backgroundColor: Colors.transparent,
+//                                         shadowColor: Colors.transparent,
+//                                         disabledBackgroundColor:
+//                                         Colors.grey[400],
+//                                       ),
+//                                       child: _isUpdating
+//                                           ? SizedBox(
+//                                         width: 24.w,
+//                                         height: 24.h,
+//                                         child: CircularProgressIndicator(
+//                                           strokeWidth: 3,
+//                                           color: Colors.white,
+//                                         ),
+//                                       )
+//                                           : Text(
+//                                         _isEditing
+//                                             ? "SAVE CHANGES"
+//                                             : "EDIT PROFILE",
+//                                         style: GoogleFonts.poppins(
+//                                           fontSize: 16.sp,
+//                                           fontWeight: FontWeight.bold,
+//                                           letterSpacing: 1.2,
+//                                           color: Colors.white,
+//                                         ),
+//                                       ),
 //                                     ),
 //                                   ),
 //                                 ),
 //                               ),
-//                             ),
+//                             ],
 //                           ),
-//                           SizedBox(width: 16.w),
-//                         ],
-//                         Expanded(
-//                           child: Material(
+//                           SizedBox(height: 16.h),
+//                           Material(
 //                             elevation: 4,
 //                             borderRadius: BorderRadius.circular(12.r),
 //                             child: Container(
+//                               width: double.infinity,
 //                               decoration: BoxDecoration(
 //                                 borderRadius: BorderRadius.circular(12.r),
-//                                 gradient: LinearGradient(
+//                                 gradient: _blockNavigation
+//                                     ? LinearGradient(
 //                                   colors: [
-//                                     const Color(0xFF3661E2),
-//                                     const Color(0xFF5B8DF1),
+//                                     Colors.grey,
+//                                     Colors.grey[400]!,
 //                                   ],
+//                                 )
+//                                     : const LinearGradient(
+//                                   colors: [Colors.red, Color(0xFFF15B5B)],
 //                                   begin: Alignment.topLeft,
 //                                   end: Alignment.bottomRight,
 //                                 ),
 //                               ),
 //                               child: ElevatedButton(
-//                                 onPressed:
-//                                 _isUpdating
-//                                     ? null
-//                                     : (_isEditing
-//                                     ? _updateProfile
-//                                     : _toggleEdit),
+//                                 onPressed: _blockNavigation ? null : _logout,
 //                                 style: ElevatedButton.styleFrom(
 //                                   padding: EdgeInsets.symmetric(vertical: 16.h),
 //                                   shape: RoundedRectangleBorder(
@@ -605,8 +933,7 @@
 //                                   shadowColor: Colors.transparent,
 //                                   disabledBackgroundColor: Colors.grey[400],
 //                                 ),
-//                                 child:
-//                                 _isUpdating
+//                                 child: _isLoggingOut
 //                                     ? SizedBox(
 //                                   width: 24.w,
 //                                   height: 24.h,
@@ -616,9 +943,7 @@
 //                                   ),
 //                                 )
 //                                     : Text(
-//                                   _isEditing
-//                                       ? "SAVE CHANGES"
-//                                       : "EDIT PROFILE",
+//                                   "LOGOUT",
 //                                   style: GoogleFonts.poppins(
 //                                     fontSize: 16.sp,
 //                                     fontWeight: FontWeight.bold,
@@ -629,119 +954,109 @@
 //                               ),
 //                             ),
 //                           ),
-//                         ),
-//                       ],
-//                     ),
-//                     SizedBox(height: 16.h),
-//                     Material(
-//                       elevation: 4,
-//                       borderRadius: BorderRadius.circular(12.r),
-//                       child: Container(
-//                         width: double.infinity,
-//                         decoration: BoxDecoration(
-//                           borderRadius: BorderRadius.circular(12.r),
-//                           gradient: const LinearGradient(
-//                             colors: [Colors.red, Color(0xFFF15B5B)],
-//                             begin: Alignment.topLeft,
-//                             end: Alignment.bottomRight,
-//                           ),
-//                         ),
-//                         child: ElevatedButton(
-//                           onPressed: _isLoggingOut ? null : _logout,
-//                           style: ElevatedButton.styleFrom(
-//                             padding: EdgeInsets.symmetric(vertical: 16.h),
-//                             shape: RoundedRectangleBorder(
-//                               borderRadius: BorderRadius.circular(12.r),
+//                           SizedBox(height: 16.h),
+//                           Material(
+//                             elevation: 4,
+//                             borderRadius: BorderRadius.circular(12.r),
+//                             child: Container(
+//                               width: double.infinity,
+//                               decoration: BoxDecoration(
+//                                 borderRadius: BorderRadius.circular(12.r),
+//                                 color: _blockNavigation
+//                                     ? Colors.grey[300]
+//                                     : Colors.white,
+//                                 border: Border.all(
+//                                   color: _blockNavigation
+//                                       ? Colors.grey
+//                                       : Colors.red,
+//                                   width: 1.5,
+//                                 ),
+//                               ),
+//                               child: ElevatedButton(
+//                                 onPressed: _blockNavigation
+//                                     ? null
+//                                     : _deleteAccount,
+//                                 style: ElevatedButton.styleFrom(
+//                                   padding: EdgeInsets.symmetric(vertical: 16.h),
+//                                   shape: RoundedRectangleBorder(
+//                                     borderRadius: BorderRadius.circular(12.r),
+//                                   ),
+//                                   backgroundColor: Colors.transparent,
+//                                   shadowColor: Colors.transparent,
+//                                   disabledBackgroundColor: Colors.grey[300],
+//                                   foregroundColor: Colors.red,
+//                                 ),
+//                                 child: _isDeleting
+//                                     ? SizedBox(
+//                                   width: 24.w,
+//                                   height: 24.h,
+//                                   child: CircularProgressIndicator(
+//                                     strokeWidth: 3,
+//                                     color: Colors.red,
+//                                   ),
+//                                 )
+//                                     : Text(
+//                                   "DELETE ACCOUNT",
+//                                   style: GoogleFonts.poppins(
+//                                     fontSize: 16.sp,
+//                                     fontWeight: FontWeight.bold,
+//                                     letterSpacing: 1.2,
+//                                     color: Colors.red,
+//                                   ),
+//                                 ),
+//                               ),
 //                             ),
-//                             backgroundColor: Colors.transparent,
-//                             shadowColor: Colors.transparent,
-//                             disabledBackgroundColor: Colors.grey[400],
 //                           ),
-//                           child:
-//                           _isLoggingOut
-//                               ? SizedBox(
-//                             width: 24.w,
-//                             height: 24.h,
-//                             child: CircularProgressIndicator(
-//                               strokeWidth: 3,
-//                               color: Colors.white,
-//                             ),
-//                           )
-//                               : Text(
-//                             "LOGOUT",
+//                           SizedBox(height: 16.h),
+//                           Text(
+//                             "Need help? Contact support",
 //                             style: GoogleFonts.poppins(
-//                               fontSize: 16.sp,
-//                               fontWeight: FontWeight.bold,
-//                               letterSpacing: 1.2,
-//                               color: Colors.white,
+//                               fontSize: 12.sp,
+//                               color: Colors.grey[600],
 //                             ),
 //                           ),
-//                         ),
+//                         ],
 //                       ),
 //                     ),
-//                     SizedBox(height: 16.h),
-//                     Material(
-//                       elevation: 4,
-//                       borderRadius: BorderRadius.circular(12.r),
-//                       child: Container(
-//                         width: double.infinity,
-//                         decoration: BoxDecoration(
-//                           borderRadius: BorderRadius.circular(12.r),
-//                           color: Colors.white,
-//                           border: Border.all(color: Colors.red, width: 1.5),
-//                         ),
-//                         child: ElevatedButton(
-//                           onPressed: _isDeleting ? null : _deleteAccount,
-//                           style: ElevatedButton.styleFrom(
-//                             padding: EdgeInsets.symmetric(vertical: 16.h),
-//                             shape: RoundedRectangleBorder(
-//                               borderRadius: BorderRadius.circular(12.r),
-//                             ),
-//                             backgroundColor: Colors.transparent,
-//                             shadowColor: Colors.transparent,
-//                             disabledBackgroundColor: Colors.grey[300],
-//                             foregroundColor: Colors.red,
-//                           ),
-//                           child: _isDeleting
-//                               ? SizedBox(
-//                             width: 24.w,
-//                             height: 24.h,
-//                             child: CircularProgressIndicator(
-//                               strokeWidth: 3,
-//                               color: Colors.red,
-//                             ),
-//                           )
-//                               : Text(
-//                             "DELETE ACCOUNT",
-//                             style: GoogleFonts.poppins(
-//                               fontSize: 16.sp,
-//                               fontWeight: FontWeight.bold,
-//                               letterSpacing: 1.2,
-//                               color: Colors.red,
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                     SizedBox(height: 24.h),
-//                     Text(
-//                       "Need help? Contact support",
-//                       style: GoogleFonts.poppins(
-//                         fontSize: 12.sp,
-//                         color: Colors.grey[600],
-//                       ),
-//                     ),
-//                   ],
+//                   ),
 //                 ),
 //               ),
 //             ),
-//           ),
+//
+//             // Blocking overlay during deletion
+//             if (_blockNavigation)
+//               Container(
+//                 color: Colors.black.withOpacity(0.5),
+//                 child: Center(
+//                   child: Column(
+//                     mainAxisAlignment: MainAxisAlignment.center,
+//                     children: [
+//                       CircularProgressIndicator(
+//                         valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+//                       ),
+//                       SizedBox(height: 16.h),
+//                       Text(
+//                         "Processing account deletion...\nPlease wait",
+//                         textAlign: TextAlign.center,
+//                         style: GoogleFonts.poppins(
+//                           color: Colors.white,
+//                           fontSize: 16.sp,
+//                           fontWeight: FontWeight.bold,
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//           ],
 //         ),
-//       ),
-//       bottomNavigationBar: CustomBottomNavigationBar(
-//         currentIndex: _selectedIndex,
-//         onTap: _onItemTapped,
-//         userModel: Provider.of<UserModel>(context, listen: false),
+//         bottomNavigationBar: _blockNavigation
+//             ? null
+//             : CustomBottomNavigationBar(
+//           currentIndex: _selectedIndex,
+//           onTap: _onItemTapped,
+//           userModel: Provider.of<UserModel>(context, listen: false),
+//         ),
 //       ),
 //     );
 //   }
@@ -945,7 +1260,6 @@
 //           borderRadius: BorderRadius.circular(12.r),
 //           borderSide: const BorderSide(color: Color(0xFF3661E2), width: 2),
 //         ),
-//         // contentPadding: EdgeInsets.symmetric(vertical: 16.h),
 //         errorStyle: GoogleFonts.poppins(fontSize: 12.sp, color: Colors.red),
 //       ),
 //       style: GoogleFonts.poppins(fontSize: 16.sp, fontWeight: FontWeight.w600),
@@ -960,7 +1274,8 @@
 //     final String referralCode = _userData?['referralCode'] ?? 'LOADING...';
 //     final String referralLink =
 //         'https://dev-lab-app.web.app/invite?code=$referralCode';
-//     final String shareMessage = '''Join me on this awesome app!
+//     final String shareMessage =
+//     '''Join me on this awesome app!
 //
 // Use my referral code: $referralCode
 // or click this link: $referralLink
@@ -1187,7 +1502,6 @@
 //   }
 // }
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -1196,6 +1510,7 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../../controllers/UserController/user_controller.dart';
 import '../../../models/UserModel/user_model.dart';
+import '../../../services/ApiService/api_service.dart';
 import '../../../utils/CustomBottomNavigationBar/custom_bottom_navigation_bar.dart';
 import '../../../utils/ErrorUtils.dart';
 import '../../../utils/NavigationUtils/navigation_utils.dart';
@@ -1370,7 +1685,7 @@ class _ProfileScreenState extends State<ProfileScreen>
       context,
       index,
       _selectedIndex,
-      (newIndex) => setState(() => _selectedIndex = newIndex),
+          (newIndex) => setState(() => _selectedIndex = newIndex),
       Provider.of<UserModel>(context, listen: false),
     );
   }
@@ -1430,9 +1745,9 @@ class _ProfileScreenState extends State<ProfileScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-        style: ButtonStyle(
-        overlayColor: MaterialStateProperty.all(Colors.grey.withOpacity(0.2)),
-        ),
+              style: ButtonStyle(
+                overlayColor: MaterialStateProperty.all(Colors.grey.withOpacity(0.2)),
+              ),
               child: Text(
                 "CANCEL",
                 style: GoogleFonts.poppins(
@@ -1499,11 +1814,8 @@ class _ProfileScreenState extends State<ProfileScreen>
           throw Exception("User ID not found");
         }
 
-        final dio = Dio();
-        final response = await dio.delete(
-          'https://2sflw15kpf.execute-api.us-east-1.amazonaws.com/dev/app-user/register-app-user?id=$userId',
-          options: Options(headers: {'Content-Type': 'application/json'}),
-        );
+        final apiService = ApiService();
+        final response = await apiService.deleteUser(userId);
 
         if (mounted) {
           Navigator.of(context).pop();
@@ -1610,118 +1922,118 @@ class _ProfileScreenState extends State<ProfileScreen>
                           SizedBox(height: 8.h),
                           _isEditing
                               ? Row(
-                                  children: [
-                                    Expanded(
-                                      child: _buildEditableField(
-                                        controller: _firstNameController,
-                                        label: "First Name *",
-                                        icon: Icons.person_outline,
-                                        validator: (value) =>
-                                            value == null || value.isEmpty
-                                            ? "Please enter your first name"
-                                            : null,
-                                        textInputAction: TextInputAction.next,
-                                      ),
-                                    ),
-                                    SizedBox(width: 12.w),
-                                    Expanded(
-                                      child: _buildEditableField(
-                                        controller: _lastNameController,
-                                        label: "Last Name",
-                                        icon: Icons.person_outline,
-                                        validator: (value) => null,
-                                        textInputAction: TextInputAction.next,
-                                      ),
-                                    ),
-                                  ],
-                                )
-                              : _buildDetailCard(
+                            children: [
+                              Expanded(
+                                child: _buildEditableField(
+                                  controller: _firstNameController,
+                                  label: "First Name *",
                                   icon: Icons.person_outline,
-                                  label: "Name",
-                                  value:
-                                      "${_userData?['firstName'] ?? ''} ${_userData?['lastName'] ?? ''}"
-                                          .trim(),
+                                  validator: (value) =>
+                                  value == null || value.isEmpty
+                                      ? "Please enter your first name"
+                                      : null,
+                                  textInputAction: TextInputAction.next,
                                 ),
+                              ),
+                              SizedBox(width: 12.w),
+                              Expanded(
+                                child: _buildEditableField(
+                                  controller: _lastNameController,
+                                  label: "Last Name",
+                                  icon: Icons.person_outline,
+                                  validator: (value) => null,
+                                  textInputAction: TextInputAction.next,
+                                ),
+                              ),
+                            ],
+                          )
+                              : _buildDetailCard(
+                            icon: Icons.person_outline,
+                            label: "Name",
+                            value:
+                            "${_userData?['firstName'] ?? ''} ${_userData?['lastName'] ?? ''}"
+                                .trim(),
+                          ),
                           SizedBox(height: 12.h),
                           _isEditing
                               ? Column(
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: _buildEditableField(
-                                            controller: _ageController,
-                                            label: "Age",
-                                            icon: Icons.cake_outlined,
-                                            validator: (value) {
-                                              if (value != null &&
-                                                  value.isNotEmpty) {
-                                                final age = int.tryParse(value);
-                                                if (age == null ||
-                                                    age <= 0 ||
-                                                    age > 120) {
-                                                  return "Please enter a valid age";
-                                                }
-                                              }
-                                              return null;
-                                            },
-                                            keyboardType: TextInputType.number,
-                                            textInputAction:
-                                                TextInputAction.next,
-                                            inputFormatters: [
-                                              FilteringTextInputFormatter.deny(
-                                                RegExp(r'\s'),
-                                              ),
-                                              FilteringTextInputFormatter
-                                                  .digitsOnly,
-                                            ],
-                                          ),
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildEditableField(
+                                      controller: _ageController,
+                                      label: "Age",
+                                      icon: Icons.cake_outlined,
+                                      validator: (value) {
+                                        if (value != null &&
+                                            value.isNotEmpty) {
+                                          final age = int.tryParse(value);
+                                          if (age == null ||
+                                              age <= 0 ||
+                                              age > 120) {
+                                            return "Please enter a valid age";
+                                          }
+                                        }
+                                        return null;
+                                      },
+                                      keyboardType: TextInputType.number,
+                                      textInputAction:
+                                      TextInputAction.next,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.deny(
+                                          RegExp(r'\s'),
                                         ),
-                                        SizedBox(width: 8.w),
-                                        IconButton(
-                                          onPressed: _selectDate,
-                                          icon: Icon(
-                                            Icons.calendar_today,
-                                            color: Color(0xFF3661E2),
-                                            size: 24.w,
-                                          ),
-                                          tooltip: "Select Date of Birth",
-                                        ),
+                                        FilteringTextInputFormatter
+                                            .digitsOnly,
                                       ],
                                     ),
-                                    SizedBox(height: 12.h),
-                                    _buildDetailCard(
-                                      icon: Icons.transgender,
-                                      label: "Gender",
-                                      value:
-                                          _userData?['gender'] ??
-                                          'Not specified',
+                                  ),
+                                  SizedBox(width: 8.w),
+                                  IconButton(
+                                    onPressed: _selectDate,
+                                    icon: Icon(
+                                      Icons.calendar_today,
+                                      color: Color(0xFF3661E2),
+                                      size: 24.w,
                                     ),
-                                  ],
-                                )
+                                    tooltip: "Select Date of Birth",
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 12.h),
+                              _buildDetailCard(
+                                icon: Icons.transgender,
+                                label: "Gender",
+                                value:
+                                _userData?['gender'] ??
+                                    'Not specified',
+                              ),
+                            ],
+                          )
                               : Row(
-                                  children: [
-                                    Expanded(
-                                      child: _buildDetailCard(
-                                        icon: Icons.cake_outlined,
-                                        label: "Age",
-                                        value:
-                                            _userData?['age']?.toString() ??
-                                            'Not provided',
-                                      ),
-                                    ),
-                                    SizedBox(width: 12.w),
-                                    Expanded(
-                                      child: _buildDetailCard(
-                                        icon: Icons.transgender,
-                                        label: "Gender",
-                                        value:
-                                            _userData?['gender'] ??
-                                            'Not specified',
-                                      ),
-                                    ),
-                                  ],
+                            children: [
+                              Expanded(
+                                child: _buildDetailCard(
+                                  icon: Icons.cake_outlined,
+                                  label: "Age",
+                                  value:
+                                  _userData?['age']?.toString() ??
+                                      'Not provided',
                                 ),
+                              ),
+                              SizedBox(width: 12.w),
+                              Expanded(
+                                child: _buildDetailCard(
+                                  icon: Icons.transgender,
+                                  label: "Gender",
+                                  value:
+                                  _userData?['gender'] ??
+                                      'Not specified',
+                                ),
+                              ),
+                            ],
+                          ),
                           SizedBox(height: 12.h),
                           _buildDetailCard(
                             icon: Icons.phone,
@@ -1737,21 +2049,21 @@ class _ProfileScreenState extends State<ProfileScreen>
                           SizedBox(height: 12.h),
                           _isEditing
                               ? _buildEditableField(
-                                  controller: _addressController,
-                                  label: "Address *",
-                                  icon: Icons.location_on_outlined,
-                                  validator: (value) =>
-                                      value == null || value.isEmpty
-                                      ? "Please enter your address"
-                                      : null,
-                                  textInputAction: TextInputAction.done,
-                                  onSubmitted: (_) => _updateProfile(),
-                                )
+                            controller: _addressController,
+                            label: "Address *",
+                            icon: Icons.location_on_outlined,
+                            validator: (value) =>
+                            value == null || value.isEmpty
+                                ? "Please enter your address"
+                                : null,
+                            textInputAction: TextInputAction.done,
+                            onSubmitted: (_) => _updateProfile(),
+                          )
                               : _buildDetailCard(
-                                  icon: Icons.location_on_outlined,
-                                  label: "Address",
-                                  value: _userData?['address'] ?? '',
-                                ),
+                            icon: Icons.location_on_outlined,
+                            label: "Address",
+                            value: _userData?['address'] ?? '',
+                          ),
                           SizedBox(height: 20.h),
                           Row(
                             children: [
@@ -1813,28 +2125,28 @@ class _ProfileScreenState extends State<ProfileScreen>
                                       borderRadius: BorderRadius.circular(12.r),
                                       gradient: _blockNavigation
                                           ? LinearGradient(
-                                              colors: [
-                                                Colors.grey,
-                                                Colors.grey[400]!,
-                                              ],
-                                            )
+                                        colors: [
+                                          Colors.grey,
+                                          Colors.grey[400]!,
+                                        ],
+                                      )
                                           : LinearGradient(
-                                              colors: [
-                                                const Color(0xFF3661E2),
-                                                const Color(0xFF5B8DF1),
-                                              ],
-                                              begin: Alignment.topLeft,
-                                              end: Alignment.bottomRight,
-                                            ),
+                                        colors: [
+                                          const Color(0xFF3661E2),
+                                          const Color(0xFF5B8DF1),
+                                        ],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
                                     ),
                                     child: ElevatedButton(
                                       onPressed: _blockNavigation
                                           ? null
                                           : (_isUpdating
-                                                ? null
-                                                : (_isEditing
-                                                      ? _updateProfile
-                                                      : _toggleEdit)),
+                                          ? null
+                                          : (_isEditing
+                                          ? _updateProfile
+                                          : _toggleEdit)),
                                       style: ElevatedButton.styleFrom(
                                         padding: EdgeInsets.symmetric(
                                           vertical: 16.h,
@@ -1847,28 +2159,28 @@ class _ProfileScreenState extends State<ProfileScreen>
                                         backgroundColor: Colors.transparent,
                                         shadowColor: Colors.transparent,
                                         disabledBackgroundColor:
-                                            Colors.grey[400],
+                                        Colors.grey[400],
                                       ),
                                       child: _isUpdating
                                           ? SizedBox(
-                                              width: 24.w,
-                                              height: 24.h,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 3,
-                                                color: Colors.white,
-                                              ),
-                                            )
+                                        width: 24.w,
+                                        height: 24.h,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 3,
+                                          color: Colors.white,
+                                        ),
+                                      )
                                           : Text(
-                                              _isEditing
-                                                  ? "SAVE CHANGES"
-                                                  : "EDIT PROFILE",
-                                              style: GoogleFonts.poppins(
-                                                fontSize: 16.sp,
-                                                fontWeight: FontWeight.bold,
-                                                letterSpacing: 1.2,
-                                                color: Colors.white,
-                                              ),
-                                            ),
+                                        _isEditing
+                                            ? "SAVE CHANGES"
+                                            : "EDIT PROFILE",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.bold,
+                                          letterSpacing: 1.2,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -1885,16 +2197,16 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 borderRadius: BorderRadius.circular(12.r),
                                 gradient: _blockNavigation
                                     ? LinearGradient(
-                                        colors: [
-                                          Colors.grey,
-                                          Colors.grey[400]!,
-                                        ],
-                                      )
+                                  colors: [
+                                    Colors.grey,
+                                    Colors.grey[400]!,
+                                  ],
+                                )
                                     : const LinearGradient(
-                                        colors: [Colors.red, Color(0xFFF15B5B)],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
+                                  colors: [Colors.red, Color(0xFFF15B5B)],
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                ),
                               ),
                               child: ElevatedButton(
                                 onPressed: _blockNavigation ? null : _logout,
@@ -1909,22 +2221,22 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 ),
                                 child: _isLoggingOut
                                     ? SizedBox(
-                                        width: 24.w,
-                                        height: 24.h,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 3,
-                                          color: Colors.white,
-                                        ),
-                                      )
+                                  width: 24.w,
+                                  height: 24.h,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                    color: Colors.white,
+                                  ),
+                                )
                                     : Text(
-                                        "LOGOUT",
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 1.2,
-                                          color: Colors.white,
-                                        ),
-                                      ),
+                                  "LOGOUT",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.2,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -1962,26 +2274,26 @@ class _ProfileScreenState extends State<ProfileScreen>
                                 ),
                                 child: _isDeleting
                                     ? SizedBox(
-                                        width: 24.w,
-                                        height: 24.h,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 3,
-                                          color: Colors.red,
-                                        ),
-                                      )
+                                  width: 24.w,
+                                  height: 24.h,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                    color: Colors.red,
+                                  ),
+                                )
                                     : Text(
-                                        "DELETE ACCOUNT",
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 16.sp,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 1.2,
-                                          color: Colors.red,
-                                        ),
-                                      ),
+                                  "DELETE ACCOUNT",
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16.sp,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 1.2,
+                                    color: Colors.red,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
-                          SizedBox(height: 24.h),
+                          SizedBox(height: 16.h),
                           Text(
                             "Need help? Contact support",
                             style: GoogleFonts.poppins(
@@ -2027,10 +2339,10 @@ class _ProfileScreenState extends State<ProfileScreen>
         bottomNavigationBar: _blockNavigation
             ? null
             : CustomBottomNavigationBar(
-                currentIndex: _selectedIndex,
-                onTap: _onItemTapped,
-                userModel: Provider.of<UserModel>(context, listen: false),
-              ),
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          userModel: Provider.of<UserModel>(context, listen: false),
+        ),
       ),
     );
   }
@@ -2249,7 +2561,7 @@ class _ProfileScreenState extends State<ProfileScreen>
     final String referralLink =
         'https://dev-lab-app.web.app/invite?code=$referralCode';
     final String shareMessage =
-        '''Join me on this awesome app! 
+    '''Join me on this awesome app! 
 
 Use my referral code: $referralCode 
 or click this link: $referralLink
@@ -2475,3 +2787,4 @@ We both get rewards when you sign up!''';
     Share.share(shareMessage, subject: 'App Referral');
   }
 }
+

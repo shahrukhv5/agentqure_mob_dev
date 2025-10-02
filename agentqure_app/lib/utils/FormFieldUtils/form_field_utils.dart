@@ -125,38 +125,4 @@ class FormFieldUtils {
     selectionHandleColor: const Color(0xFF3661E2),
   );
 
-  // Helper method to create consistent TextFormField
-  // static TextFormField buildTextFormField({
-  //   required TextEditingController controller,
-  //   required String labelText,
-  //   required IconData icon,
-  //   required String? Function(String?) validator,
-  //   TextInputType keyboardType = TextInputType.text,
-  //   TextInputAction textInputAction = TextInputAction.next,
-  //   int? maxLength,
-  //   List<TextInputFormatter>? inputFormatters,
-  //   int? maxLines = 1,
-  //   bool hasError = false,
-  //   bool isOptional = false,
-  //   void Function(String)? onFieldSubmitted,
-  // }) {
-  //   return TextFormField(
-  //     controller: controller,
-  //     cursorColor: cursorColor,
-  //     keyboardType: keyboardType,
-  //     textInputAction: textInputAction,
-  //     maxLength: maxLength,
-  //     inputFormatters: inputFormatters,
-  //     maxLines: maxLines,
-  //     onFieldSubmitted: onFieldSubmitted,
-  //     decoration: buildInputDecoration(
-  //       labelText: labelText,
-  //       icon: icon,
-  //       hasError: hasError,
-  //       isOptional: isOptional,
-  //     ),
-  //     style: formTextStyle(),
-  //     validator: validator,
-  //   );
-  // }
 }
